@@ -31,6 +31,7 @@ namespace ImportCostPro.Persistence.Contexts
         // DbSet de todas las entidades
         // =====================================
         public DbSet<Country> Countries { get; set; }
+        public DbSet<Importer> Importers { get; set; }
 
         /// <summary>
         /// Metodo que se ejecuta cada vez que se llama a SaveChangesAsync en el contexto de la base de datos.
