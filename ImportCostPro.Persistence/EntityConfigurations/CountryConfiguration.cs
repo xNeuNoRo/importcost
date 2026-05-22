@@ -8,7 +8,7 @@ namespace ImportCostPro.Persistence.EntityConfigurations
     {
         public void Configure(EntityTypeBuilder<Country> builder)
         {
-            builder.HasKey(x => x.ID);
+            builder.HasKey(x => x.Id);
 
             builder.ToTable("Countries");
 

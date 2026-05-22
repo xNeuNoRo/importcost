@@ -1,5 +1,6 @@
 using ImportCostPro.Persistence.Contexts;
 using ImportCostPro.Persistence.Entities;
+using ImportCostPro.Persistence.Interfaces.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 namespace ImportCostPro.Persistence.Repositories
@@ -20,9 +21,9 @@ namespace ImportCostPro.Persistence.Repositories
         }
 
         /// Obtiene un país por su ID.
-        public async Task<Country?> GetByIdAsync(int id)
+        public async Task<Country?> GetByIdAsync(Guid id)
         {
-            return await _context.Countries.FirstOrDefaultAsync(c => c.ID == id);
+            return await _context.Countries.FirstOrDefaultAsync(c => c.Id == id);
         }
 
         /// Obtiene un país por su código ISO.
@@ -52,13 +53,13 @@ namespace ImportCostPro.Persistence.Repositories
         }
 
         /// Verifica si existe un país con el ID especificado.
-        public async Task<bool> ExistsByIdAsync(int id)
+        public async Task<bool> ExistsByIdAsync(Guid id)
         {
-            return await _context.Countries.AnyAsync(c => c.ID == id);
+            return await _context.Countries.AnyAsync(c => c.Id == id);
         }
 
         /// Elimina un país por su ID.
-        public async Task DeleteAsync(int id)
+        public async Task DeleteAsync(Guid id)
         {
             var country = await GetByIdAsync(id);
             if (country != null)

@@ -1,9 +1,9 @@
 namespace ImportCostPro.Persistence.Common
 {
-    public class BaseEntity<TKey>
+    public abstract class BaseEntity
     {
-        public required TKey ID { get; set; }
-        public required string Name { get; set; }
-        public required bool IsActive { get; set; }
+        public Guid Id { get; protected set; } = Guid.NewGuid();
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime? UpdatedAt { get; set; }
     }
 }

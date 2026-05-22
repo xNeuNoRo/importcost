@@ -1,31 +1,47 @@
 using ImportCostPro.Persistence.Entities;
 
-namespace ImportCostPro.Persistence.Repositories
+namespace ImportCostPro.Persistence.Interfaces.Repositories
 {
     public interface ICountryRepository
     {
+        /// <summary>
         /// Obtiene todos los países.
+        /// </summary>
         Task<IEnumerable<Country>> GetAllAsync();
 
+        /// <summary>
         /// Obtiene un país por su ID.
-        Task<Country?> GetByIdAsync(int id);
+        /// </summary>
+        Task<Country?> GetByIdAsync(Guid id);
 
+        /// <summary>
         /// Obtiene un país por su código ISO.
+        /// </summary>
         Task<Country?> GetByIsoCodeAsync(string isoCode);
 
+        /// <summary>
         /// Agrega un nuevo país.
+        /// </summary>
         Task AddAsync(Country country);
 
+        /// <summary>
         /// Actualiza un país existente.
+        /// </summary>
         Task UpdateAsync(Country country);
 
+        /// <summary>
         /// Verifica si existe un país con el código ISO especificado.
+        /// </summary>
         Task<bool> ExistsByIsoCodeAsync(string isoCode);
 
+        /// <summary>
         /// Verifica si existe un país con el ID especificado.
-        Task<bool> ExistsByIdAsync(int id);
+        /// </summary>
+        Task<bool> ExistsByIdAsync(Guid id);
 
+        /// <summary>
         /// Elimina un país por su ID.
-        Task DeleteAsync(int id);
+        /// </summary>
+        Task DeleteAsync(Guid id);
     }
 }
