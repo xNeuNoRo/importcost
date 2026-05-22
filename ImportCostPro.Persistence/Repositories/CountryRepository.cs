@@ -17,11 +17,11 @@ namespace ImportCostPro.Persistence.Repositories
         /// Obtiene todos los países.
         public async Task<IEnumerable<Country>> GetAllAsync()
         {
-            return await _context.Countries.ToListAsync();
+            return await _context.Countries.AsNoTracking().ToListAsync();
         }
 
         /// Obtiene un país por su ID.
-        public async Task<Country?> GetByIdAsync(Guid id)
+        public async Task<Country?> GetByIdAsync(int id)
         {
             return await _context.Countries.FirstOrDefaultAsync(c => c.Id == id);
         }
@@ -53,13 +53,13 @@ namespace ImportCostPro.Persistence.Repositories
         }
 
         /// Verifica si existe un país con el ID especificado.
-        public async Task<bool> ExistsByIdAsync(Guid id)
+        public async Task<bool> ExistsByIdAsync(int id)
         {
             return await _context.Countries.AnyAsync(c => c.Id == id);
         }
 
         /// Elimina un país por su ID.
-        public async Task DeleteAsync(Guid id)
+        public async Task DeleteAsync(int id)
         {
             var country = await GetByIdAsync(id);
             if (country != null)

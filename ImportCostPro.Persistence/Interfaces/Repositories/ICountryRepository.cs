@@ -12,7 +12,7 @@ namespace ImportCostPro.Persistence.Interfaces.Repositories
         /// <summary>
         /// Obtiene un país por su ID.
         /// </summary>
-        Task<Country?> GetByIdAsync(Guid id);
+        Task<Country?> GetByIdAsync(int id);
 
         /// <summary>
         /// Obtiene un país por su código ISO.
@@ -37,11 +37,11 @@ namespace ImportCostPro.Persistence.Interfaces.Repositories
         /// <summary>
         /// Verifica si existe un país con el ID especificado.
         /// </summary>
-        Task<bool> ExistsByIdAsync(Guid id);
+        Task<bool> ExistsByIdAsync(int id);
 
         /// <summary>
         /// Elimina un país por su ID.
         /// </summary>
-        Task DeleteAsync(Guid id);
+        Task DeleteAsync(int id);
     }
 }
