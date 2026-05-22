@@ -1,0 +1,39 @@
+﻿using ImportCostPro.Persistence.Entities;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+namespace ImportCostPro.Persistence.EntityConfigurations
+{
+    public class CurrencyEntityConfiguration : IEntityTypeConfiguration<Currency>
+    {
+        public void Configure(EntityTypeBuilder<Currency> builder)
+        {
+            // Primary key (PK)
+            builder.HasKey(x => x.Id);
+
+            builder.ToTable("Currencies");
+
+            #region Properties configurations
+
+            builder.Property(x => x.Name).IsRequired().HasMaxLength(150);
+
+            // IsoCode debe tener exactamente 3 caracteres
+            builder.Property(x => x.IsoCode).IsRequired().HasMaxLength(3);
+
+            builder.Property(x => x.IsActive).IsRequired().HasDefaultValue(true);
+
+            builder.Property(x => x.Symbol).IsRequired().HasMaxLength(10);
+
+            builder.Property(x => x.IsLocalCurrency).IsRequired().HasDefaultValue(false);
+
+            #endregion
+
+            #region Indexes
+
+            // Aseguramos unicidad del codigo ISO
+            builder.HasIndex(x => x.IsoCode).IsUnique();
+
+            #endregion
+        }
+    }
+}
