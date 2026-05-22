@@ -2,6 +2,7 @@ using ImportCostPro.Persistence.Common;
 using ImportCostPro.Persistence.Entities;
 using ImportCostPro.Persistence.EntityConfigurations;
 using ImportCostPro.Persistence.Interfaces.Providers;
+using ImportCostPro.Persistence.Providers;
 using Microsoft.EntityFrameworkCore;
 
 namespace ImportCostPro.Persistence.Contexts
@@ -9,6 +10,13 @@ namespace ImportCostPro.Persistence.Contexts
     public class AppDbContext : DbContext
     {
         private readonly IDateTimeProvider _dateTimeProvider;
+
+        /// <summary>
+        /// Constructor alternativo pa que el EFC en las migraciones no se queje
+        /// de que no encuentra el IDateTimeProvider, ya que en las migraciones no se inyectan dependencias.
+        /// </summary>
+        public AppDbContext(DbContextOptions<AppDbContext> options)
+            : this(options, new DateTimeProvider()) { }
 
         public AppDbContext(
             DbContextOptions<AppDbContext> options,
@@ -18,6 +26,11 @@ namespace ImportCostPro.Persistence.Contexts
         {
             _dateTimeProvider = dateTimeProvider;
         }
+
+        // =====================================
+        // DbSet de todas las entidades
+        // =====================================
+        public DbSet<Country> Countries { get; set; }
 
         /// <summary>
         /// Metodo que se ejecuta cada vez que se llama a SaveChangesAsync en el contexto de la base de datos.
@@ -52,8 +65,6 @@ namespace ImportCostPro.Persistence.Contexts
             return await base.SaveChangesAsync(cancellationToken);
         }
 
-        public DbSet<Country> Countries { get; set; }
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -61,8 +72,6 @@ namespace ImportCostPro.Persistence.Contexts
             // En lugar de andar creando 1 por 1 cada configuración, buscamos todas
             // las clases que implementen IEntityTypeConfiguration<T> y las aplique automáticamente
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
-
-            modelBuilder.ApplyConfiguration(new CountryEntityConfiguration());
         }
     }
 }
