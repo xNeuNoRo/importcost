@@ -15,29 +15,32 @@ namespace ImportCostPro.Persistence.EntityConfigurations
 
             #region Properties configurations
 
-            builder.Property(b => b.ComercialName).IsRequired().HasMaxLength(150);
+            builder.Property(x => x.LegalName).IsRequired().HasMaxLength(150);
 
-            builder.Property(b => b.RNC).IsRequired().HasMaxLength(20);
+            builder.Property(x => x.TaxId).IsRequired().HasMaxLength(20);
 
-            builder.Property(b => b.Phone).HasMaxLength(20);
+            builder.Property(x => x.PhoneNumber).HasMaxLength(20);
 
-            builder.Property(b => b.Email).IsRequired().HasMaxLength(100);
+            builder.Property(x => x.Email).HasMaxLength(100);
 
-            builder.Property(b => b.Address).IsRequired().HasMaxLength(250);
+            builder.Property(x => x.Address).HasMaxLength(250);
 
-            builder.Property(b => b.IsActive).IsRequired().HasDefaultValue(true);
+            builder.Property(x => x.IsActive).IsRequired().HasDefaultValue(true);
+
             #endregion
 
             #region Indexes
-            builder.HasIndex(b => b.RNC).IsUnique();
+
+            builder.HasIndex(x => x.TaxId).IsUnique();
 
             #endregion
 
             #region Relationships
+
             builder
-                .HasOne<Country>()
+                .HasOne(x => x.Country)
                 .WithMany()
-                .HasForeignKey(b => b.CountryId)
+                .HasForeignKey(x => x.CountryId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             #endregion

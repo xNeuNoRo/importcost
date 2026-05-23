@@ -10,33 +10,30 @@ namespace ImportCostPro.Persistence.Repositories
         public ImporterRepository(AppDbContext context)
             : base(context) { }
 
-        public async Task<IEnumerable<Importer>> GetAllWithAsync()
+        public async Task<IEnumerable<Importer>> GetAllWithCountryAsync()
         {
-            // Incluimos la entidad relacionada Country para obtener el nombre del país junto con los importadores
-
             return await _dbSet
                 .AsNoTracking()
                 .Include(i => i.Country)
-                .OrderBy(i => i.ComercialName)
+                .OrderBy(i => i.LegalName) // Ordenamos por nombre legal para mejor UX
                 .ToListAsync();
         }
 
-        public async Task<Importer?> GetByIAsync(int id)
+        public async Task<Importer?> GetByIdWithCountryAsync(int id)
         {
-            // Incluimos la entidad relacionada Country para obtener el nombre del país junto con el importador específico
             return await _dbSet.Include(i => i.Country).FirstOrDefaultAsync(i => i.Id == id);
         }
 
-        public async Task<bool> ExistTaxIdAsync(string taxId, int? excludeId = null)
+        public async Task<bool> ExistsTaxIdAsync(string taxId, int? excludeId = null)
         {
             string cleanTaxId = taxId.Trim();
 
             if (excludeId.HasValue)
             {
-                return await _dbSet.AnyAsync(i => i.RNC == cleanTaxId && i.Id != excludeId.Value);
+                return await _dbSet.AnyAsync(i => i.TaxId == cleanTaxId && i.Id != excludeId.Value);
             }
 
-            return await _dbSet.AnyAsync(i => i.RNC == cleanTaxId);
+            return await _dbSet.AnyAsync(i => i.TaxId == cleanTaxId);
         }
     }
 }
