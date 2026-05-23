@@ -34,22 +34,13 @@ namespace ImportCostPro.Persistence.EntityConfigurations
             #endregion
 
             #region Relationships
-            builder.HasOne<Country>()
+            builder
+                .HasOne<Country>()
                 .WithMany()
                 .HasForeignKey(b => b.CountryId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             #endregion
-
-
-            
-
-
-         
-            
-
-
-            
         }
     }
 }

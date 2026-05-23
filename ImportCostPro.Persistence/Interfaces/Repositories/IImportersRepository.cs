@@ -7,10 +7,8 @@ namespace ImportCostPro.Persistence.Interfaces.Repositories
         Task<IEnumerable<Importer>> GetAllWithAsync();
 
         Task<Importer?> GetByIAsync(int id);
-     
-     // Validar que los Rnc no se repitan entre importadores
+
+        // Validar que los Rnc no se repitan entre importadores
         Task<bool> ExistTaxIdAsync(string RNC, int? excludeId = null);
-    
-     
     }
 }
