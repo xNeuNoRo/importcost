@@ -31,6 +31,7 @@ namespace ImportCostPro.Persistence.Contexts
         // =====================================
         public DbSet<Country> Countries { get; set; }
         public DbSet<Currency> Currencies { get; set; }
+        public DbSet<Supplier> Suppliers { get; set; }
         public DbSet<ExchangeRate> ExchangeRates { get; set; }
         public DbSet<Importer> Importers { get; set; }
         public DbSet<TaxConfiguration> TaxConfigurations { get; set; }
