@@ -17,7 +17,6 @@ namespace ImportCostPro.Persistence.EntityConfigurations
 
             builder.Property(x => x.Name).IsRequired().HasMaxLength(150);
 
-            // IsoCode debe tener exactamente 3 caracteres
             builder.Property(x => x.IsoCode).IsRequired().HasMaxLength(3);
 
             builder.Property(x => x.IsActive).IsRequired().HasDefaultValue(true);

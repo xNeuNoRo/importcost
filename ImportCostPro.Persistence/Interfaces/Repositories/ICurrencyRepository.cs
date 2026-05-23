@@ -15,11 +15,9 @@ namespace ImportCostPro.Persistence.Interfaces.Repositories
         Task<bool> AnyLocalCurrencyAsync(int? excludingId = null);
 
         /// <summary>
-        /// Verifica si la moneda está referenciada por otras entidades del sistema 
+        /// Verifica si la moneda está referenciada por otras entidades del sistema
         /// (tasas, proveedores, órdenes, gastos, resultados de landed cost, etc.).
-        /// Recorre los DbSet disponibles en el DbContext y busca propiedades "CurrencyId" en las entidades.
         /// </summary>
         Task<bool> IsCurrencyReferencedAsync(int currencyId);
-
     }
 }
