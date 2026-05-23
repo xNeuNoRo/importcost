@@ -1,6 +1,5 @@
 using ImportCostPro.Persistence.Common;
 using ImportCostPro.Persistence.Entities;
-using ImportCostPro.Persistence.EntityConfigurations;
 using ImportCostPro.Persistence.Interfaces.Providers;
 using ImportCostPro.Persistence.Providers;
 using Microsoft.EntityFrameworkCore;
@@ -32,6 +31,8 @@ namespace ImportCostPro.Persistence.Contexts
         // =====================================
         public DbSet<Country> Countries { get; set; }
         public DbSet<ExchangeRate> ExchangeRates { get; set; }
+        public DbSet<Importer> Importers { get; set; }
+        public DbSet<Currency> Currencies { get; set; }
 
         /// <summary>
         /// Metodo que se ejecuta cada vez que se llama a SaveChangesAsync en el contexto de la base de datos.
