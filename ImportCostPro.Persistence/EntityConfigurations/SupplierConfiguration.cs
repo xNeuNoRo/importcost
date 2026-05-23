@@ -4,12 +4,13 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace ImportCostPro.Persistence.EntityConfigurations
 {
-    public class SuppliersConfiguration : IEntityTypeConfiguration<Supplier>
+    public class SupplierConfiguration : IEntityTypeConfiguration<Supplier>
     {
         public void Configure(EntityTypeBuilder<Supplier> builder)
         {
-            builder.HasKey(x => x.Id);
             builder.ToTable("Suppliers");
+
+            builder.HasKey(x => x.Id);
 
             #region  Properties configurations;
 

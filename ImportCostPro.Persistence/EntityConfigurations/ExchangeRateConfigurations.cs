@@ -43,6 +43,23 @@ namespace ImportCostPro.Persistence.EntityConfigurations
                 .OnDelete(DeleteBehavior.Restrict);
 
             #endregion
+
+            #region Indexes
+
+            // Para evitar tener más de una tasa activa para la misma combinación de monedas y fecha,
+            // esto evita a nivel de bd que bajo concurrencia se pudiese crear más de una tasa activa
+            // para la misma combinación de monedas y fecha.
+            builder
+                .HasIndex(e => new
+                {
+                    e.FromCurrencyId,
+                    e.ToCurrencyId,
+                    e.EffectiveDate,
+                })
+                .IsUnique()
+                .HasFilter("[IsActive] = 1");
+
+            #endregion
         }
     }
 }
