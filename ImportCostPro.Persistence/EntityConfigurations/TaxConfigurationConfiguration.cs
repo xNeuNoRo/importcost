@@ -24,6 +24,14 @@ namespace ImportCostPro.Persistence.EntityConfigurations
             builder.Property(x => x.CustomsServiceRate).IsRequired().HasPrecision(5, 2);
 
             #endregion
+
+            #region DB Constraints
+
+            // Constraint que nos garantiza q solo exista un solo registro en la tabla de TaxConfiguration,
+            // ya que esta tabla es para almacenar la config global de impuestos del sistema.
+            builder.ToTable(t => t.HasCheckConstraint("CK_TaxConfiguration_SingleRow", "[Id] = 1"));
+
+            #endregion
         }
     }
 }

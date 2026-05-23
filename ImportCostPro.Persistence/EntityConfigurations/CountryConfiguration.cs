@@ -4,14 +4,15 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace ImportCostPro.Persistence.EntityConfigurations
 {
-    public class CountryEntityConfiguration : IEntityTypeConfiguration<Country>
+    // Cambiado el nombre de la clase a singular y homogéneo: CountryConfiguration
+    public class CountryConfiguration : IEntityTypeConfiguration<Country>
     {
         public void Configure(EntityTypeBuilder<Country> builder)
         {
-            // Primary key (PK)
-            builder.HasKey(x => x.Id);
-
             builder.ToTable("Countries");
+
+            // Primary Key (PK)
+            builder.HasKey(x => x.Id);
 
             #region Properties configurations
 
