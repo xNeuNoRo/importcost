@@ -1,6 +1,5 @@
 using ImportCostPro.Persistence.Common;
 using ImportCostPro.Persistence.Entities;
-using ImportCostPro.Persistence.EntityConfigurations;
 using ImportCostPro.Persistence.Interfaces.Providers;
 using ImportCostPro.Persistence.Providers;
 using Microsoft.EntityFrameworkCore;
@@ -31,7 +30,7 @@ namespace ImportCostPro.Persistence.Contexts
         // DbSet de todas las entidades
         // =====================================
         public DbSet<Country> Countries { get; set; }
-        
+        public DbSet<Importer> Importers { get; set; }
         public DbSet<Currency> Currencies { get; set; }
 
         /// <summary>
