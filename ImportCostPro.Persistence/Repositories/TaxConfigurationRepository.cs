@@ -15,7 +15,7 @@ namespace ImportCostPro.Persistence.Repositories
 
         public async Task<TaxConfiguration?> GetSingleConfigurationAsync()
         {
-            return await _dbSet.FirstOrDefaultAsync();
+            return await _dbSet.SingleOrDefaultAsync();
         }
     }
 }

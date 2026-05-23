@@ -1,7 +1,8 @@
+using ImportCostPro.Persistence.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace ImportCostPro.Persistence.Entities.EntityConfigurations
+namespace ImportCostPro.Persistence.EntityConfigurations
 {
     public class TaxConfigurationConfiguration : IEntityTypeConfiguration<TaxConfiguration>
     {
@@ -12,7 +13,7 @@ namespace ImportCostPro.Persistence.Entities.EntityConfigurations
             // Primary key (PK)
             builder.HasKey(x => x.Id);
 
-            # region Properties configurations
+            #region Properties configurations
 
             // Esto es literal un decimal(5,2) en sql server
             // Lo cual nos permite almacenar valores como 18.00,
