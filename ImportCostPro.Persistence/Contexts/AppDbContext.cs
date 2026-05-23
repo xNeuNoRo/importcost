@@ -1,6 +1,5 @@
 using ImportCostPro.Persistence.Common;
 using ImportCostPro.Persistence.Entities;
-using ImportCostPro.Persistence.EntityConfigurations;
 using ImportCostPro.Persistence.Interfaces.Providers;
 using ImportCostPro.Persistence.Providers;
 using Microsoft.EntityFrameworkCore;
