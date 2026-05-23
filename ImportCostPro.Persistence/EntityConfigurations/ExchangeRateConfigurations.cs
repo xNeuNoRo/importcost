@@ -8,5 +8,6 @@ namespace ImportCostPro.Persistence.EntityConfigurations
 {
     internal class ExchangeRateConfigurations
     {
+        
     }
 }
