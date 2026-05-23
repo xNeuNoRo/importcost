@@ -10,28 +10,39 @@ namespace ImportCostPro.Persistence.EntityConfigurations
         {
             builder.ToTable("ExchangeRates");
 
+            // Primary Key (PK)
             builder.HasKey(e => e.Id);
 
-            builder.Property(e => e.RateValue)
-                .HasColumnType("decimal(18,4)")
-                .IsRequired();
+            #region Properties configurations
 
-            builder.Property(e => e.EffectiveDate)
-                .IsRequired();
+            builder.Property(e => e.RateValue).IsRequired().HasPrecision(18, 4);
 
-            builder.Property(e => e.IsActive)
-                .HasDefaultValue(true);
+            builder.Property(e => e.EffectiveDate).IsRequired().HasColumnType("date");
 
-            // Relaciones con la entidad Currency
-            builder.HasOne(e => e.OriginCurrency)
+            builder.Property(e => e.IsActive).IsRequired().HasDefaultValue(true);
+
+            builder
+                .Property(e => e.IsUsedInOfficialCalculation)
+                .IsRequired()
+                .HasDefaultValue(false);
+
+            #endregion
+
+            #region Relationships
+
+            builder
+                .HasOne(e => e.FromCurrency)
                 .WithMany()
-                .HasForeignKey(e => e.OriginCurrencyId)
+                .HasForeignKey(e => e.FromCurrencyId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            builder.HasOne(e => e.DestinationCurrency)
+            builder
+                .HasOne(e => e.ToCurrency)
                 .WithMany()
-                .HasForeignKey(e => e.DestinationCurrencyId)
+                .HasForeignKey(e => e.ToCurrencyId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            #endregion
         }
     }
 }

@@ -7,47 +7,50 @@ namespace ImportCostPro.Persistence.Repositories
 {
     public class ExchangeRateRepository : GenericRepository<ExchangeRate>, IExchangeRateRepository
     {
-        public ExchangeRateRepository(AppDbContext context) 
+        public ExchangeRateRepository(AppDbContext context)
             : base(context) { }
 
-        /// <summary>
-        /// Obtiene todas las tasas de cambio incluyendo las entidades de moneda de origen y destino,
-        /// ordenadas de más reciente a más antiguo por la fecha efectiva.
-        /// </summary>
         public async Task<IEnumerable<ExchangeRate>> GetAllWithCurrenciesAsync()
         {
-            return await _context.Set<ExchangeRate>()
-                .Include(e => e.OriginCurrency)
-                .Include(e => e.DestinationCurrency)
+            return await _dbSet
+                .AsNoTracking()
+                .Include(e => e.FromCurrency)
+                .Include(e => e.ToCurrency)
                 .OrderByDescending(e => e.EffectiveDate)
                 .ToListAsync();
         }
 
-        /// <summary>
-        /// Obtiene la última tasa activa para una combinación de monedas dada en o antes de la fecha indicada.
-        /// </summary>
-        public async Task<ExchangeRate?> GetLatestActiveRateAsync(int originCurrencyId, int destinationCurrencyId, DateTime date)
+        public async Task<ExchangeRate?> GetLatestActiveRateAsync(
+            int fromCurrencyId,
+            int toCurrencyId,
+            DateTime date
+        )
         {
-            return await _context.Set<ExchangeRate>()
-                .Where(e => e.OriginCurrencyId == originCurrencyId &&
-                            e.DestinationCurrencyId == destinationCurrencyId &&
-                            e.IsActive &&
-                            e.EffectiveDate.Date <= date.Date)
+            return await _dbSet
+                .AsNoTracking()
+                .Where(e =>
+                    e.FromCurrencyId == fromCurrencyId
+                    && e.ToCurrencyId == toCurrencyId
+                    && e.IsActive
+                    && e.EffectiveDate <= date.Date
+                )
                 .OrderByDescending(e => e.EffectiveDate)
                 .FirstOrDefaultAsync();
         }
 
-        /// <summary>
-        /// Comprueba si existe otra tasa activa con la misma combinación de monedas y fecha efectiva,
-        /// opcionalmente excluyendo un registro por su Id.
-        /// </summary>
-        public async Task<bool> ExistsActiveDuplicateAsync(int originCurrencyId, int destinationCurrencyId, DateTime effectiveDate, int? excludeId = null)
+        public async Task<bool> ExistsActiveDuplicateAsync(
+            int fromCurrencyId,
+            int toCurrencyId,
+            DateTime effectiveDate,
+            int? excludeId = null
+        )
         {
-            var query = _context.Set<ExchangeRate>()
-                .Where(e => e.OriginCurrencyId == originCurrencyId &&
-                            e.DestinationCurrencyId == destinationCurrencyId &&
-                            e.EffectiveDate.Date == effectiveDate.Date &&
-                            e.IsActive);
+            var query = _dbSet.Where(e =>
+                e.FromCurrencyId == fromCurrencyId
+                && e.ToCurrencyId == toCurrencyId
+                && e.EffectiveDate == effectiveDate.Date
+                && e.IsActive
+            );
 
             if (excludeId.HasValue)
             {
