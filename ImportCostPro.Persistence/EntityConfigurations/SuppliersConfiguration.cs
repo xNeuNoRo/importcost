@@ -38,6 +38,13 @@ namespace ImportCostPro.Persistence.EntityConfigurations
                 .OnDelete(DeleteBehavior.Restrict);
 
             #endregion
+
+            #region Indexes
+
+            // El nombre no puede ser dup
+            builder.HasIndex(x => x.Name).IsUnique();
+
+            #endregion
         }
     }
 }

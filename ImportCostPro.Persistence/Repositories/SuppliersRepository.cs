@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ImportCostPro.Persistence.Repositories
 {
-    public class SupplierRepository : GenericRepository<Supplier>, ISupplierRepository
+    public class SupplierRepository : GenericRepository<Supplier>, ISuppliersRepository
     {
         public SupplierRepository(AppDbContext context)
             : base(context) { }
@@ -30,9 +30,9 @@ namespace ImportCostPro.Persistence.Repositories
 
         public async Task<bool> ExistsByNameAsync(string name, int? excludeId = null)
         {
-            string cleanName = name.Trim().ToLower();
+            string cleanName = name.Trim();
 
-            var query = _dbSet.Where(s => s.Name.ToLower() == cleanName);
+            var query = _dbSet.Where(s => s.Name == cleanName);
 
             if (excludeId.HasValue)
             {

@@ -2,7 +2,7 @@ using ImportCostPro.Persistence.Entities;
 
 namespace ImportCostPro.Persistence.Interfaces.Repositories
 {
-    public interface ISupplierRepository : IGenericRepository<Supplier>
+    public interface ISuppliersRepository : IGenericRepository<Supplier>
     {
         /// <summary>
         /// Obtiene todos los proveedores con sus entidades de país y moneda inyectadas.
