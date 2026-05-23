@@ -5,9 +5,8 @@ namespace ImportCostPro.Persistence.Entities
     public class Supplier : ActivatableBaseEntity
     {
         public required string Name { get; set; }
-        public string ? PhoneNumber { get; set; }
-        public required string Email { get; set; }
-        public string ? Address { get; set; }
+        public string? PhoneNumber { get; set; }
+        public string? Email { get; set; }
 
         // Pais de Origen y moneda principal de negociacion
 
@@ -15,8 +14,7 @@ namespace ImportCostPro.Persistence.Entities
         public int DefaultCurrencyId { get; set; }
 
         // => Navigation Properties
-        public Country? Country { get; set; }
-        public Currency? Currency { get; set; }
-        
+        public Country OriginCountry { get; set; } = null!;
+        public Currency DefaultCurrency { get; set; } = null!;
     }
 }

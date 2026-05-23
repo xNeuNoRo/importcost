@@ -2,13 +2,29 @@ using ImportCostPro.Persistence.Entities;
 
 namespace ImportCostPro.Persistence.Interfaces.Repositories
 {
-    public interface ISuppliersRepository : IGenericRepository<Supplier>
+    public interface ISupplierRepository : IGenericRepository<Supplier>
     {
-        // Implementar conseguir el provedor con la moneda y pais de origen
-        Task<IEnumerable<Supplier>> ExistsByCurrencyAndOriginCountryAsync(string currency, string originCountry, int? excludeId = null);
+        /// <summary>
+        /// Obtiene todos los proveedores con sus entidades de país y moneda inyectadas.
+        /// </summary>
+        Task<IEnumerable<Supplier>> GetAllWithRelationsAsync();
 
-        // Metodo que verifica si ya existe un proveedor con el mismo nombre, permitiendo excluir un ID en caso de actualizaciones.
-        Task <bool> ExistsByNameAsync(string Name, int? excludeId = null);
+        /// <summary>
+        /// Obtiene un proveedor específico por su ID incluyendo su país y moneda de negociación.
+        /// </summary>
+        Task<Supplier?> GetByIdWithRelationsAsync(int id);
 
+        /// <summary>
+        /// Verifica si ya existe un proveedor con el mismo nombre, permitiendo excluir un ID para actualizaciones.
+        /// </summary>
+        Task<bool> ExistsByNameAsync(string name, int? excludeId = null);
+
+        /// <summary>
+        /// Obtiene los proveedores filtrados eficientemente mediante los IDs de País y Moneda.
+        /// </summary>
+        Task<IEnumerable<Supplier>> GetByCurrencyAndCountryAsync(
+            int defaultCurrencyId,
+            int originCountryId
+        );
     }
 }
