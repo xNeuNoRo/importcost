@@ -32,6 +32,10 @@ namespace ImportCostPro.Persistence.EntityConfigurations
 
             // Aseguramos unicidad del codigo ISO
             builder.HasIndex(x => x.IsoCode).IsUnique();
+            
+            // Solo puede haber una moneda local, por ende le dicemos a efc que 
+            // cree un indice unico sobre IsLocalCurrency pero solo para los registros donde IsLocalCurrency = true
+            builder.HasIndex(x => x.IsLocalCurrency).IsUnique().HasFilter("[IsLocalCurrency] = 1");
 
             #endregion
         }
