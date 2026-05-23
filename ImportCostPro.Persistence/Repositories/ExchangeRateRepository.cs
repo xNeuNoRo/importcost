@@ -1,12 +1,63 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using ImportCostPro.Persistence.Contexts;
+using ImportCostPro.Persistence.Entities;
+using ImportCostPro.Persistence.Interfaces.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 namespace ImportCostPro.Persistence.Repositories
 {
-    internal class ExchangeRateRepository
+    public class ExchangeRateRepository : GenericRepository<ExchangeRate>, IExchangeRateRepository
     {
+        public ExchangeRateRepository(AppDbContext context)
+            : base(context) { }
+
+        public async Task<IEnumerable<ExchangeRate>> GetAllWithCurrenciesAsync()
+        {
+            return await _dbSet
+                .AsNoTracking()
+                .Include(e => e.FromCurrency)
+                .Include(e => e.ToCurrency)
+                .OrderByDescending(e => e.EffectiveDate)
+                .ToListAsync();
+        }
+
+        public async Task<ExchangeRate?> GetLatestActiveRateAsync(
+            int fromCurrencyId,
+            int toCurrencyId,
+            DateTime date
+        )
+        {
+            return await _dbSet
+                .AsNoTracking()
+                .Where(e =>
+                    e.FromCurrencyId == fromCurrencyId
+                    && e.ToCurrencyId == toCurrencyId
+                    && e.IsActive
+                    && e.EffectiveDate <= date.Date
+                )
+                .OrderByDescending(e => e.EffectiveDate)
+                .FirstOrDefaultAsync();
+        }
+
+        public async Task<bool> ExistsActiveDuplicateAsync(
+            int fromCurrencyId,
+            int toCurrencyId,
+            DateTime effectiveDate,
+            int? excludeId = null
+        )
+        {
+            var query = _dbSet.Where(e =>
+                e.FromCurrencyId == fromCurrencyId
+                && e.ToCurrencyId == toCurrencyId
+                && e.EffectiveDate == effectiveDate.Date
+                && e.IsActive
+            );
+
+            if (excludeId.HasValue)
+            {
+                query = query.Where(e => e.Id != excludeId.Value);
+            }
+
+            return await query.AnyAsync();
+        }
     }
 }
