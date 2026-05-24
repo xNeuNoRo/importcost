@@ -29,8 +29,17 @@ namespace ImportCostPro.Persistence.EntityConfigurations
 
             #region Relationships
 
-            builder.HasOne(x => x.ImportOrder).WithMany().HasForeignKey(x => x.ImportOrderId);
-            builder.HasOne(x => x.Product).WithMany().HasForeignKey(x => x.ProductId);
+            builder
+                .HasOne(x => x.ImportOrder)
+                .WithMany()
+                .HasForeignKey(x => x.ImportOrderId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder
+                .HasOne(x => x.Product)
+                .WithMany()
+                .HasForeignKey(x => x.ProductId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             #endregion
         }

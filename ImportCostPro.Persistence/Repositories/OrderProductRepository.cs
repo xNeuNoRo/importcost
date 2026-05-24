@@ -38,8 +38,8 @@ namespace ImportCostPro.Persistence.Repositories
                     g.Sum(x => x.Quantity * x.UnitFobPrice), // Total FOB
                     g.Sum(x => x.Quantity * x.Product.UnitWeight), // Total Peso
                     g.Sum(x =>
-                        x.Quantity
-                        * (x.Product.Length ?? 0) // El peso se calcula como la cantidad por el ancho por el largo por el alto, considerando que alguna de las dimensiones pueden ser nulas, en ese caso se toma como 0.
+                        (decimal)x.Quantity
+                        * (x.Product.Length ?? 0) // El volumen se calcula como la cantidad por el ancho por el largo por el alto, considerando que alguna de las dimensiones pueden ser nulas, en ese caso se toma como 0.
                         * (x.Product.Width ?? 0)
                         * (x.Product.Height ?? 0)
                     ), // Total Volumen
