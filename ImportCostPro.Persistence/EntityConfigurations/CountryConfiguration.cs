@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace ImportCostPro.Persistence.EntityConfigurations
 {
-    // Cambiado el nombre de la clase a singular y homogéneo: CountryConfiguration
     public class CountryConfiguration : IEntityTypeConfiguration<Country>
     {
         public void Configure(EntityTypeBuilder<Country> builder)
