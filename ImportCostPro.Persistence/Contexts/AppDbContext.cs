@@ -31,10 +31,17 @@ namespace ImportCostPro.Persistence.Contexts
         // =====================================
         public DbSet<Country> Countries { get; set; }
         public DbSet<Currency> Currencies { get; set; }
-        public DbSet<Supplier> Suppliers { get; set; }
-        public DbSet<ExchangeRate> ExchangeRates { get; set; }
-        public DbSet<Importer> Importers { get; set; }
+        public DbSet<TariffCategory> TariffCategories { get; set; }
         public DbSet<TaxConfiguration> TaxConfigurations { get; set; }
+        public DbSet<Importer> Importers { get; set; }
+        public DbSet<Supplier> Suppliers { get; set; }
+        public DbSet<Product> Products { get; set; }
+        public DbSet<ExchangeRate> ExchangeRates { get; set; }
+        public DbSet<ImportOrder> ImportOrders { get; set; }
+        public DbSet<OrderProduct> OrderProducts { get; set; }
+        public DbSet<ImportExpense> ImportExpenses { get; set; }
+        public DbSet<CalculationResult> CalculationResults { get; set; }
+        public DbSet<CalculationResultDetail> CalculationResultDetails { get; set; }
 
         /// <summary>
         /// Metodo que se ejecuta cada vez que se llama a SaveChangesAsync en el contexto de la base de datos.
