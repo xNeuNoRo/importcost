@@ -26,5 +26,10 @@ namespace ImportCostPro.Persistence.Interfaces.Repositories
             int defaultCurrencyId,
             int originCountryId
         );
+
+        /// <summary>
+        /// Determina si el proveedor está siendo referenciado por alguna orden de importación activa o histórica en el sistema.
+        /// </summary>
+        Task<bool> IsSupplierReferencedAsync(int supplierId);
     }
 }

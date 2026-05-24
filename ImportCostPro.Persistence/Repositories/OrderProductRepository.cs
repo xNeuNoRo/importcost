@@ -16,6 +16,7 @@ namespace ImportCostPro.Persistence.Repositories
             return await _dbSet
                 .AsNoTracking()
                 .Include(op => op.Product)
+                    .ThenInclude(p => p.TariffCategory)
                 .Where(op => op.ImportOrderId == importOrderId)
                 .ToListAsync();
         }

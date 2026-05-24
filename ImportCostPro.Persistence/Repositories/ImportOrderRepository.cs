@@ -79,5 +79,18 @@ namespace ImportCostPro.Persistence.Repositories
             // si es mayor a 0, obviamente algo se actualizo
             return rowsAffected > 0;
         }
+
+        public async Task<ImportOrder?> GetAggregateForCalculationAsync(int id)
+        {
+            return await _dbSet
+                .AsNoTracking()
+                .Include(o => o.Currency)
+                .Include(o => o.Expenses)
+                .Include(o => o.OrderProducts)
+                    .ThenInclude(op => op.Product)
+                        .ThenInclude(p => p.TariffCategory)
+                .Where(o => o.Id == id)
+                .FirstOrDefaultAsync();
+        }
     }
 }

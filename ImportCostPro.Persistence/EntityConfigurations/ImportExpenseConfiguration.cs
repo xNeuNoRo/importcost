@@ -26,7 +26,7 @@ namespace ImportCostPro.Persistence.EntityConfigurations
 
             builder
                 .HasOne(x => x.ImportOrder)
-                .WithMany()
+                .WithMany(o => o.Expenses)
                 .HasForeignKey(x => x.ImportOrderId)
                 .OnDelete(DeleteBehavior.Restrict);
 

@@ -40,11 +40,14 @@ namespace ImportCostPro.Persistence.Repositories
             bool isUsedInSuppliers = await _context
                 .Set<Supplier>()
                 .AnyAsync(s => s.OriginCountryId == countryId);
+            bool isUsedInProducts = await _context
+                .Set<Product>()
+                .AnyAsync(p => p.DefaultOriginCountryId == countryId);
+            bool isUsedInOrders = await _context
+                .Set<ImportOrder>()
+                .AnyAsync(o => o.OriginCountryId == countryId);
 
-            // En products seria algo como esto:
-            // bool isUsedInProducts = await _context.Set<Product>().AnyAsync(p => p.OriginCountryId == countryId);
-
-            return isUsedInImporters || isUsedInSuppliers;
+            return isUsedInImporters || isUsedInSuppliers || isUsedInProducts || isUsedInOrders;
         }
     }
 }

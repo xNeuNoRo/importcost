@@ -18,5 +18,10 @@ namespace ImportCostPro.Persistence.Interfaces.Repositories
         /// Verifica si ya existe un TaxId (RNC) registrado, permitiendo excluir un ID en caso de actualizaciones.
         /// </summary>
         Task<bool> ExistsTaxIdAsync(string taxId, int? excludeId = null);
+
+        /// <summary>
+        /// Determina si el importador está siendo referenciado por alguna orden de importación activa o histórica en el sistema.
+        /// </summary>
+        Task<bool> IsImporterReferencedAsync(int importerId);
     }
 }

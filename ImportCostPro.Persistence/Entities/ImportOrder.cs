@@ -20,5 +20,10 @@ namespace ImportCostPro.Persistence.Entities
         public Supplier Supplier { get; set; } = null!;
         public Country OriginCountry { get; set; } = null!;
         public Currency Currency { get; set; } = null!;
+
+        public ICollection<OrderProduct> OrderProducts { get; set; } = new List<OrderProduct>();
+        public ICollection<ImportExpense> Expenses { get; set; } = new List<ImportExpense>();
+        public ICollection<CalculationResult> CalculationResults { get; set; } =
+            new List<CalculationResult>();
     }
 }

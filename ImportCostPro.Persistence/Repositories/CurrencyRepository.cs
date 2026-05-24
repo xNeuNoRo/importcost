@@ -10,6 +10,11 @@ namespace ImportCostPro.Persistence.Repositories
         public CurrencyRepository(AppDbContext context)
             : base(context) { }
 
+        public async Task<Currency?> GetLocalCurrencyAsync()
+        {
+            return await _dbSet.AsNoTracking().FirstOrDefaultAsync(c => c.IsLocalCurrency);
+        }
+
         public async Task<bool> ExistsByIsoCodeAsync(string isoCode, int? excludeId = null)
         {
             string cleanIso = isoCode.Trim();
@@ -46,11 +51,23 @@ namespace ImportCostPro.Persistence.Repositories
                 .Set<Supplier>()
                 .AnyAsync(s => s.DefaultCurrencyId == currencyId);
 
-            // En las otras entidades q faltan:
-            // bool isUsedInOrders = await _context.Set<ImportOrder>().AnyAsync(io => io.CurrencyId == currencyId);
-            // bool isUsedInExpenses = await _context.Set<ImportExpense>().AnyAsync(ie => ie.CurrencyId == currencyId);
+            bool isUsedInOrders = await _context
+                .Set<ImportOrder>()
+                .AnyAsync(io => io.CurrencyId == currencyId);
 
-            return isUsedInRates || isUsedInSuppliers;
+            bool isUsedInExpenses = await _context
+                .Set<ImportExpense>()
+                .AnyAsync(ie => ie.CurrencyId == currencyId);
+
+            bool isUsedInCalculations = await _context
+                .Set<CalculationResult>()
+                .AnyAsync(cr => cr.LocalCurrencyUsedId == currencyId);
+
+            return isUsedInRates
+                || isUsedInSuppliers
+                || isUsedInOrders
+                || isUsedInExpenses
+                || isUsedInCalculations;
         }
     }
 }

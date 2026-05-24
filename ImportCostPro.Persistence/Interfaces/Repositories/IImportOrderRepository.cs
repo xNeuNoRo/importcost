@@ -3,7 +3,7 @@ using ImportCostPro.Persistence.Enums;
 
 namespace ImportCostPro.Persistence.Interfaces.Repositories
 {
-    // Esta interfaz no hereda directamente de GenericRepository 
+    // Esta interfaz no hereda directamente de GenericRepository
     // para restringir las operaciones disponibles por seguridad
     public interface IImportOrderRepository
     {
@@ -43,5 +43,11 @@ namespace ImportCostPro.Persistence.Interfaces.Repositories
         /// Actualiza el estado de una orden de importación.
         /// </summary>
         Task<bool> UpdateStatusAsync(int id, OrderStatus newStatus);
+
+        /// <summary>
+        /// Recupera una orden de importación con toda su información relacionada optimizada para el proceso de cálculo,
+        /// incluyendo productos, gastos y datos maestros necesarios para el motor de promediacion.
+        /// </summary>
+        Task<ImportOrder?> GetAggregateForCalculationAsync(int id);
     }
 }

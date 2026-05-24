@@ -43,5 +43,10 @@ namespace ImportCostPro.Persistence.Repositories
 
             return await query.AnyAsync();
         }
+
+        public async Task<bool> IsImporterReferencedAsync(int importerId)
+        {
+            return await _context.Set<ImportOrder>().AnyAsync(o => o.ImporterId == importerId);
+        }
     }
 }

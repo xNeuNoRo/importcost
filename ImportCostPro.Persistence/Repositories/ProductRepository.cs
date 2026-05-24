@@ -48,7 +48,15 @@ namespace ImportCostPro.Persistence.Repositories
 
         public async Task<bool> IsProductReferencedInOrdersAsync(int productId)
         {
-            return await Task.FromResult(false); // Placeholder hasta que implementemos la entidad de Orden de Importación
+            bool inOrderProducts = await _context
+                .Set<OrderProduct>()
+                .AnyAsync(op => op.ProductId == productId);
+
+            bool inCalculationDetails = await _context
+                .Set<CalculationResultDetail>()
+                .AnyAsync(crd => crd.ProductId == productId);
+
+            return inOrderProducts || inCalculationDetails;
         }
     }
 }
