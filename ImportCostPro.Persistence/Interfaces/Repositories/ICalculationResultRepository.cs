@@ -21,7 +21,7 @@ namespace ImportCostPro.Persistence.Interfaces.Repositories
         Task<IEnumerable<CalculationResult>> GetHistoryByOrderIdAsync(int importOrderId);
 
         /// <summary>
-        /// Recupera el último cálculo oficial realizado para una orden de importación (el vigente),
+        /// Recupera el último cálculo oficial registrado para una orden de importación,
         /// incluyendo de forma optimizada todo el desglose de productos (Details) para el cierre logístico.
         /// </summary>
         Task<CalculationResult?> GetLatestCalculatedResultWithDetailsAsync(int importOrderId);
