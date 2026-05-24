@@ -9,15 +9,12 @@ namespace ImportCostPro.Persistence.EntityConfigurations
         public void Configure(EntityTypeBuilder<OrderProduct> builder)
         {
             builder.ToTable("OrderProducts");
-
             builder.HasKey(x => x.Id);
 
             #region Properties configurations
 
             builder.Property(x => x.Quantity).IsRequired().HasPrecision(10, 2);
-
             builder.Property(x => x.UnitFobPrice).IsRequired().HasPrecision(18, 2);
-
             builder.Property(x => x.TargetProfitMargin).IsRequired().HasPrecision(5, 2);
 
             #endregion
@@ -33,7 +30,6 @@ namespace ImportCostPro.Persistence.EntityConfigurations
             #region Relationships
 
             builder.HasOne(x => x.ImportOrder).WithMany().HasForeignKey(x => x.ImportOrderId);
-
             builder.HasOne(x => x.Product).WithMany().HasForeignKey(x => x.ProductId);
 
             #endregion
