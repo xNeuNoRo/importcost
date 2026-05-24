@@ -34,15 +34,9 @@ namespace ImportCostPro.Persistence.Repositories
 
         public async Task<bool> IsTariffCategoryReferencedAsync(int tariffCategoryId)
         {
-            /*
-            bool isUsedInProducts = await _context.Set<Product>()
+            return await _context
+                .Set<Product>()
                 .AnyAsync(p => p.TariffCategoryId == tariffCategoryId);
-                
-            return isUsedInProducts;
-            */
-
-            // Por ahora retornamos false en lo q brego lo de producto xd
-            return await Task.FromResult(false);
         }
     }
 }
