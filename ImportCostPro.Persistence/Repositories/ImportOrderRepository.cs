@@ -59,23 +59,12 @@ namespace ImportCostPro.Persistence.Repositories
 
         public async Task<bool> UpdateStatusAsync(int id, OrderStatus newStatus)
         {
-            // Para cambiar el estado de la orden (Abierta -> Calculada -> Cerrada),
-            // no hacemos un SELECT innecesario. Instanciamos una entidad ligera, y le decimos al change trackker que solo
-            // modificamos el campo de Status. Esto es tres mil veces más eficiente,
-            // ya que evitamos cargar toda la orden y sus relaciones a memoria.
-            var order = new ImportOrder
-            {
-                Id = id,
-                OrderNumber = string.Empty, // Dummy string reglamentario para cumplir con el 'required' de C#
-                OrderDate = DateTime.MinValue,
-                TransportMode = TransportMode.Maritime,
-                Status = newStatus,
-            };
-
-            _context.Entry(order).Property(o => o.Status).IsModified = true;
-
-            // el savechanges nos va a devolver el numero de filas q actualizamos
-            var rowsAffected = await _context.SaveChangesAsync();
+            // Para cambiar el estado de la orden (Abierta => Calculada => Cerrada),
+            // no hacemos un SELECT o carga innecesaria. Solo le decimos q modifique el campo de Status.
+            // Esto es tres mil veces más eficiente, ya que evitamos cargar toda la orden y sus relaciones a memoria.
+            var rowsAffected = await _dbSet
+                .Where(o => o.Id == id)
+                .ExecuteUpdateAsync(setters => setters.SetProperty(o => o.Status, newStatus));
 
             // si es mayor a 0, obviamente algo se actualizo
             return rowsAffected > 0;
