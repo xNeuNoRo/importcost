@@ -10,16 +10,14 @@ namespace ImportCostPro.Persistence.EntityConfigurations
         {
             builder.ToTable("Suppliers");
 
+            // Primary Key (PK)
             builder.HasKey(x => x.Id);
 
             #region  Properties configurations;
 
             builder.Property(x => x.Name).IsRequired().HasMaxLength(150);
-
             builder.Property(x => x.PhoneNumber).HasMaxLength(20);
-
             builder.Property(x => x.Email).IsRequired().HasMaxLength(100);
-
             builder.Property(x => x.IsActive).IsRequired().HasDefaultValue(true);
 
             #endregion
