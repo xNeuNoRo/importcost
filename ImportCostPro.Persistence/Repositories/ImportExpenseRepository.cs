@@ -13,26 +13,6 @@ namespace ImportCostPro.Persistence.Repositories
         public ImportExpenseRepository(AppDbContext context)
             : base(context) { }
 
-        public new async Task AddAsync(ImportExpense entity)
-        {
-            await base.AddAsync(entity);
-        }
-
-        public new async Task UpdateAsync(ImportExpense entity)
-        {
-            await base.UpdateAsync(entity);
-        }
-
-        public new async Task DeleteAsync(int id)
-        {
-            await base.DeleteAsync(id);
-        }
-
-        public new async Task<ImportExpense?> GetByIdAsync(int id)
-        {
-            return await base.GetByIdAsync(id);
-        }
-
         public async Task<IEnumerable<ImportExpense>> GetExpensesByOrderIdAsync(int importOrderId)
         {
             return await _dbSet
