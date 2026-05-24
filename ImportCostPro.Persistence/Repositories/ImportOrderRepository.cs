@@ -11,6 +11,16 @@ namespace ImportCostPro.Persistence.Repositories
         public ImportOrderRepository(AppDbContext context)
             : base(context) { }
 
+        public new async Task AddAsync(ImportOrder entity)
+        {
+            await base.AddAsync(entity);
+        }
+
+        public new async Task<ImportOrder?> GetByIdAsync(int id)
+        {
+            return await base.GetByIdAsync(id);
+        }
+
         public async Task<IEnumerable<ImportOrder>> GetAllWithRelationsAsync()
         {
             return await _dbSet

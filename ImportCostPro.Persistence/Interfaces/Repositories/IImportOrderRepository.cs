@@ -3,8 +3,22 @@ using ImportCostPro.Persistence.Enums;
 
 namespace ImportCostPro.Persistence.Interfaces.Repositories
 {
-    public interface IImportOrderRepository : IGenericRepository<ImportOrder>
+    // Esta interfaz no hereda directamente de GenericRepository 
+    // para restringir las operaciones disponibles por seguridad
+    public interface IImportOrderRepository
     {
+        // SOLO USAREMOS EL ADDASYNC Y EL GETBYIDASYNC DE GENERICREPOSITORY
+
+        /// <summary>
+        /// Registra una nueva orden de importación en el sistema.
+        /// </summary>
+        Task AddAsync(ImportOrder entity);
+
+        /// <summary>
+        /// Recupera una orden básica por su identificador único para validaciones previas de estado.
+        /// </summary>
+        Task<ImportOrder?> GetByIdAsync(int id);
+
         /// <summary>
         /// Obtiene el listado de órdenes con todas sus relaciones.
         /// </summary>
