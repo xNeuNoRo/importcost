@@ -16,7 +16,7 @@ namespace ImportCostPro.Persistence.Interfaces.Repositories
         Task<bool> IsProductAlreadyInOrderAsync(int importOrderId, int productId);
 
         /// <summary>
-        /// Calcula los totales necesarios para la prorrateo de costos de una orden de importación,
+        /// Calcula los totales necesarios para la promediación de costos de una orden de importación,
         /// incluyendo el total FOB original, el peso total, el volumen total y la cantidad total de mercancía.
         /// </summary>
         Task<OrderProrationTotalsProjection?> GetProrationTotalsAsync(int importOrderId);
