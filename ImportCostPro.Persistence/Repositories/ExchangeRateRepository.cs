@@ -26,13 +26,15 @@ namespace ImportCostPro.Persistence.Repositories
             DateTime date
         )
         {
+            var targetDate = date.Date;
+
             return await _dbSet
                 .AsNoTracking()
                 .Where(e =>
                     e.FromCurrencyId == fromCurrencyId
                     && e.ToCurrencyId == toCurrencyId
                     && e.IsActive
-                    && e.EffectiveDate <= date.Date
+                    && e.EffectiveDate <= targetDate
                 )
                 .OrderByDescending(e => e.EffectiveDate)
                 .FirstOrDefaultAsync();
@@ -45,10 +47,12 @@ namespace ImportCostPro.Persistence.Repositories
             int? excludeId = null
         )
         {
+            var targetEffectiveDate = effectiveDate.Date;
+
             var query = _dbSet.Where(e =>
                 e.FromCurrencyId == fromCurrencyId
                 && e.ToCurrencyId == toCurrencyId
-                && e.EffectiveDate == effectiveDate.Date
+                && e.EffectiveDate == targetEffectiveDate
                 && e.IsActive
             );
 

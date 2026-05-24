@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using ImportCostPro.Persistence.Contexts;
 using ImportCostPro.Persistence.Entities;
 using ImportCostPro.Persistence.Interfaces.Repositories;
@@ -5,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ImportCostPro.Persistence.Repositories
 {
-    public class ImporterRepository : GenericRepository<Importer>, IImportersRepository
+    public class ImporterRepository : GenericRepository<Importer>, IImporterRepository
     {
         public ImporterRepository(AppDbContext context)
             : base(context) { }
@@ -21,19 +24,24 @@ namespace ImportCostPro.Persistence.Repositories
 
         public async Task<Importer?> GetByIdWithCountryAsync(int id)
         {
-            return await _dbSet.Include(i => i.Country).FirstOrDefaultAsync(i => i.Id == id);
+            return await _dbSet
+                .AsNoTracking()
+                .Include(i => i.Country)
+                .FirstOrDefaultAsync(i => i.Id == id);
         }
 
         public async Task<bool> ExistsTaxIdAsync(string taxId, int? excludeId = null)
         {
             string cleanTaxId = taxId.Trim();
 
+            var query = _dbSet.Where(i => i.TaxId == cleanTaxId);
+
             if (excludeId.HasValue)
             {
-                return await _dbSet.AnyAsync(i => i.TaxId == cleanTaxId && i.Id != excludeId.Value);
+                query = query.Where(i => i.Id != excludeId.Value);
             }
 
-            return await _dbSet.AnyAsync(i => i.TaxId == cleanTaxId);
+            return await query.AnyAsync();
         }
     }
 }

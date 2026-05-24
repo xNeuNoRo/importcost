@@ -6,8 +6,8 @@ using Microsoft.EntityFrameworkCore;
 namespace ImportCostPro.Persistence.Repositories
 {
     public class TaxConfigurationRepository
-        : GenericRepository<TaxConfiguration>, // No importa q reutilicemos el crud,
-            // solo se expondra por la interfaz los metodos necesarios para esta entidad
+        : GenericRepository<TaxConfiguration>, // Reutilizamos el crud para redirigir las ops. de
+            // update y add y asi ahorramos logica repetida.
             ITaxConfigurationRepository
     {
         public TaxConfigurationRepository(AppDbContext context)
@@ -15,7 +15,20 @@ namespace ImportCostPro.Persistence.Repositories
 
         public async Task<TaxConfiguration?> GetSingleConfigurationAsync()
         {
-            return await _dbSet.SingleOrDefaultAsync();
+            return await _dbSet.AsNoTracking().SingleOrDefaultAsync();
+        }
+
+        // Redirigimos las operaciones de actualización y creación
+        // al GenericRepository para evitar duplicación de lógica.
+
+        public new async Task UpdateAsync(TaxConfiguration config)
+        {
+            await base.UpdateAsync(config);
+        }
+
+        public new async Task AddAsync(TaxConfiguration config)
+        {
+            await base.AddAsync(config);
         }
     }
 }

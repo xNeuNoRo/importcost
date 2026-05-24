@@ -39,7 +39,7 @@ namespace ImportCostPro.Persistence.Repositories
         /// <param name="id">EL ID del registro a obtener</param>
         public async Task<T?> GetByIdAsync(int id)
         {
-            return await _dbSet.FirstOrDefaultAsync(e => e.Id == id);
+            return await _dbSet.FindAsync(id);
         }
 
         /// <summary>
@@ -58,7 +58,9 @@ namespace ImportCostPro.Persistence.Repositories
         /// <param name="entity">El registro a actualizar</param>
         public async Task UpdateAsync(T entity)
         {
-            _dbSet.Update(entity);
+            // La marcamos nosotros como modificada para que el contexto sepa que debe actualizarla
+            // De esa forma actualizamos sin importar q no este trackeada
+            _context.Entry(entity).State = EntityState.Modified;
             await _context.SaveChangesAsync();
         }
 
@@ -68,12 +70,22 @@ namespace ImportCostPro.Persistence.Repositories
         /// <param name="id">El ID del registro a eliminar</param>
         public async Task DeleteAsync(int id)
         {
-            var entity = await GetByIdAsync(id);
-            if (entity != null)
+            // Creamos una instancia ligera de la entidad con solo el ID para evitar cargarla completamente desde la base de datos
+            var entity = _context.Set<T>().Local.FirstOrDefault(e => e.Id == id);
+            if (entity == null)
+            {
+                // Si no está en memoria local, creamos la instancia ligera
+                entity = Activator.CreateInstance<T>();
+                entity.Id = id;
+                // Lo adjuntamos directamente marcándolo para borrado
+                _context.Entry(entity).State = EntityState.Deleted;
+            }
+            else
             {
                 _dbSet.Remove(entity);
-                await _context.SaveChangesAsync();
             }
+
+            await _context.SaveChangesAsync();
         }
 
         /// <summary>

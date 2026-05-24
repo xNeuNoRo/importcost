@@ -2,7 +2,7 @@ using ImportCostPro.Persistence.Entities;
 
 namespace ImportCostPro.Persistence.Interfaces.Repositories
 {
-    public interface IImportersRepository : IGenericRepository<Importer>
+    public interface IImporterRepository : IGenericRepository<Importer>
     {
         /// <summary>
         /// Obtiene todos los importadores incluyendo la información de su país de origen.

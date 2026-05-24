@@ -12,6 +12,11 @@ namespace ImportCostPro.Persistence.Interfaces.Repositories
         /// <summary>
         /// Verifica si existe un país con el código ISO especificado.
         /// </summary>
-        Task<bool> ExistsByIsoCodeAsync(string isoCode);
+        Task<bool> ExistsByIsoCodeAsync(string isoCode, int? excludeId = null);
+
+        /// <summary>
+        /// Verifica si el país está referenciado por otras entidades del sistema
+        /// </summary>
+        Task<bool> IsCountryReferencedAsync(int countryId);
     }
 }

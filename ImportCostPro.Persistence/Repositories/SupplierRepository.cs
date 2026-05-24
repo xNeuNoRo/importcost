@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ImportCostPro.Persistence.Repositories
 {
-    public class SupplierRepository : GenericRepository<Supplier>, ISuppliersRepository
+    public class SupplierRepository : GenericRepository<Supplier>, ISupplierRepository
     {
         public SupplierRepository(AppDbContext context)
             : base(context) { }
@@ -23,6 +23,7 @@ namespace ImportCostPro.Persistence.Repositories
         public async Task<Supplier?> GetByIdWithRelationsAsync(int id)
         {
             return await _dbSet
+                .AsNoTracking()
                 .Include(s => s.OriginCountry)
                 .Include(s => s.DefaultCurrency)
                 .FirstOrDefaultAsync(s => s.Id == id);

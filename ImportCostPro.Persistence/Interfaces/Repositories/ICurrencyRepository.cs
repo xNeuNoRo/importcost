@@ -7,7 +7,7 @@ namespace ImportCostPro.Persistence.Interfaces.Repositories
         /// <summary>
         /// Verifica si existe una moneda con el código ISO especificado.
         /// </summary>
-        Task<bool> ExistsByIsoCodeAsync(string isoCode);
+        Task<bool> ExistsByIsoCodeAsync(string isoCode, int? excludeId = null);
 
         /// <summary>
         /// Verifica si ya existe una moneda marcada como moneda local.
