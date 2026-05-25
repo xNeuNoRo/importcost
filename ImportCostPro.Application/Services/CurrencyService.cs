@@ -35,15 +35,15 @@ namespace ImportCostPro.Application.Services
 
         public async Task<CurrencyResponse> CreateAsync(CreateCurrencyRequest request)
         {
-            request.Name = request.Name?.Trim() ?? string.Empty;
-            request.IsoCode = request.IsoCode?.Trim().ToUpper() ?? string.Empty;
-            request.Symbol = request.Symbol?.Trim() ?? string.Empty;
+            string normalizedIsoCode = request.IsoCode?.Trim().ToUpperInvariant() ?? string.Empty;
+            string normalizedName = request.Name?.Trim() ?? string.Empty;
+            string normalizedSymbol = request.Symbol?.Trim() ?? string.Empty;
 
-            if (await _currencyRepository.ExistsByIsoCodeAsync(request.IsoCode))
+            if (await _currencyRepository.ExistsByIsoCodeAsync(normalizedIsoCode))
             {
                 throw new ValidationBusinessException(
                     nameof(request.IsoCode),
-                    $"El código ISO '{request.IsoCode}' ya se encuentra registrado para otra moneda."
+                    $"El código ISO '{normalizedIsoCode}' ya se encuentra registrado para otra moneda."
                 );
             }
 
@@ -57,6 +57,10 @@ namespace ImportCostPro.Application.Services
 
             // Alabadas sean las extensiones de mapeo automatico papadio
             var currency = request.Adapt<Currency>();
+
+            currency.Name = normalizedName;
+            currency.IsoCode = normalizedIsoCode;
+            currency.Symbol = normalizedSymbol;
             currency.IsActive = true;
 
             await _currencyRepository.AddAsync(currency);
@@ -68,7 +72,7 @@ namespace ImportCostPro.Application.Services
         public async Task<CurrencyResponse> UpdateAsync(UpdateCurrencyRequest request)
         {
             request.Name = request.Name?.Trim() ?? string.Empty;
-            request.IsoCode = request.IsoCode?.Trim().ToUpper() ?? string.Empty;
+            request.IsoCode = request.IsoCode?.Trim().ToUpperInvariant() ?? string.Empty;
             request.Symbol = request.Symbol?.Trim() ?? string.Empty;
 
             var existingCurrency = await _currencyRepository.GetByIdAsync(request.Id);
