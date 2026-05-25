@@ -1,5 +1,6 @@
 using ImportCostPro.Application.DTOs.Product.Requests;
 using ImportCostPro.Application.DTOs.Product.Responses;
+using ImportCostPro.Application.Exceptions;
 using ImportCostPro.Application.Extensions;
 using ImportCostPro.Persistence.Entities;
 using ImportCostPro.Persistence.Interfaces.Repositories;
@@ -33,8 +34,9 @@ namespace ImportCostPro.Application.Services
             var country = await _countryRepository.GetByIdAsync(request.DefaultOriginCountryId);
             if (country == null || !country.IsActive)
             {
-                throw new KeyNotFoundException(
-                    $"El país de origen con ID {request.DefaultOriginCountryId} no existe en el sistema o se encuentra inactivo."
+                throw new ValidationBusinessException(
+                    nameof(request.DefaultOriginCountryId),
+                    "El país de origen seleccionado no es válido o se encuentra inactivo."
                 );
             }
 
@@ -44,8 +46,9 @@ namespace ImportCostPro.Application.Services
             );
             if (tariffCategory == null || !tariffCategory.IsActive)
             {
-                throw new KeyNotFoundException(
-                    $"La categoría arancelaria con ID {request.TariffCategoryId} no existe en el sistema o se encuentra inactiva."
+                throw new ValidationBusinessException(
+                    nameof(request.TariffCategoryId),
+                    "La categoría arancelaria seleccionada no es válida o se encuentra inactiva."
                 );
             }
 
@@ -55,7 +58,8 @@ namespace ImportCostPro.Application.Services
             );
             if (referenceCodeExists)
             {
-                throw new InvalidOperationException(
+                throw new ValidationBusinessException(
+                    nameof(request.ReferenceCode),
                     $"El código de referencia '{request.ReferenceCode}' ya está registrado en el catálogo."
                 );
             }
@@ -79,8 +83,8 @@ namespace ImportCostPro.Application.Services
             var entity = await _productRepository.GetByIdAsync(request.Id);
             if (entity == null)
             {
-                throw new KeyNotFoundException(
-                    $"El producto con ID {request.Id} no existe en el sistema."
+                throw new BusinessException(
+                    $"El producto que intenta actualizar ya no existe en el sistema."
                 );
             }
 
@@ -88,8 +92,9 @@ namespace ImportCostPro.Application.Services
             var country = await _countryRepository.GetByIdAsync(request.DefaultOriginCountryId);
             if (country == null || !country.IsActive)
             {
-                throw new KeyNotFoundException(
-                    $"El país de origen con ID {request.DefaultOriginCountryId} no existe o se encuentra inactivo."
+                throw new ValidationBusinessException(
+                    nameof(request.DefaultOriginCountryId),
+                    "El país de origen seleccionado no existe o se encuentra inactivo."
                 );
             }
 
@@ -99,8 +104,9 @@ namespace ImportCostPro.Application.Services
             );
             if (tariffCategory == null || !tariffCategory.IsActive)
             {
-                throw new KeyNotFoundException(
-                    $"La categoría arancelaria con ID {request.TariffCategoryId} no existe o se encuentra inactiva."
+                throw new ValidationBusinessException(
+                    nameof(request.TariffCategoryId),
+                    "La categoría arancelaria seleccionada no existe o se encuentra inactiva."
                 );
             }
 
@@ -111,7 +117,8 @@ namespace ImportCostPro.Application.Services
             );
             if (referenceCodeExists)
             {
-                throw new InvalidOperationException(
+                throw new ValidationBusinessException(
+                    nameof(request.ReferenceCode),
                     $"El código de referencia '{request.ReferenceCode}' ya está registrado en otro producto."
                 );
             }
@@ -131,15 +138,17 @@ namespace ImportCostPro.Application.Services
             var entity = await _productRepository.GetByIdAsync(id);
             if (entity == null)
             {
-                throw new KeyNotFoundException($"El producto con ID {id} no existe en el sistema.");
+                throw new BusinessException(
+                    $"El producto que intenta eliminar no existe en el sistema."
+                );
             }
 
             // Validamos q el producto no esté referenciado en órdenes de importación activas o históricas
             bool isReferenced = await _productRepository.IsProductReferencedInOrdersAsync(id);
             if (isReferenced)
             {
-                throw new InvalidOperationException(
-                    $"No se puede eliminar el producto '{entity.Name}' porque ya se encuentra vinculado a transacciones u órdenes de importación activas."
+                throw new BusinessException(
+                    $"No se puede eliminar el producto '{entity.Name}' porque cuenta con transacciones logísticas u órdenes asociadas."
                 );
             }
 
@@ -155,7 +164,7 @@ namespace ImportCostPro.Application.Services
             var entity = await _productRepository.GetByIdAsync(id);
             if (entity == null)
             {
-                throw new KeyNotFoundException($"El producto con ID {id} no existe en el sistema.");
+                throw new BusinessException($"El producto no existe en el sistema.");
             }
 
             // Simplemente invertimos el estado actual del producto
