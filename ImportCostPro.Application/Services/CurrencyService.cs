@@ -71,9 +71,9 @@ namespace ImportCostPro.Application.Services
 
         public async Task<CurrencyResponse> UpdateAsync(UpdateCurrencyRequest request)
         {
-            request.Name = request.Name?.Trim() ?? string.Empty;
-            request.IsoCode = request.IsoCode?.Trim().ToUpperInvariant() ?? string.Empty;
-            request.Symbol = request.Symbol?.Trim() ?? string.Empty;
+            string normalizedIsoCode = request.IsoCode?.Trim().ToUpperInvariant() ?? string.Empty;
+            string normalizedName = request.Name?.Trim() ?? string.Empty;
+            string normalizedSymbol = request.Symbol?.Trim() ?? string.Empty;
 
             var existingCurrency = await _currencyRepository.GetByIdAsync(request.Id);
             if (existingCurrency == null)
@@ -83,13 +83,13 @@ namespace ImportCostPro.Application.Services
                 );
             }
 
-            if (existingCurrency.IsoCode != request.IsoCode)
+            if (existingCurrency.IsoCode != normalizedIsoCode)
             {
-                if (await _currencyRepository.ExistsByIsoCodeAsync(request.IsoCode, request.Id))
+                if (await _currencyRepository.ExistsByIsoCodeAsync(normalizedIsoCode, request.Id))
                 {
                     throw new ValidationBusinessException(
                         nameof(request.IsoCode),
-                        $"El código ISO '{request.IsoCode}' ya está siendo utilizado por otra divisa."
+                        $"El código ISO '{normalizedIsoCode}' ya está siendo utilizado por otra divisa."
                     );
                 }
 
@@ -115,6 +115,11 @@ namespace ImportCostPro.Application.Services
 
             // Mapster carreando
             request.Adapt(existingCurrency);
+
+            existingCurrency.Name = normalizedName;
+            existingCurrency.IsoCode = normalizedIsoCode;
+            existingCurrency.Symbol = normalizedSymbol;
+
             await _currencyRepository.UpdateAsync(existingCurrency);
 
             return existingCurrency.Adapt<CurrencyResponse>();
@@ -125,7 +130,7 @@ namespace ImportCostPro.Application.Services
             var currency = await _currencyRepository.GetByIdAsync(id);
             if (currency == null)
             {
-                throw new BusinessException("La moneda especificada no existe en el catálogo.");
+                throw new BusinessException("La moneda específica no existe en el catálogo.");
             }
 
             if (currency.IsLocalCurrency)
