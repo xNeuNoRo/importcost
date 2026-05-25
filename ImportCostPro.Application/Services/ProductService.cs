@@ -25,6 +25,26 @@ namespace ImportCostPro.Application.Services
             _tariffCategoryRepository = tariffCategoryRepository;
         }
 
+        public async Task<IEnumerable<ProductResponse>> GetAllAsync()
+        {
+            // Obtenemos todos los productos con sus relaciones
+            var products = await _productRepository.GetAllWithRelationsAsync();
+
+            // Mapeamos cada producto a su DTO de respuesta, incluyendo datos cruzados y calculados
+            return products.Select(p => p.ToResponse()).ToList();
+        }
+
+        public async Task<ProductResponse?> GetByIdAsync(int id)
+        {
+            // Obtenemos el producto por ID con sus relaciones y validamos q exista
+            var product = await _productRepository.GetByIdWithRelationsAsync(id);
+            if (product == null)
+            {
+                return null;
+            }
+            return product.ToResponse();
+        }
+
         public async Task<ProductResponse> CreateAsync(CreateProductRequest request)
         {
             // Sanitizamos y normalizamos el código de referencia para evitar duplicados por formato
@@ -174,26 +194,6 @@ namespace ImportCostPro.Application.Services
             await _productRepository.UpdateAsync(entity);
 
             return true;
-        }
-
-        public async Task<IEnumerable<ProductResponse>> GetAllAsync()
-        {
-            // Obtenemos todos los productos con sus relaciones
-            var products = await _productRepository.GetAllWithRelationsAsync();
-
-            // Mapeamos cada producto a su DTO de respuesta, incluyendo datos cruzados y calculados
-            return products.Select(p => p.ToResponse()).ToList();
-        }
-
-        public async Task<ProductResponse?> GetByIdAsync(int id)
-        {
-            // Obtenemos el producto por ID con sus relaciones y validamos q exista
-            var product = await _productRepository.GetByIdWithRelationsAsync(id);
-            if (product == null)
-            {
-                return null;
-            }
-            return product.ToResponse();
         }
     }
 }

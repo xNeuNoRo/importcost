@@ -1,5 +1,8 @@
 namespace ImportCostPro.Application.DTOs.Currency.Responses
 {
+    /// <summary>
+    /// Contrato unificado de salida plano para la visualización de divisas.
+    /// </summary>
     public class CurrencyResponse
     {
         public int Id { get; set; }

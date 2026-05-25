@@ -1,13 +1,13 @@
-
 using ImportCostPro.Application.DTOs.Currency.Requests;
 using ImportCostPro.Application.DTOs.Currency.Responses;
-using ImportCostPro.Application.Interfaces;
+using ImportCostPro.Application.Exceptions;
 using ImportCostPro.Persistence.Entities;
 using ImportCostPro.Persistence.Interfaces.Repositories;
+using Mapster;
 
 namespace ImportCostPro.Application.Services
 {
-    public class CurrencyService : ICurrencyService
+    public class CurrencyService
     {
         private readonly ICurrencyRepository _currencyRepository;
 
@@ -19,129 +19,150 @@ namespace ImportCostPro.Application.Services
         public async Task<IEnumerable<CurrencyResponse>> GetAllAsync()
         {
             var currencies = await _currencyRepository.GetAllAsync();
-            return currencies.Select(c => new CurrencyResponse
-            {
-                Id = c.Id,
-                Name = c.Name,
-                IsoCode = c.IsoCode,
-                Symbol = c.Symbol,
-                IsLocalCurrency = c.IsLocalCurrency,
-                IsActive = c.IsActive
-            });
+            // Mapster carrea y resuelve el mapeo pa no matarnos a mano con mapeos manuales
+            return currencies.Adapt<IEnumerable<CurrencyResponse>>().ToList();
         }
 
         public async Task<CurrencyResponse?> GetByIdAsync(int id)
         {
             var currency = await _currencyRepository.GetByIdAsync(id);
-            if (currency == null) return null;
+            if (currency == null)
+                return null;
 
-            return new CurrencyResponse
-            {
-                Id = currency.Id,
-                Name = currency.Name,
-                IsoCode = currency.IsoCode,
-                Symbol = currency.Symbol,
-                IsLocalCurrency = currency.IsLocalCurrency,
-                IsActive = currency.IsActive
-            };
+            // Mapster carrea y resuelve el mapeo pa no matarnos a mano con mapeos manuales
+            return currency.Adapt<CurrencyResponse>();
         }
 
-        public async Task<int> CreateAsync(CreateCurrencyRequest request)
+        public async Task<CurrencyResponse> CreateAsync(CreateCurrencyRequest request)
         {
-            // El código ISO debe guardarse preferiblemente en mayúscula. [cite: 88]
-            request.IsoCode = request.IsoCode.ToUpper();
+            request.Name = request.Name?.Trim() ?? string.Empty;
+            request.IsoCode = request.IsoCode?.Trim().ToUpper() ?? string.Empty;
+            request.Symbol = request.Symbol?.Trim() ?? string.Empty;
 
             if (await _currencyRepository.ExistsByIsoCodeAsync(request.IsoCode))
             {
-                throw new InvalidOperationException("Ya existe una moneda registrada con este código ISO.");
+                throw new ValidationBusinessException(
+                    nameof(request.IsoCode),
+                    $"El código ISO '{request.IsoCode}' ya se encuentra registrado para otra moneda."
+                );
             }
 
             if (request.IsLocalCurrency && await _currencyRepository.AnyLocalCurrencyAsync())
             {
-                throw new Exception("Ya existe una moneda configurada como moneda local. Solo puede existir una moneda local en el sistema.");
+                throw new ValidationBusinessException(
+                    nameof(request.IsLocalCurrency),
+                    "Ya existe una moneda configurada como moneda local principal en el sistema. Solo se permite una."
+                );
             }
 
-            var currency = new Currency
-            {
-                Name = request.Name,
-                IsoCode = request.IsoCode,
-                Symbol = request.Symbol,
-                IsLocalCurrency = request.IsLocalCurrency,
-                IsActive = true
-            };
+            // Alabadas sean las extensiones de mapeo automatico papadio
+            var currency = request.Adapt<Currency>();
+            currency.IsActive = true;
 
             await _currencyRepository.AddAsync(currency);
-            return currency.Id;
+
+            // Mapster carrea y resuelve el mapeo pa no matarnos a mano con mapeos manuales
+            return currency.Adapt<CurrencyResponse>();
         }
 
-        public async Task UpdateAsync(UpdateCurrencyRequest request)
+        public async Task<CurrencyResponse> UpdateAsync(UpdateCurrencyRequest request)
         {
-            var existingCurrency = await _currencyRepository.GetByIdAsync(request.Id)
-                ?? throw new InvalidOperationException("Moneda no encontrada.");
+            request.Name = request.Name?.Trim() ?? string.Empty;
+            request.IsoCode = request.IsoCode?.Trim().ToUpper() ?? string.Empty;
+            request.Symbol = request.Symbol?.Trim() ?? string.Empty;
 
-            // El código ISO debe manejarse preferiblemente en mayúscula. [cite: 164]
-            request.IsoCode = request.IsoCode.ToUpper();
+            var existingCurrency = await _currencyRepository.GetByIdAsync(request.Id);
+            if (existingCurrency == null)
+            {
+                throw new BusinessException(
+                    "La moneda que intenta actualizar ya no existe en el sistema."
+                );
+            }
 
             if (existingCurrency.IsoCode != request.IsoCode)
             {
                 if (await _currencyRepository.ExistsByIsoCodeAsync(request.IsoCode, request.Id))
                 {
-                    throw new InvalidOperationException("Ya existe una moneda registrada con este código ISO.");
+                    throw new ValidationBusinessException(
+                        nameof(request.IsoCode),
+                        $"El código ISO '{request.IsoCode}' ya está siendo utilizado por otra divisa."
+                    );
                 }
 
                 if (await _currencyRepository.IsCurrencyReferencedAsync(request.Id))
                 {
-                    throw new InvalidOperationException("No se puede modificar el código ISO de esta moneda porque ya está siendo utilizada en registros del sistema.");
+                    throw new ValidationBusinessException(
+                        nameof(request.IsoCode),
+                        "No se puede alterar el código ISO de esta divisa porque ya cuenta con transacciones u órdenes históricas vinculadas."
+                    );
                 }
             }
 
             if (request.IsLocalCurrency && !existingCurrency.IsLocalCurrency)
             {
-                // Excluir la propia moneda al comprobar si ya existe una moneda local
                 if (await _currencyRepository.AnyLocalCurrencyAsync(request.Id))
                 {
-                    throw new InvalidOperationException("Ya existe una moneda configurada como moneda local. Solo puede existir una moneda local en el sistema.");
+                    throw new ValidationBusinessException(
+                        nameof(request.IsLocalCurrency),
+                        "Operación rechazada. Ya existe otra divisa establecida como moneda local base."
+                    );
                 }
             }
 
-            existingCurrency.Name = request.Name;
-            existingCurrency.IsoCode = request.IsoCode;
-            existingCurrency.Symbol = request.Symbol;
-            existingCurrency.IsLocalCurrency = request.IsLocalCurrency;
-
+            // Mapster carreando
+            request.Adapt(existingCurrency);
             await _currencyRepository.UpdateAsync(existingCurrency);
+
+            return existingCurrency.Adapt<CurrencyResponse>();
         }
 
-        public async Task ToggleStatusAsync(int id)
+        public async Task<bool> ToggleStatusAsync(int id)
         {
-            var currency = await _currencyRepository.GetByIdAsync(id)
-                ?? throw new Exception("Moneda no encontrada.");
-
-            if (currency.IsActive && currency.IsLocalCurrency && await _currencyRepository.IsCurrencyReferencedAsync(id))
+            var currency = await _currencyRepository.GetByIdAsync(id);
+            if (currency == null)
             {
-                throw new InvalidOperationException("No se puede inactivar la moneda local mientras existan registros que dependan de ella.");
+                throw new BusinessException("La moneda especificada no existe en el catálogo.");
+            }
+
+            if (currency.IsLocalCurrency)
+            {
+                throw new BusinessException(
+                    "La moneda local base del sistema no puede ser desactivada."
+                );
             }
 
             currency.IsActive = !currency.IsActive;
             await _currencyRepository.UpdateAsync(currency);
+
+            return true;
         }
 
-        public async Task DeleteAsync(int id)
+        public async Task<bool> DeleteAsync(int id)
         {
-            var currency = await _currencyRepository.GetByIdAsync(id)
-                ?? throw new InvalidOperationException("Moneda no encontrada.");
+            var currency = await _currencyRepository.GetByIdAsync(id);
+            if (currency == null)
+            {
+                throw new BusinessException(
+                    "La moneda que intenta eliminar no existe en el sistema."
+                );
+            }
 
             if (currency.IsLocalCurrency)
             {
-                throw new InvalidOperationException("No se puede eliminar la moneda local del sistema.");
+                throw new BusinessException(
+                    "Está prohibido eliminar físicamente la moneda local del sistema."
+                );
             }
 
             if (await _currencyRepository.IsCurrencyReferencedAsync(id))
             {
-                throw new InvalidOperationException("No se puede eliminar esta moneda porque está asociada a otros registros del sistema.");
+                throw new BusinessException(
+                    $"No es posible eliminar la divisa '{currency.Name}' debido a que cuenta con tasas de cambio u órdenes de importación asociadas."
+                );
             }
 
             await _currencyRepository.DeleteAsync(id);
+            return true;
         }
     }
 }
