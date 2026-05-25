@@ -26,6 +26,9 @@ namespace ImportCostPro.Application.Services
 
         public async Task<ProductResponse> CreateAsync(CreateProductRequest request)
         {
+            // Sanitizamos y normalizamos el código de referencia para evitar duplicados por formato
+            request.ReferenceCode = request.ReferenceCode?.Trim().ToUpper() ?? string.Empty;
+
             // Validamos q sea un pais existente y activo
             var country = await _countryRepository.GetByIdAsync(request.DefaultOriginCountryId);
             if (country == null || !country.IsActive)
@@ -69,6 +72,9 @@ namespace ImportCostPro.Application.Services
 
         public async Task<ProductResponse> UpdateAsync(UpdateProductRequest request)
         {
+            // Sanitizamos y normalizamos el código de referencia para evitar duplicados por formato
+            request.ReferenceCode = request.ReferenceCode?.Trim().ToUpper() ?? string.Empty;
+
             // Validamos q el producto exista
             var entity = await _productRepository.GetByIdAsync(request.Id);
             if (entity == null)
