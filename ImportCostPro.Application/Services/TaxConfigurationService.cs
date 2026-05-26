@@ -29,7 +29,7 @@ namespace ImportCostPro.Application.Services
                 };
             }
 
-            return config.ToResponse()!;
+            return config.ToResponse();
         }
 
         public async Task<TaxConfigurationResponse> SaveConfigurationAsync(
@@ -61,15 +61,30 @@ namespace ImportCostPro.Application.Services
             {
                 var newConfig = TaxConfiguration.Create(normalizedItbis, normalizedCustoms);
 
-                await _taxConfigurationRepository.AddAsync(newConfig);
-                return newConfig.ToResponse()!;
+                try
+                {
+                    await _taxConfigurationRepository.AddAsync(newConfig);
+                    return newConfig.ToResponse();
+                }
+                catch (Microsoft.EntityFrameworkCore.DbUpdateException) // Si arrojo una excepcion de actualizacion,
+                // lo mas probable es q sea por una condicion de carrera, asi que intentamos
+                // obtener el registro nuevamente para devolverlo
+                {
+                    currentConfig = await _taxConfigurationRepository.GetSingleConfigurationAsync();
+
+                    if (currentConfig == null)
+                    {
+                        throw;
+                    }
+                }
             }
 
+            // Flujo regular de actualización o rescate del Catch de concurrencia
             currentConfig.UpdateRates(normalizedItbis, normalizedCustoms);
 
             await _taxConfigurationRepository.UpdateAsync(currentConfig);
 
-            return currentConfig.ToResponse()!;
+            return currentConfig.ToResponse();
         }
     }
 }
