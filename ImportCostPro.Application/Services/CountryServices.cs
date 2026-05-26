@@ -1,5 +1,5 @@
-using ImportCostPro.Application.DTOs.Country.Responses;
 using ImportCostPro.Application.DTOs.Country.Requests;
+using ImportCostPro.Application.DTOs.Country.Responses;
 using ImportCostPro.Application.Exceptions;
 using ImportCostPro.Persistence.Entities;
 using ImportCostPro.Persistence.Interfaces.Repositories;
@@ -19,7 +19,6 @@ namespace ImportCostPro.Application.Services
         public async Task<IEnumerable<CountryResponse>> GetAllAsync()
         {
             var countries = await _countryRepository.GetAllAsync();
-            // Mapster carrea y resuelve el mapeo pa no matarnos a mano con mapeos manuales
             return countries.Adapt<IEnumerable<CountryResponse>>().ToList();
         }
 
@@ -29,7 +28,6 @@ namespace ImportCostPro.Application.Services
             if (country == null)
                 return null;
 
-            // Mapster carrea y resuelve el mapeo pa no matarnos a mano con mapeos manuales
             return country.Adapt<CountryResponse>();
         }
 
@@ -46,20 +44,18 @@ namespace ImportCostPro.Application.Services
                 );
             }
 
-            // Usamos Mapster para crear la instancia base limpia de la entidad
             var country = request.Adapt<Country>();
 
-            // Asignamos las propiedades normalizadas de forma correcta
             country.Name = normalizedName;
             country.IsoCode = normalizedIsoCode;
-            country.IsActive = true; 
+            country.IsActive = true;
 
             await _countryRepository.AddAsync(country);
-            
+
             return country.Adapt<CountryResponse>();
         }
 
-        public async Task<CountryResponse> UpdatAsync(UpdateCountryRequest request)
+        public async Task<CountryResponse> UpdateAsync(UpdateCountryRequest request)
         {
             string normalizedName = request.Name?.Trim() ?? string.Empty;
             string normalizedIsoCode = request.IsoCode?.Trim().ToUpperInvariant() ?? string.Empty;
@@ -67,13 +63,15 @@ namespace ImportCostPro.Application.Services
             var existingCountry = await _countryRepository.GetByIdAsync(request.Id);
             if (existingCountry == null)
             {
-                throw new ValidationBusinessException(
-                    nameof(request.Id),
-                    $"No se encontró un país con el ID '{request.Id}'."
-                );
+                throw new BusinessException($"No se encontró un país con el ID '{request.Id}'.");
             }
 
-            if (await _countryRepository.ExistsByIsoCodeAsync(normalizedIsoCode, excludeId: request.Id))
+            if (
+                await _countryRepository.ExistsByIsoCodeAsync(
+                    normalizedIsoCode,
+                    excludeId: request.Id
+                )
+            )
             {
                 throw new ValidationBusinessException(
                     nameof(request.IsoCode),
@@ -81,10 +79,7 @@ namespace ImportCostPro.Application.Services
                 );
             }
 
-            // Mapster mapea los cambios sobre la entidad existente
             existingCountry = request.Adapt(existingCountry);
-
-            // Aseguramos valores limpios antes de persistir
             existingCountry.Name = normalizedName;
             existingCountry.IsoCode = normalizedIsoCode;
 
@@ -97,20 +92,16 @@ namespace ImportCostPro.Application.Services
             var existingCountry = await _countryRepository.GetByIdAsync(id);
             if (existingCountry == null)
             {
-                throw new ValidationBusinessException(
-                    nameof(id),
-                    $"No se encontró un país con el ID '{id}'."
-                );
+                throw new BusinessException($"No se encontró un país con el ID '{id}'.");
             }
 
             if (await _countryRepository.IsCountryReferencedAsync(id))
             {
                 throw new BusinessException(
-                    $"No se puede eliminar el país '{existingCountry.Name}' porque está siendo referenciado por otras entidades en el sistema."
+                    $"No se puede eliminar el país '{existingCountry.Name}' porque está siendo referenciado por otras entidades."
                 );
             }
 
-            // SOLUCIÓN AL ERROR: Le pasamos el 'id' numérico entero como pide tu repositorio genérico
             await _countryRepository.DeleteAsync(id);
             return true;
         }
@@ -120,13 +111,11 @@ namespace ImportCostPro.Application.Services
             var existingCountry = await _countryRepository.GetByIdAsync(id);
             if (existingCountry == null)
             {
-                throw new ValidationBusinessException(
-                    nameof(id),
-                    $"No se encontró un país con el ID '{id}'."
-                );
+                throw new BusinessException($"No se encontró un país con el ID '{id}'.");
             }
 
             existingCountry.IsActive = !existingCountry.IsActive;
+
             await _countryRepository.UpdateAsync(existingCountry);
             return true;
         }
