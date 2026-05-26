@@ -75,20 +75,17 @@ namespace ImportCostPro.Persistence.Repositories
 
         public async Task<bool> IsExchangeRateReferencedAsync(int id)
         {
-            return await _dbSet
-                .Where(e => e.Id == id)
-                .Select(e => e.IsUsedInOfficialCalculation)
-                .FirstOrDefaultAsync();
+            return await _dbSet.AnyAsync(e => e.Id == id && e.IsUsedInOfficialCalculation);
         }
 
         public async Task MarkAsUsedAsync(int id)
         {
-            var rate = await _dbSet.FindAsync(id);
-            if (rate != null && !rate.IsUsedInOfficialCalculation)
-            {
-                rate.IsUsedInOfficialCalculation = true;
-                await UpdateAsync(rate);
-            }
+            await _dbSet
+                .Where(e => e.Id == id && !e.IsUsedInOfficialCalculation)
+                .ExecuteUpdateAsync(setters =>
+                    // Solo actualizamos si no está marcado como usado para evitar escrituras innecesarias
+                    setters.SetProperty(e => e.IsUsedInOfficialCalculation, _ => true)
+                );
         }
     }
 }
