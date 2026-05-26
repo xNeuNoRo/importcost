@@ -34,13 +34,14 @@ namespace ImportCostPro.Persistence.Interfaces.Repositories
         );
 
         /// <summary>
-        /// Verifica si una tasa de cambio está siendo referenciada en
-        /// alguna entidad relacionada (ej. prorrateos) para proteger el histórico.
+        /// Determina si una tasa de cambio está marcada como usada o referenciada
+        /// mediante el indicador de la propia entidad, para proteger el historial.
         /// </summary>
         Task<bool> IsExchangeRateReferencedAsync(int id);
 
         /// <summary>
-        /// Marca una tasa de cambio como "usada" o "referenciada" para evitar que sea eliminada físicamente
+        /// Marca una tasa de cambio como usada o referenciada en el indicador de la propia entidad
+        /// para evitar que sea eliminada físicamente.
         /// </summary>
         Task MarkAsUsedAsync(int id);
     }

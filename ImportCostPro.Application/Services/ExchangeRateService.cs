@@ -10,10 +10,15 @@ namespace ImportCostPro.Application.Services
     public class ExchangeRateService
     {
         private readonly IExchangeRateRepository _exchangeRateRepository;
+        private readonly ICurrencyRepository _currencyRepository;
 
-        public ExchangeRateService(IExchangeRateRepository exchangeRateRepository)
+        public ExchangeRateService(
+            IExchangeRateRepository exchangeRateRepository,
+            ICurrencyRepository currencyRepository
+        )
         {
             _exchangeRateRepository = exchangeRateRepository;
+            _currencyRepository = currencyRepository;
         }
 
         public async Task<IEnumerable<ExchangeRateResponse>> GetAllAsync()
@@ -42,8 +47,26 @@ namespace ImportCostPro.Application.Services
             ValidateBasicRules(
                 normalizedFromCurrencyId,
                 normalizedToCurrencyId,
-                normalizedRateValue
+                normalizedRateValue,
+                nameof(request.FromCurrencyId),
+                nameof(request.RateValue)
             );
+
+            if (!await _currencyRepository.ExistsByIdAsync(normalizedFromCurrencyId))
+            {
+                throw new ValidationBusinessException(
+                    nameof(request.FromCurrencyId),
+                    $"La moneda de origen con ID {normalizedFromCurrencyId} no existe."
+                );
+            }
+
+            if (!await _currencyRepository.ExistsByIdAsync(normalizedToCurrencyId))
+            {
+                throw new ValidationBusinessException(
+                    nameof(request.ToCurrencyId),
+                    $"La moneda de destino con ID {normalizedToCurrencyId} no existe."
+                );
+            }
 
             bool duplicate = await _exchangeRateRepository.ExistsActiveDuplicateAsync(
                 normalizedFromCurrencyId,
@@ -82,7 +105,9 @@ namespace ImportCostPro.Application.Services
             ValidateBasicRules(
                 normalizedFromCurrencyId,
                 normalizedToCurrencyId,
-                normalizedRateValue
+                normalizedRateValue,
+                nameof(request.FromCurrencyId),
+                nameof(request.RateValue)
             );
 
             var entity = await _exchangeRateRepository.GetByIdAsync(request.Id);
@@ -97,6 +122,22 @@ namespace ImportCostPro.Application.Services
             {
                 throw new BusinessException(
                     "No se puede modificar una tasa de cambio que ya ha sido utilizada en un histórico de importación."
+                );
+            }
+
+            if (!await _currencyRepository.ExistsByIdAsync(normalizedFromCurrencyId))
+            {
+                throw new ValidationBusinessException(
+                    nameof(request.FromCurrencyId),
+                    $"La moneda de origen con ID {normalizedFromCurrencyId} no existe."
+                );
+            }
+
+            if (!await _currencyRepository.ExistsByIdAsync(normalizedToCurrencyId))
+            {
+                throw new ValidationBusinessException(
+                    nameof(request.ToCurrencyId),
+                    $"La moneda de destino con ID {normalizedToCurrencyId} no existe."
                 );
             }
 
@@ -165,13 +206,15 @@ namespace ImportCostPro.Application.Services
         private static void ValidateBasicRules(
             int fromCurrencyId,
             int toCurrencyId,
-            decimal rateValue
+            decimal rateValue,
+            string fromCurrencyPropertyName,
+            string rateValuePropertyName
         )
         {
             if (fromCurrencyId == toCurrencyId)
             {
                 throw new ValidationBusinessException(
-                    nameof(fromCurrencyId),
+                    fromCurrencyPropertyName,
                     "La moneda origen y la moneda destino no pueden ser iguales."
                 );
             }
@@ -179,7 +222,7 @@ namespace ImportCostPro.Application.Services
             if (rateValue <= 0)
             {
                 throw new ValidationBusinessException(
-                    nameof(rateValue),
+                    rateValuePropertyName,
                     "El valor de la tasa de cambio debe ser mayor a 0."
                 );
             }
