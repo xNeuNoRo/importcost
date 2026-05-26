@@ -17,7 +17,8 @@ namespace ImportCostPro.Application.Services
         public SupplierService(
             ISupplierRepository supplierRepository,
             ICountryRepository countryRepository,
-            ICurrencyRepository currencyRepository)
+            ICurrencyRepository currencyRepository
+        )
         {
             _supplierRepository = supplierRepository;
             _countryRepository = countryRepository;
@@ -42,7 +43,15 @@ namespace ImportCostPro.Application.Services
 
         public async Task<SupplierResponse> CreateAsync(CreateSupplierRequest request)
         {
-            request.Name = request.Name?.Trim() ?? string.Empty;
+            string normalizedName = request.Name?.Trim() ?? string.Empty;
+
+            if (string.IsNullOrWhiteSpace(normalizedName))
+            {
+                throw new ValidationBusinessException(
+                    nameof(request.Name),
+                    "El nombre del proveedor es requerido y no puede estar vacío."
+                );
+            }
 
             var country = await _countryRepository.GetByIdAsync(request.OriginCountryId);
             if (country == null || !country.IsActive)
@@ -62,16 +71,17 @@ namespace ImportCostPro.Application.Services
                 );
             }
 
-            bool nameExists = await _supplierRepository.ExistsByNameAsync(request.Name);
+            bool nameExists = await _supplierRepository.ExistsByNameAsync(normalizedName);
             if (nameExists)
             {
                 throw new ValidationBusinessException(
                     nameof(request.Name),
-                    $"El proveedor con el nombre '{request.Name}' ya está registrado."
+                    $"El proveedor con el nombre '{normalizedName}' ya está registrado."
                 );
             }
 
             var entity = request.Adapt<Supplier>();
+            entity.Name = normalizedName;
             entity.IsActive = true;
 
             await _supplierRepository.AddAsync(entity);
@@ -81,7 +91,15 @@ namespace ImportCostPro.Application.Services
 
         public async Task<SupplierResponse> UpdateAsync(UpdateSupplierRequest request)
         {
-            request.Name = request.Name?.Trim() ?? string.Empty;
+            string normalizedName = request.Name?.Trim() ?? string.Empty;
+
+            if (string.IsNullOrWhiteSpace(normalizedName))
+            {
+                throw new ValidationBusinessException(
+                    nameof(request.Name),
+                    "El nombre del proveedor es requerido y no puede estar vacío."
+                );
+            }
 
             var entity = await _supplierRepository.GetByIdAsync(request.Id);
             if (entity == null)
@@ -94,12 +112,15 @@ namespace ImportCostPro.Application.Services
             var country = await _countryRepository.GetByIdAsync(request.OriginCountryId);
             var currency = await _currencyRepository.GetByIdAsync(request.DefaultCurrencyId);
 
-            bool nameExists = await _supplierRepository.ExistsByNameAsync(request.Name, excludeId: request.Id);
+            bool nameExists = await _supplierRepository.ExistsByNameAsync(
+                normalizedName,
+                excludeId: request.Id
+            );
             if (nameExists)
             {
                 throw new ValidationBusinessException(
                     nameof(request.Name),
-                    $"El nombre '{request.Name}' ya está registrado en otro proveedor."
+                    $"El nombre '{normalizedName}' ya está registrado en otro proveedor."
                 );
             }
 
@@ -125,7 +146,10 @@ namespace ImportCostPro.Application.Services
             }
             else
             {
-                if (entity.OriginCountryId != request.OriginCountryId && (country == null || !country.IsActive))
+                if (
+                    entity.OriginCountryId != request.OriginCountryId
+                    && (country == null || !country.IsActive)
+                )
                 {
                     throw new ValidationBusinessException(
                         nameof(request.OriginCountryId),
@@ -133,7 +157,10 @@ namespace ImportCostPro.Application.Services
                     );
                 }
 
-                if (entity.DefaultCurrencyId != request.DefaultCurrencyId && (currency == null || !currency.IsActive))
+                if (
+                    entity.DefaultCurrencyId != request.DefaultCurrencyId
+                    && (currency == null || !currency.IsActive)
+                )
                 {
                     throw new ValidationBusinessException(
                         nameof(request.DefaultCurrencyId),
@@ -143,6 +170,7 @@ namespace ImportCostPro.Application.Services
             }
 
             request.Adapt(entity);
+            entity.Name = normalizedName;
 
             await _supplierRepository.UpdateAsync(entity);
 
