@@ -80,7 +80,11 @@ namespace ImportCostPro.Application.Services
 
             await _importerRepository.AddAsync(importer);
 
-            return importer.Adapt<ImporterResponse>();
+            var response = importer.Adapt<ImporterResponse>();
+            response.CountryName = countryExists.Name;
+            response.CountryIsoCode = countryExists.IsoCode;
+
+            return response;
         }
 
         public async Task<ImporterResponse> UpdateAsync(UpdateImporterRequest request)
@@ -133,7 +137,12 @@ namespace ImportCostPro.Application.Services
             existingImporter.TaxId = normalizedTaxID;
 
             await _importerRepository.UpdateAsync(existingImporter);
-            return existingImporter.Adapt<ImporterResponse>();
+
+            var response = existingImporter.Adapt<ImporterResponse>();
+            response.CountryName = countryExists.Name;
+            response.CountryIsoCode = countryExists.IsoCode;
+
+            return response;
         }
 
         public async Task<bool> DeleteAsync(int id)
