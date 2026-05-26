@@ -12,7 +12,7 @@ namespace ImportCostPro.Persistence.Entities
         public DateTime EffectiveDate { get; private set; }
         public bool IsUsedInOfficialCalculation { get; set; } = false; // Flag de control para evitar eliminación/edición crítica
 
-        protected ExchangeRate() { }
+        public ExchangeRate() { }
 
         private ExchangeRate(
             int fromCurrencyId,
