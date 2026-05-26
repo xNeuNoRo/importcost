@@ -169,7 +169,7 @@ namespace ImportCostPro.Application.Services
             return responseRate!.ToResponse();
         }
 
-        public async Task<bool> ToggleActiveAsync(int id)
+        public async Task<bool> ToggleStatusAsync(int id)
         {
             var entity = await _exchangeRateRepository.GetByIdAsync(id);
             if (entity == null)
