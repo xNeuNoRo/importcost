@@ -2,6 +2,7 @@
 using ImportCostPro.Application.DTOs.ExchangeRate.Responses;
 using ImportCostPro.Application.Exceptions;
 using ImportCostPro.Application.Extensions;
+using ImportCostPro.Persistence.Entities;
 using ImportCostPro.Persistence.Interfaces.Repositories;
 
 namespace ImportCostPro.Application.Services
@@ -21,77 +22,167 @@ namespace ImportCostPro.Application.Services
             return rates.Select(r => r.ToResponse());
         }
 
-        public async Task<ExchangeRateResponse> GetByIdAsync(int id)
+        public async Task<ExchangeRateResponse?> GetByIdAsync(int id)
         {
-            var rate = await _exchangeRateRepository.GetByIdAsync(id)
-                ?? throw new ValidationBusinessException($"La tasa de cambio con ID {id} no fue encontrada.", nameof(id));
-
+            var rate = await _exchangeRateRepository.GetByIdWithCurrenciesAsync(id);
+            if (rate == null)
+            {
+                return null;
+            }
             return rate.ToResponse();
         }
 
         public async Task<ExchangeRateResponse> CreateAsync(CreateExchangeRateRequest request)
         {
-            ValidateBasicRules(request.FromCurrencyId, request.ToCurrencyId, request.RateValue);
+            int normalizedFromCurrencyId = request.FromCurrencyId;
+            int normalizedToCurrencyId = request.ToCurrencyId;
+            decimal normalizedRateValue = request.RateValue;
+            DateTime normalizedEffectiveDate = request.EffectiveDate.Date;
+
+            ValidateBasicRules(
+                normalizedFromCurrencyId,
+                normalizedToCurrencyId,
+                normalizedRateValue
+            );
 
             bool duplicate = await _exchangeRateRepository.ExistsActiveDuplicateAsync(
-                request.FromCurrencyId, request.ToCurrencyId, request.EffectiveDate);
+                normalizedFromCurrencyId,
+                normalizedToCurrencyId,
+                normalizedEffectiveDate
+            );
 
             if (duplicate)
-                throw new ValidationBusinessException("Ya existe una tasa de cambio activa para la misma moneda origen, destino y fecha de vigencia.", nameof(request.FromCurrencyId));
+            {
+                throw new ValidationBusinessException(
+                    nameof(request.FromCurrencyId),
+                    "Ya existe una tasa de cambio activa para la misma moneda origen, destino y fecha de vigencia."
+                );
+            }
 
-            var entity = request.ToEntity();
+            var entity = ExchangeRate.Create(
+                normalizedFromCurrencyId,
+                normalizedToCurrencyId,
+                normalizedRateValue,
+                normalizedEffectiveDate
+            );
+
             await _exchangeRateRepository.AddAsync(entity);
 
-            return entity.ToResponse();
+            var responseRate = await _exchangeRateRepository.GetByIdWithCurrenciesAsync(entity.Id);
+            return responseRate!.ToResponse();
         }
 
         public async Task<ExchangeRateResponse> UpdateAsync(UpdateExchangeRateRequest request)
         {
-            ValidateBasicRules(request.FromCurrencyId, request.ToCurrencyId, request.RateValue);
+            int normalizedFromCurrencyId = request.FromCurrencyId;
+            int normalizedToCurrencyId = request.ToCurrencyId;
+            decimal normalizedRateValue = request.RateValue;
+            DateTime normalizedEffectiveDate = request.EffectiveDate.Date;
 
-            var entity = await _exchangeRateRepository.GetByIdAsync(request.Id)
-                ?? throw new ValidationBusinessException($"La tasa de cambio con ID {request.Id} no fue encontrada.", nameof(request.Id));
+            ValidateBasicRules(
+                normalizedFromCurrencyId,
+                normalizedToCurrencyId,
+                normalizedRateValue
+            );
+
+            var entity = await _exchangeRateRepository.GetByIdAsync(request.Id);
+            if (entity == null)
+            {
+                throw new BusinessException(
+                    $"La tasa de cambio con ID {request.Id} no fue encontrada en el sistema."
+                );
+            }
+
+            if (await _exchangeRateRepository.IsExchangeRateReferencedAsync(request.Id))
+            {
+                throw new BusinessException(
+                    "No se puede modificar una tasa de cambio que ya ha sido utilizada en un histórico de importación."
+                );
+            }
 
             bool duplicate = await _exchangeRateRepository.ExistsActiveDuplicateAsync(
-                request.FromCurrencyId, request.ToCurrencyId, request.EffectiveDate, request.Id);
+                normalizedFromCurrencyId,
+                normalizedToCurrencyId,
+                normalizedEffectiveDate,
+                request.Id
+            );
 
             if (duplicate)
-                throw new ValidationBusinessException("Ya existe una tasa de cambio activa para la misma moneda origen, destino y fecha de vigencia.", nameof(request.FromCurrencyId));
+            {
+                throw new ValidationBusinessException(
+                    nameof(request.FromCurrencyId),
+                    "Ya existe una tasa de cambio activa para la misma moneda origen, destino y fecha de vigencia."
+                );
+            }
 
-            entity.FromCurrencyId = request.FromCurrencyId;
-            entity.ToCurrencyId = request.ToCurrencyId;
-            entity.RateValue = request.RateValue;
-            entity.EffectiveDate = request.EffectiveDate;
+            entity.UpdateDetails(
+                normalizedFromCurrencyId,
+                normalizedToCurrencyId,
+                normalizedRateValue,
+                normalizedEffectiveDate
+            );
 
             await _exchangeRateRepository.UpdateAsync(entity);
 
-            return entity.ToResponse();
+            var responseRate = await _exchangeRateRepository.GetByIdWithCurrenciesAsync(entity.Id);
+            return responseRate!.ToResponse();
         }
 
-        public async Task ToggleActiveAsync(int id)
+        public async Task<bool> ToggleActiveAsync(int id)
         {
-            var entity = await _exchangeRateRepository.GetByIdAsync(id)
-                ?? throw new ValidationBusinessException($"La tasa de cambio con ID {id} no fue encontrada.", nameof(id));
+            var entity = await _exchangeRateRepository.GetByIdAsync(id);
+            if (entity == null)
+            {
+                throw new BusinessException($"La tasa de cambio con ID {id} no fue encontrada.");
+            }
 
             entity.IsActive = !entity.IsActive;
             await _exchangeRateRepository.UpdateAsync(entity);
+
+            return true;
         }
 
-        public async Task DeleteAsync(int id)
+        public async Task<bool> DeleteAsync(int id)
         {
-            var entity = await _exchangeRateRepository.GetByIdAsync(id)
-                ?? throw new ValidationBusinessException($"La tasa de cambio con ID {id} no fue encontrada.", nameof(id));
+            var entity = await _exchangeRateRepository.GetByIdAsync(id);
+            if (entity == null)
+            {
+                throw new BusinessException($"La tasa de cambio con ID {id} no fue encontrada.");
+            }
+
+            if (await _exchangeRateRepository.IsExchangeRateReferencedAsync(id))
+            {
+                throw new BusinessException(
+                    "Está prohibido eliminar físicamente una tasa que cuenta con histórico de prorrateo."
+                );
+            }
 
             await _exchangeRateRepository.DeleteAsync(id);
+
+            return true;
         }
 
-        private static void ValidateBasicRules(int fromCurrencyId, int toCurrencyId, decimal rateValue)
+        private static void ValidateBasicRules(
+            int fromCurrencyId,
+            int toCurrencyId,
+            decimal rateValue
+        )
         {
             if (fromCurrencyId == toCurrencyId)
-                throw new ValidationBusinessException("La moneda origen y la moneda destino no pueden ser iguales.", nameof(fromCurrencyId));
+            {
+                throw new ValidationBusinessException(
+                    nameof(fromCurrencyId),
+                    "La moneda origen y la moneda destino no pueden ser iguales."
+                );
+            }
 
             if (rateValue <= 0)
-                throw new ValidationBusinessException("El valor de la tasa de cambio debe ser mayor a 0.", nameof(rateValue));
+            {
+                throw new ValidationBusinessException(
+                    nameof(rateValue),
+                    "El valor de la tasa de cambio debe ser mayor a 0."
+                );
+            }
         }
     }
 }
