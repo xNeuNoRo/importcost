@@ -36,6 +36,22 @@ namespace ImportCostPro.Application.Services
             string normalizedName = request.Name?.Trim() ?? string.Empty;
             string normalizedIsoCode = request.IsoCode?.Trim().ToUpperInvariant() ?? string.Empty;
 
+            if (string.IsNullOrWhiteSpace(normalizedName))
+            {
+                throw new ValidationBusinessException(
+                    nameof(request.Name),
+                    "El nombre del país es requerido y no puede estar vacío."
+                );
+            }
+
+            if (normalizedIsoCode.Length != 3)
+            {
+                throw new ValidationBusinessException(
+                    nameof(request.IsoCode),
+                    "El código ISO del país debe tener exactamente 3 caracteres."
+                );
+            }
+
             if (await _countryRepository.ExistsByIsoCodeAsync(normalizedIsoCode))
             {
                 throw new ValidationBusinessException(
