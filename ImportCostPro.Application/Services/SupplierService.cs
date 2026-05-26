@@ -44,12 +44,21 @@ namespace ImportCostPro.Application.Services
         public async Task<SupplierResponse> CreateAsync(CreateSupplierRequest request)
         {
             string normalizedName = request.Name?.Trim() ?? string.Empty;
+            string normalizedEmail = request.Email?.Trim() ?? string.Empty;
 
             if (string.IsNullOrWhiteSpace(normalizedName))
             {
                 throw new ValidationBusinessException(
                     nameof(request.Name),
                     "El nombre del proveedor es requerido y no puede estar vacío."
+                );
+            }
+
+            if (string.IsNullOrWhiteSpace(normalizedEmail))
+            {
+                throw new ValidationBusinessException(
+                    nameof(request.Email),
+                    "El correo electrónico del proveedor es requerido y no puede estar vacío."
                 );
             }
 
@@ -82,6 +91,7 @@ namespace ImportCostPro.Application.Services
 
             var entity = request.Adapt<Supplier>();
             entity.Name = normalizedName;
+            entity.Email = normalizedEmail;
             entity.IsActive = true;
 
             await _supplierRepository.AddAsync(entity);
