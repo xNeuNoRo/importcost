@@ -7,16 +7,42 @@ namespace ImportCostPro.Persistence.Entities
         /// <summary>
         /// Código oficial del arancel
         /// </summary>
-        public required string Code { get; set; }
+        public string Code { get; private set; } = null!;
 
         /// <summary>
         /// Descripción oficial de la mercancía
         /// </summary>
-        public required string Description { get; set; }
+        public string Description { get; private set; } = null!;
 
         /// <summary>
         /// Tasa de arancel aduanero aplicable a esta categoría, expresada como un porcentaje (por ejemplo, 5.5 para 5.5%).
         /// </summary>
-        public required decimal CustomsDutyRate { get; set; }
+        public decimal CustomsDutyRate { get; private set; }
+
+        public TariffCategory() { }
+
+        private TariffCategory(string code, string description, decimal customsDutyRate)
+        {
+            Code = code.Trim().ToUpperInvariant();
+            Description = description.Trim();
+            CustomsDutyRate = customsDutyRate;
+            IsActive = true;
+        }
+
+        public static TariffCategory Create(
+            string code,
+            string description,
+            decimal customsDutyRate
+        )
+        {
+            return new TariffCategory(code, description, customsDutyRate);
+        }
+
+        public void UpdateDetails(string code, string description, decimal customsDutyRate)
+        {
+            Code = code.Trim().ToUpperInvariant();
+            Description = description.Trim();
+            CustomsDutyRate = customsDutyRate;
+        }
     }
 }
