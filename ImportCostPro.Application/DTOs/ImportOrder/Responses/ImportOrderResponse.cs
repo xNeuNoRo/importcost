@@ -13,8 +13,8 @@ namespace ImportCostPro.Application.DTOs.ImportOrder.Responses
         public int SupplierId { get; set; }
         public string SupplierName { get; set; } = null!;
 
-        public int CountryId { get; set; }
-        public string CountryName { get; set; } = null!;
+        public int OriginCountryId { get; set; }
+        public string OriginCountryName { get; set; } = null!;
 
         public int CurrencyId { get; set; }
         public string CurrencyIsoCode { get; set; } = null!;
