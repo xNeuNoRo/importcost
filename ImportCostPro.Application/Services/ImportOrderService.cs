@@ -90,7 +90,6 @@ namespace ImportCostPro.Application.Services
 
             ValidateBasicRules(normalizedOrderNumber, nameof(request.OrderNumber));
 
-            // 🛡️ OPTIMIZACIÓN DE RENDIMIENTO: Validamos el estado actual usando tu método liviano
             var currentStatus = await _importOrderRepository.GetStatusByIdAsync(request.Id);
             if (currentStatus == null)
             {
@@ -99,7 +98,6 @@ namespace ImportCostPro.Application.Services
                 );
             }
 
-            // 🛡️ Candado Funcional Estricto: Control de máquina de estados
             if (currentStatus == OrderStatus.Closed || currentStatus == OrderStatus.Canceled)
             {
                 throw new BusinessException(
@@ -127,7 +125,6 @@ namespace ImportCostPro.Application.Services
                 );
             }
 
-            // Recuperamos la entidad completa traída del repositorio para mutarla bajo el tracker de EF Core
             var entity = await _importOrderRepository.GetByIdWithRelationsAsync(request.Id);
 
             entity!.UpdateDetails(
@@ -139,10 +136,6 @@ namespace ImportCostPro.Application.Services
                 request.OriginCountryId,
                 request.CurrencyId
             );
-
-            // Al no tener un método Update genérico expuesto en tu interfaz restringida, el guardado final
-            // se procesa a nivel de infraestructura mediante el tracking automático de cambios de EF Core
-            // sobre el grafo de la entidad cuando el contexto confirma la transacción, o mediante la persistencia atómica.
 
             return entity.ToResponse();
         }
@@ -157,7 +150,6 @@ namespace ImportCostPro.Application.Services
                 );
             }
 
-            // Si la orden ya está archivada/cerrada permanentemente, bloqueamos mutaciones descontroladas de estado
             if (currentStatus == OrderStatus.Closed || currentStatus == OrderStatus.Canceled)
             {
                 throw new BusinessException(
