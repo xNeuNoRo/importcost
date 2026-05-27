@@ -34,8 +34,8 @@ namespace ImportCostPro.Application.Services
 
         public async Task<TariffCategoryResponse> CreateAsync(CreateTariffCategoryRequest request)
         {
-            string normalizedCode = request.Code.Trim().ToUpper();
-            string normalizedDescription = request.Description.Trim();
+            string normalizedCode = request.Code?.Trim().ToUpper() ?? string.Empty;
+            string normalizedDescription = request.Description?.Trim() ?? string.Empty;
             decimal normalizedRate = request.CustomsDutyRate;
 
             ValidateBasicRules(
@@ -69,8 +69,8 @@ namespace ImportCostPro.Application.Services
 
         public async Task<TariffCategoryResponse> UpdateAsync(UpdateTariffCategoryRequest request)
         {
-            string normalizedCode = request.Code.Trim().ToUpper();
-            string normalizedDescription = request.Description.Trim();
+            string normalizedCode = request.Code?.Trim().ToUpper() ?? string.Empty;
+            string normalizedDescription = request.Description?.Trim() ?? string.Empty;
             decimal normalizedRate = request.CustomsDutyRate;
 
             ValidateBasicRules(
@@ -116,7 +116,7 @@ namespace ImportCostPro.Application.Services
             return entity.ToResponse();
         }
 
-        public async Task<bool> ToggleActiveAsync(int id)
+        public async Task<bool> ToggleStatusAsync(int id)
         {
             var entity = await _tariffCategoryRepository.GetByIdAsync(id);
             if (entity == null)

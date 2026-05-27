@@ -23,7 +23,7 @@ namespace ImportCostPro.Persistence.Entities
 
         private TariffCategory(string code, string description, decimal customsDutyRate)
         {
-            Code = code.Trim().ToUpper();
+            Code = code.Trim().ToUpperInvariant();
             Description = description.Trim();
             CustomsDutyRate = customsDutyRate;
             IsActive = true;
@@ -40,7 +40,7 @@ namespace ImportCostPro.Persistence.Entities
 
         public void UpdateDetails(string code, string description, decimal customsDutyRate)
         {
-            Code = code.Trim().ToUpper();
+            Code = code.Trim().ToUpperInvariant();
             Description = description.Trim();
             CustomsDutyRate = customsDutyRate;
         }
