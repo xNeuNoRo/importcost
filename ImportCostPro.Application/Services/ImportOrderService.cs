@@ -90,15 +90,15 @@ namespace ImportCostPro.Application.Services
 
             ValidateBasicRules(normalizedOrderNumber, nameof(request.OrderNumber));
 
-            var currentStatus = await _importOrderRepository.GetStatusByIdAsync(request.Id);
-            if (currentStatus == null)
+            var entity = await _importOrderRepository.GetByIdAsync(request.Id);
+            if (entity == null)
             {
                 throw new BusinessException(
                     $"La orden de importación con ID {request.Id} no fue encontrada en el sistema."
                 );
             }
 
-            if (currentStatus == OrderStatus.Closed || currentStatus == OrderStatus.Canceled)
+            if (entity.Status == OrderStatus.Closed || entity.Status == OrderStatus.Canceled)
             {
                 throw new BusinessException(
                     "No se permite editar una orden que se encuentra en estado Closed o Canceled."
@@ -124,8 +124,6 @@ namespace ImportCostPro.Application.Services
                     $"El número de orden '{normalizedOrderNumber}' ya está en uso por otra importación."
                 );
             }
-
-            var entity = await _importOrderRepository.GetByIdAsync(request.Id);
 
             entity!.UpdateDetails(
                 normalizedOrderNumber,
@@ -160,7 +158,15 @@ namespace ImportCostPro.Application.Services
                 );
             }
 
-            return await _importOrderRepository.UpdateStatusAsync(id, newStatus);
+            var updated = await _importOrderRepository.UpdateStatusAsync(id, newStatus);
+            if (!updated)
+            {
+                throw new BusinessException(
+                    $"La orden de importación con ID {id} no fue encontrada."
+                );
+            }
+            
+            return true;
         }
 
         private static void ValidateBasicRules(string orderNumber, string orderNumberPropertyName)

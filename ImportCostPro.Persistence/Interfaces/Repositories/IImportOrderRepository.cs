@@ -7,7 +7,7 @@ namespace ImportCostPro.Persistence.Interfaces.Repositories
     // para restringir las operaciones disponibles por seguridad
     public interface IImportOrderRepository
     {
-        // SOLO USAREMOS EL ADDASYNC Y EL GETBYIDASYNC DE GENERICREPOSITORY
+        // SOLO USAREMOS EL ADDASYNC, UPDATEASYNC EL GETBYIDASYNC DE GENERICREPOSITORY
 
         /// <summary>
         /// Registra una nueva orden de importación en el sistema.
