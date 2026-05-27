@@ -15,6 +15,11 @@ namespace ImportCostPro.Persistence.Interfaces.Repositories
         Task AddAsync(ImportOrder entity);
 
         /// <summary>
+        /// Actualiza una orden de importación existente en el sistema.
+        /// </summary>
+        Task UpdateAsync(ImportOrder entity);
+
+        /// <summary>
         /// Recupera una orden básica por su identificador único para validaciones previas de estado.
         /// </summary>
         Task<ImportOrder?> GetByIdAsync(int id);

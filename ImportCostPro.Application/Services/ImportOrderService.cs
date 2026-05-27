@@ -125,7 +125,7 @@ namespace ImportCostPro.Application.Services
                 );
             }
 
-            var entity = await _importOrderRepository.GetByIdWithRelationsAsync(request.Id);
+            var entity = await _importOrderRepository.GetByIdAsync(request.Id);
 
             entity!.UpdateDetails(
                 normalizedOrderNumber,
@@ -137,7 +137,10 @@ namespace ImportCostPro.Application.Services
                 request.CurrencyId
             );
 
-            return entity.ToResponse();
+            await _importOrderRepository.UpdateAsync(entity);
+
+            var responseOrder = await _importOrderRepository.GetByIdWithRelationsAsync(entity.Id);
+            return responseOrder!.ToResponse();
         }
 
         public async Task<bool> ChangeStatusAsync(int id, OrderStatus newStatus)
