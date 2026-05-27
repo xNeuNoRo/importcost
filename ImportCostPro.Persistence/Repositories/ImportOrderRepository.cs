@@ -16,6 +16,11 @@ namespace ImportCostPro.Persistence.Repositories
             await base.AddAsync(entity);
         }
 
+        public new Task UpdateAsync(ImportOrder entity)
+        {
+            return base.UpdateAsync(entity);
+        }
+
         public new async Task<ImportOrder?> GetByIdAsync(int id)
         {
             return await base.GetByIdAsync(id);
