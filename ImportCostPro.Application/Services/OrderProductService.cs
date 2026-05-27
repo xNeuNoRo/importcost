@@ -73,11 +73,20 @@ namespace ImportCostPro.Application.Services
                 );
             }
 
-            if (!await _productRepository.ExistsByIdAsync(request.ProductId))
+            var product = await _productRepository.GetByIdAsync(request.ProductId);
+            if (product == null)
             {
                 throw new ValidationBusinessException(
                     nameof(request.ProductId),
                     $"El producto con ID {request.ProductId} no existe en el catálogo maestro."
+                );
+            }
+
+            if (!product.IsActive)
+            {
+                throw new ValidationBusinessException(
+                    nameof(request.ProductId),
+                    $"El producto '{product.Name}' se encuentra inactivo o descontinuado y no puede ser añadido a nuevas órdenes de importación."
                 );
             }
 
@@ -193,7 +202,7 @@ namespace ImportCostPro.Application.Services
                 );
             }
 
-            if (targetProfitMargin <= 0 || targetProfitMargin > 100)
+            if (targetProfitMargin < 0.01m || targetProfitMargin > 100)
             {
                 throw new ValidationBusinessException(
                     marginPropName,
