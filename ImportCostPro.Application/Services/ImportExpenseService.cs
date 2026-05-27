@@ -51,7 +51,11 @@ namespace ImportCostPro.Application.Services
                 normalizedDescription,
                 request.ExpenseType,
                 request.DistributionBase,
-                request.OriginalAmount
+                request.OriginalAmount,
+                nameof(request.Description),
+                nameof(request.ExpenseType),
+                nameof(request.DistributionBase),
+                nameof(request.OriginalAmount)
             );
 
             var orderStatus = await _importOrderRepository.GetStatusByIdAsync(
@@ -71,7 +75,7 @@ namespace ImportCostPro.Application.Services
             )
             {
                 throw new BusinessException(
-                    "Está estrictamente prohibido agregar gastos logísticos a una orden en estado %s, Calculated, Closed o Canceled."
+                    $"Está estrictamente prohibido agregar gastos logísticos a una orden en estado {orderStatus}."
                 );
             }
 
@@ -140,13 +144,6 @@ namespace ImportCostPro.Application.Services
         {
             string normalizedDescription = request.Description?.Trim() ?? string.Empty;
 
-            ValidateBasicRules(
-                normalizedDescription,
-                ExpenseType.OtherExpenses,
-                request.DistributionBase,
-                request.OriginalAmount
-            );
-
             var entity = await _importExpenseRepository.GetByIdAsync(request.Id);
             if (entity == null)
             {
@@ -168,6 +165,18 @@ namespace ImportCostPro.Application.Services
                 );
             }
 
+            ValidateBasicRules(
+                normalizedDescription,
+                entity.ExpenseType,
+                request.DistributionBase,
+                request.OriginalAmount,
+                nameof(request.Description),
+                "ExpenseType",
+                nameof(request.DistributionBase),
+                nameof(request.OriginalAmount)
+            );
+
+            // Mantenemos la inmutabilidad relacional de los contratos purgados
             entity.Description = normalizedDescription;
             entity.DistributionBase = request.DistributionBase;
             entity.OriginalAmount = request.OriginalAmount;
@@ -207,13 +216,17 @@ namespace ImportCostPro.Application.Services
             string description,
             ExpenseType expenseType,
             DistributionBase distributionBase,
-            decimal originalAmount
+            decimal originalAmount,
+            string descPropName,
+            string typePropName,
+            string basePropName,
+            string amountPropName
         )
         {
             if (string.IsNullOrWhiteSpace(description))
             {
                 throw new ValidationBusinessException(
-                    nameof(description),
+                    descPropName,
                     "La descripción del gasto de importación es obligatoria."
                 );
             }
@@ -221,7 +234,7 @@ namespace ImportCostPro.Application.Services
             if (!Enum.IsDefined(typeof(ExpenseType), expenseType))
             {
                 throw new ValidationBusinessException(
-                    nameof(expenseType),
+                    typePropName,
                     "El tipo de gasto seleccionado no es válido."
                 );
             }
@@ -229,7 +242,7 @@ namespace ImportCostPro.Application.Services
             if (!Enum.IsDefined(typeof(DistributionBase), distributionBase))
             {
                 throw new ValidationBusinessException(
-                    nameof(distributionBase),
+                    basePropName,
                     "La base de distribución seleccionada no es válida."
                 );
             }
@@ -237,7 +250,7 @@ namespace ImportCostPro.Application.Services
             if (originalAmount <= 0)
             {
                 throw new ValidationBusinessException(
-                    nameof(originalAmount),
+                    amountPropName,
                     "El monto original del gasto logístico debe ser mayor a 0."
                 );
             }
