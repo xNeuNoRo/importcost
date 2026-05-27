@@ -51,11 +51,7 @@ namespace ImportCostPro.Application.Services
                 normalizedDescription,
                 request.ExpenseType,
                 request.DistributionBase,
-                request.OriginalAmount,
-                nameof(request.Description),
-                nameof(request.ExpenseType),
-                nameof(request.DistributionBase),
-                nameof(request.OriginalAmount)
+                request.OriginalAmount
             );
 
             var orderStatus = await _importOrderRepository.GetStatusByIdAsync(
@@ -68,10 +64,14 @@ namespace ImportCostPro.Application.Services
                 );
             }
 
-            if (orderStatus == OrderStatus.Closed || orderStatus == OrderStatus.Canceled)
+            if (
+                orderStatus == OrderStatus.Calculated
+                || orderStatus == OrderStatus.Closed
+                || orderStatus == OrderStatus.Canceled
+            )
             {
                 throw new BusinessException(
-                    "Está estrictamente prohibido agregar gastos logísticos a una orden en estado Closed o Canceled."
+                    "Está estrictamente prohibido agregar gastos logísticos a una orden en estado %s, Calculated, Closed o Canceled."
                 );
             }
 
@@ -80,7 +80,7 @@ namespace ImportCostPro.Application.Services
             {
                 throw new ValidationBusinessException(
                     nameof(request.CurrencyId),
-                    $"La moneda con ID {request.CurrencyId} no existe en el catálogo maestro."
+                    $"La moneda con ID {request.CurrencyId} no existe."
                 );
             }
 
@@ -88,20 +88,35 @@ namespace ImportCostPro.Application.Services
             {
                 throw new ValidationBusinessException(
                     nameof(request.CurrencyId),
-                    $"La moneda '{currency.Name}' se encuentra inactiva y no puede utilizarse para transacciones de gastos."
+                    $"La moneda '{currency.Name}' se encuentra inactiva."
                 );
             }
 
             if (
-                await _importExpenseRepository.HasExpenseTypeAsync(
+                request.ExpenseType == ExpenseType.InternationalFreight
+                && await _importExpenseRepository.HasExpenseTypeAsync(
                     request.ImportOrderId,
-                    request.ExpenseType
+                    ExpenseType.InternationalFreight
                 )
             )
             {
                 throw new ValidationBusinessException(
                     nameof(request.ExpenseType),
-                    "Ya existe un gasto registrado bajo este tipo en la orden de importación. Si desea modificar su valor, proceda a editar el registro existente."
+                    "Ya existe un gasto de flete internacional registrado para esta orden."
+                );
+            }
+
+            if (
+                request.ExpenseType == ExpenseType.InternationalInsurance
+                && await _importExpenseRepository.HasExpenseTypeAsync(
+                    request.ImportOrderId,
+                    ExpenseType.InternationalInsurance
+                )
+            )
+            {
+                throw new ValidationBusinessException(
+                    nameof(request.ExpenseType),
+                    "Ya existe un gasto de seguro internacional registrado para esta orden."
                 );
             }
 
@@ -129,11 +144,7 @@ namespace ImportCostPro.Application.Services
                 normalizedDescription,
                 ExpenseType.OtherExpenses,
                 request.DistributionBase,
-                request.OriginalAmount,
-                nameof(request.Description),
-                "ExpenseType",
-                nameof(request.DistributionBase),
-                nameof(request.OriginalAmount)
+                request.OriginalAmount
             );
 
             var entity = await _importExpenseRepository.GetByIdAsync(request.Id);
@@ -145,10 +156,15 @@ namespace ImportCostPro.Application.Services
             }
 
             var orderStatus = await _importOrderRepository.GetStatusByIdAsync(entity.ImportOrderId);
-            if (orderStatus == OrderStatus.Closed || orderStatus == OrderStatus.Canceled)
+
+            if (
+                orderStatus == OrderStatus.Calculated
+                || orderStatus == OrderStatus.Closed
+                || orderStatus == OrderStatus.Canceled
+            )
             {
                 throw new BusinessException(
-                    "No se permite modificar gastos logísticos de una orden que se encuentra en estado Closed o Canceled."
+                    "No se permite modificar gastos logísticos de una orden en estado Calculated, Closed o Canceled."
                 );
             }
 
@@ -171,10 +187,15 @@ namespace ImportCostPro.Application.Services
             }
 
             var orderStatus = await _importOrderRepository.GetStatusByIdAsync(entity.ImportOrderId);
-            if (orderStatus == OrderStatus.Closed || orderStatus == OrderStatus.Canceled)
+
+            if (
+                orderStatus == OrderStatus.Calculated
+                || orderStatus == OrderStatus.Closed
+                || orderStatus == OrderStatus.Canceled
+            )
             {
                 throw new BusinessException(
-                    "No se permite eliminar gastos logísticos de una orden que se encuentra en estado Closed o Canceled."
+                    "No se permite eliminar gastos logísticos de una orden en estado Calculated, Closed o Canceled."
                 );
             }
 
@@ -186,17 +207,13 @@ namespace ImportCostPro.Application.Services
             string description,
             ExpenseType expenseType,
             DistributionBase distributionBase,
-            decimal originalAmount,
-            string descPropName,
-            string typePropName,
-            string basePropName,
-            string amountPropName
+            decimal originalAmount
         )
         {
             if (string.IsNullOrWhiteSpace(description))
             {
                 throw new ValidationBusinessException(
-                    descPropName,
+                    nameof(description),
                     "La descripción del gasto de importación es obligatoria."
                 );
             }
@@ -204,24 +221,24 @@ namespace ImportCostPro.Application.Services
             if (!Enum.IsDefined(typeof(ExpenseType), expenseType))
             {
                 throw new ValidationBusinessException(
-                    typePropName,
-                    "El tipo de gasto de importación seleccionado no es válido."
+                    nameof(expenseType),
+                    "El tipo de gasto seleccionado no es válido."
                 );
             }
 
             if (!Enum.IsDefined(typeof(DistributionBase), distributionBase))
             {
                 throw new ValidationBusinessException(
-                    basePropName,
-                    "La base de distribución seleccionada para el prorrateo no es válida."
+                    nameof(distributionBase),
+                    "La base de distribución seleccionada no es válida."
                 );
             }
 
             if (originalAmount <= 0)
             {
                 throw new ValidationBusinessException(
-                    amountPropName,
-                    "El monto original del gasto logístico debe ser estrictamente mayor a 0."
+                    nameof(originalAmount),
+                    "El monto original del gasto logístico debe ser mayor a 0."
                 );
             }
         }
