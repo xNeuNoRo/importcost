@@ -51,7 +51,12 @@ namespace ImportCostPro.Application.Services
         {
             string normalizedOrderNumber = request.OrderNumber?.Trim() ?? string.Empty;
 
-            ValidateBasicRules(normalizedOrderNumber, nameof(request.OrderNumber));
+            ValidateBasicRules(
+                normalizedOrderNumber,
+                request.TransportMode,
+                nameof(request.OrderNumber),
+                nameof(request.TransportMode)
+            );
 
             await EnsureRelationsExistAsync(
                 request.ImporterId,
@@ -88,7 +93,12 @@ namespace ImportCostPro.Application.Services
         {
             string normalizedOrderNumber = request.OrderNumber?.Trim() ?? string.Empty;
 
-            ValidateBasicRules(normalizedOrderNumber, nameof(request.OrderNumber));
+            ValidateBasicRules(
+                normalizedOrderNumber,
+                request.TransportMode,
+                nameof(request.OrderNumber),
+                nameof(request.TransportMode)
+            );
 
             var entity = await _importOrderRepository.GetByIdAsync(request.Id);
             if (entity == null)
@@ -143,6 +153,14 @@ namespace ImportCostPro.Application.Services
 
         public async Task<bool> ChangeStatusAsync(int id, OrderStatus newStatus)
         {
+            if (!Enum.IsDefined(typeof(OrderStatus), newStatus))
+            {
+                throw new ValidationBusinessException(
+                    nameof(newStatus),
+                    "El estado de la orden de importación especificado no es válido."
+                );
+            }
+
             var currentStatus = await _importOrderRepository.GetStatusByIdAsync(id);
             if (currentStatus == null)
             {
@@ -162,20 +180,33 @@ namespace ImportCostPro.Application.Services
             if (!updated)
             {
                 throw new BusinessException(
-                    $"La orden de importación con ID {id} no fue encontrada."
+                    $"No se pudo actualizar el estado de la orden de importación con ID {id}."
                 );
             }
-            
+
             return true;
         }
 
-        private static void ValidateBasicRules(string orderNumber, string orderNumberPropertyName)
+        private static void ValidateBasicRules(
+            string orderNumber,
+            TransportMode transportMode,
+            string orderNumberPropertyName,
+            string transportModePropertyName
+        )
         {
             if (string.IsNullOrWhiteSpace(orderNumber))
             {
                 throw new ValidationBusinessException(
                     orderNumberPropertyName,
                     "El número de la orden de importación es obligatorio."
+                );
+            }
+
+            if (!Enum.IsDefined(typeof(TransportMode), transportMode))
+            {
+                throw new ValidationBusinessException(
+                    transportModePropertyName,
+                    "El medio de transporte seleccionado no es válido para el sistema de importación."
                 );
             }
         }
