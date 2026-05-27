@@ -37,7 +37,7 @@ namespace ImportCostPro.Application.Services
 
         public async Task<OrderProductResponse?> GetByIdAsync(int id)
         {
-            var orderProduct = await _orderProductRepository.GetByIdAsync(id);
+            var orderProduct = await _orderProductRepository.GetByIdWithProductAsync(id);
             if (orderProduct == null)
             {
                 return null;
@@ -105,7 +105,7 @@ namespace ImportCostPro.Application.Services
 
             await _orderProductRepository.AddAsync(entity);
 
-            var responseEntity = await _orderProductRepository.GetByIdAsync(entity.Id);
+            var responseEntity = await _orderProductRepository.GetByIdWithProductAsync(entity.Id);
             return responseEntity!.ToResponse();
         }
 
@@ -129,7 +129,6 @@ namespace ImportCostPro.Application.Services
             }
 
             var orderStatus = await _importOrderRepository.GetStatusByIdAsync(entity.ImportOrderId);
-
             if (orderStatus == OrderStatus.Closed || orderStatus == OrderStatus.Canceled)
             {
                 throw new BusinessException(
@@ -143,7 +142,8 @@ namespace ImportCostPro.Application.Services
 
             await _orderProductRepository.UpdateAsync(entity);
 
-            return entity.ToResponse();
+            var responseEntity = await _orderProductRepository.GetByIdWithProductAsync(entity.Id);
+            return responseEntity!.ToResponse();
         }
 
         public async Task<bool> DeleteAsync(int id)
@@ -157,7 +157,6 @@ namespace ImportCostPro.Application.Services
             }
 
             var orderStatus = await _importOrderRepository.GetStatusByIdAsync(entity.ImportOrderId);
-
             if (orderStatus == OrderStatus.Closed || orderStatus == OrderStatus.Canceled)
             {
                 throw new BusinessException(
