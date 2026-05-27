@@ -36,15 +36,16 @@ namespace ImportCostPro.Application.Services
         {
             string normalizedCode = request.Code?.Trim().ToUpperInvariant() ?? string.Empty;
             string normalizedDescription = request.Description?.Trim() ?? string.Empty;
-            decimal normalizedRate = request.CustomsDutyRate;
 
             ValidateBasicRules(
                 normalizedCode,
                 normalizedDescription,
-                normalizedRate,
+                request.CustomsDutyRate,
+                request.ExciseTaxRate,
                 nameof(request.Code),
                 nameof(request.Description),
-                nameof(request.CustomsDutyRate)
+                nameof(request.CustomsDutyRate),
+                nameof(request.ExciseTaxRate)
             );
 
             bool duplicate = await _tariffCategoryRepository.ExistsByCodeAsync(normalizedCode);
@@ -59,7 +60,8 @@ namespace ImportCostPro.Application.Services
             var entity = TariffCategory.Create(
                 normalizedCode,
                 normalizedDescription,
-                normalizedRate
+                request.CustomsDutyRate,
+                request.ExciseTaxRate
             );
 
             await _tariffCategoryRepository.AddAsync(entity);
@@ -71,15 +73,16 @@ namespace ImportCostPro.Application.Services
         {
             string normalizedCode = request.Code?.Trim().ToUpperInvariant() ?? string.Empty;
             string normalizedDescription = request.Description?.Trim() ?? string.Empty;
-            decimal normalizedRate = request.CustomsDutyRate;
 
             ValidateBasicRules(
                 normalizedCode,
                 normalizedDescription,
-                normalizedRate,
+                request.CustomsDutyRate,
+                request.ExciseTaxRate,
                 nameof(request.Code),
                 nameof(request.Description),
-                nameof(request.CustomsDutyRate)
+                nameof(request.CustomsDutyRate),
+                nameof(request.ExciseTaxRate)
             );
 
             var entity = await _tariffCategoryRepository.GetByIdAsync(request.Id);
@@ -109,7 +112,12 @@ namespace ImportCostPro.Application.Services
                 );
             }
 
-            entity.UpdateDetails(normalizedCode, normalizedDescription, normalizedRate);
+            entity.UpdateDetails(
+                normalizedCode,
+                normalizedDescription,
+                request.CustomsDutyRate,
+                request.ExciseTaxRate
+            );
 
             await _tariffCategoryRepository.UpdateAsync(entity);
 
@@ -158,9 +166,11 @@ namespace ImportCostPro.Application.Services
             string code,
             string description,
             decimal customsDutyRate,
+            decimal exciseTaxRate,
             string codePropertyName,
             string descriptionPropertyName,
-            string ratePropertyName
+            string ratePropertyName,
+            string excisePropertyName
         )
         {
             if (string.IsNullOrWhiteSpace(code))
@@ -184,6 +194,14 @@ namespace ImportCostPro.Application.Services
                 throw new ValidationBusinessException(
                     ratePropertyName,
                     "El porcentaje de arancel aduanero (Gravamen) debe estar configurado entre 0 y 100%."
+                );
+            }
+
+            if (exciseTaxRate < 0 || exciseTaxRate > 100)
+            {
+                throw new ValidationBusinessException(
+                    excisePropertyName,
+                    "El porcentaje del Impuesto Selectivo al Consumo (ISC) debe estar configurado entre 0 y 100%."
                 );
             }
         }

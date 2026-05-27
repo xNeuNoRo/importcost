@@ -13,6 +13,7 @@ namespace ImportCostPro.Application.Extensions
                 Code = entity.Code,
                 Description = entity.Description,
                 CustomsDutyRate = entity.CustomsDutyRate,
+                ExciseTaxRate = entity.ExciseTaxRate,
                 IsActive = entity.IsActive,
             };
         }

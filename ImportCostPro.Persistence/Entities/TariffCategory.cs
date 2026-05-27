@@ -18,31 +18,45 @@ namespace ImportCostPro.Persistence.Entities
         /// Tasa de arancel aduanero aplicable a esta categoría, expresada como un porcentaje (por ejemplo, 5.5 para 5.5%).
         /// </summary>
         public decimal CustomsDutyRate { get; private set; }
+        public decimal ExciseTaxRate { get; private set; }
 
         public TariffCategory() { }
 
-        private TariffCategory(string code, string description, decimal customsDutyRate)
+        private TariffCategory(
+            string code,
+            string description,
+            decimal customsDutyRate,
+            decimal exciseTaxRate = 0m
+        )
         {
             Code = code.Trim().ToUpperInvariant();
             Description = description.Trim();
             CustomsDutyRate = customsDutyRate;
+            ExciseTaxRate = exciseTaxRate;
             IsActive = true;
         }
 
         public static TariffCategory Create(
             string code,
             string description,
-            decimal customsDutyRate
+            decimal customsDutyRate,
+            decimal exciseTaxRate = 0m
         )
         {
-            return new TariffCategory(code, description, customsDutyRate);
+            return new TariffCategory(code, description, customsDutyRate, exciseTaxRate);
         }
 
-        public void UpdateDetails(string code, string description, decimal customsDutyRate)
+        public void UpdateDetails(
+            string code,
+            string description,
+            decimal customsDutyRate,
+            decimal exciseTaxRate
+        )
         {
             Code = code.Trim().ToUpperInvariant();
             Description = description.Trim();
             CustomsDutyRate = customsDutyRate;
+            ExciseTaxRate = exciseTaxRate;
         }
     }
 }

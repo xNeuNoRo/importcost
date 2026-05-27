@@ -230,21 +230,34 @@ namespace ImportCostPro.Application.Services
                 // del producto sobre el valor CIF local.
                 decimal tariffPercent = line.Product?.TariffCategory?.CustomsDutyRate ?? 0m;
                 decimal customsDutyAmount = localTotalCif * (tariffPercent / 100m);
-                decimal exciseTaxAmount = 0m;
+
+                // Cálculo del impuesto de excise para esta línea, si aplica. El monto del excise se calcula
+                // aplicando el porcentaje de excise correspondiente a la categoría arancelaria del producto
+                // sobre la suma del valor CIF local + aranceles
+                decimal excisePercent = line.Product?.TariffCategory?.ExciseTaxRate ?? 0m;
+                decimal exciseTaxAmount =
+                    excisePercent > 0
+                        ? (localTotalCif + customsDutyAmount) * (excisePercent / 100m)
+                        : 0m;
+
+                // Cálculo del monto del servicio aduanal para esta línea, si aplica. El monto del servicio aduanal se calcula
+                // aplicando el porcentaje de servicio aduanal configurado en la configuración de impuestos
+                // sobre el valor CIF local
                 decimal customsServiceAmount = localTotalCif * customsServiceRate;
 
                 // Base imponible acumulada del ITBIS para esta línea,
-                // que incluye CIF + aranceles + otros impuestos aduanales
+                // que incluye el valor CIF local + impuestos aduanales + impuestos de excise + servicio aduanal + gastos locales prorrateados asignados a esta línea
                 decimal itbisBase =
                     localTotalCif + customsDutyAmount + exciseTaxAmount + customsServiceAmount;
                 decimal itbisAmount = itbisBase * itbisRate;
 
                 // El costo de importación local total asignado a esta línea es
-                // la suma del CIF local + impuestos aduanales + gastos locales prorrateados
+                // la suma del valor CIF local + impuestos aduanales + impuestos de excise + servicio aduanal + gastos locales prorrateados asignados a esta línea
                 decimal localTotalLandedCost =
                     localTotalCif
                     + customsDutyAmount
                     + customsServiceAmount
+                    + exciseTaxAmount
                     + itbisAmount
                     + line.AllocatedLocalExpenses;
                 decimal unitLandedCost = localTotalLandedCost / line.Quantity;
@@ -295,7 +308,7 @@ namespace ImportCostPro.Application.Services
                 TotalInsurance = resultDetails.Sum(x => x.AllocatedInsurance),
                 TotalCif = resultDetails.Sum(x => x.LocalTotalCif),
                 TotalTariff = resultDetails.Sum(x => x.CustomsDutyAmount),
-                TotalExciseTax = 0m,
+                TotalExciseTax = resultDetails.Sum(x => x.ExciseTaxAmount),
                 TotalCustomsService = resultDetails.Sum(x => x.CustomsServiceAmount),
                 TotalItbis = resultDetails.Sum(x => x.ItbisAmount),
                 TotalLocalExpenses = resultDetails.Sum(x => x.AllocatedLocalExpenses),

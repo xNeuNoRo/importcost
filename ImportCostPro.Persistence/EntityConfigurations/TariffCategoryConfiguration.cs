@@ -18,6 +18,7 @@ namespace ImportCostPro.Persistence.EntityConfigurations
             builder.Property(x => x.Code).IsRequired().HasMaxLength(20);
             builder.Property(x => x.Description).IsRequired().HasMaxLength(500);
             builder.Property(x => x.CustomsDutyRate).IsRequired().HasPrecision(5, 2);
+            builder.Property(x => x.ExciseTaxRate).HasPrecision(18, 2).HasDefaultValue(0m);
             builder.Property(x => x.IsActive).IsRequired().HasDefaultValue(true);
 
             #endregion
