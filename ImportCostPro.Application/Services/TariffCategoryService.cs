@@ -34,7 +34,7 @@ namespace ImportCostPro.Application.Services
 
         public async Task<TariffCategoryResponse> CreateAsync(CreateTariffCategoryRequest request)
         {
-            string normalizedCode = request.Code?.Trim().ToUpper() ?? string.Empty;
+            string normalizedCode = request.Code?.Trim().ToUpperInvariant() ?? string.Empty;
             string normalizedDescription = request.Description?.Trim() ?? string.Empty;
             decimal normalizedRate = request.CustomsDutyRate;
 
@@ -69,7 +69,7 @@ namespace ImportCostPro.Application.Services
 
         public async Task<TariffCategoryResponse> UpdateAsync(UpdateTariffCategoryRequest request)
         {
-            string normalizedCode = request.Code?.Trim().ToUpper() ?? string.Empty;
+            string normalizedCode = request.Code?.Trim().ToUpperInvariant() ?? string.Empty;
             string normalizedDescription = request.Description?.Trim() ?? string.Empty;
             decimal normalizedRate = request.CustomsDutyRate;
 
