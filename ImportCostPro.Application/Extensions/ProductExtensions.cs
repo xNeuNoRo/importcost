@@ -28,6 +28,7 @@ namespace ImportCostPro.Application.Extensions
             dto.TariffCategoryCode = finalTariff?.Code ?? "N/A";
             dto.TariffCategoryDescription = finalTariff?.Description ?? "N/A";
             dto.CustomsDutyRate = finalTariff?.CustomsDutyRate ?? 0m;
+            dto.ExciseTaxRate = finalTariff?.ExciseTaxRate ?? 0m;
             dto.VolumeCubicMeters =
                 (product.Length ?? 0m) * (product.Width ?? 0m) * (product.Height ?? 0m);
 
