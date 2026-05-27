@@ -7,7 +7,7 @@ namespace ImportCostPro.Application.DTOs.OrderProduct.Responses
         public int Id { get; set; }
         public int ImportOrderId { get; set; }
         public int ProductId { get; set; }
-        public string ProductCode { get; set; } = null!;
+        public string ProductReferenceCode { get; set; } = null!;
         public string ProductName { get; set; } = null!;
         public UnitOfMeasure UnitOfMeasure { get; set; }
         public decimal Quantity { get; set; }
