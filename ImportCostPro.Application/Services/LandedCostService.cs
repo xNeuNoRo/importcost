@@ -255,7 +255,7 @@ namespace ImportCostPro.Application.Services
                 decimal customsServiceAmount = localTotalCif * customsServiceRate;
 
                 // Base imponible acumulada del ITBIS para esta línea,
-                // que incluye el valor CIF local + impuestos aduanales + impuestos de excise + servicio aduanal + gastos locales prorrateados asignados a esta línea
+                // que incluye el valor CIF local + impuestos aduanales + impuestos de excise + servicio aduanal
                 decimal itbisBase =
                     localTotalCif + customsDutyAmount + exciseTaxAmount + customsServiceAmount;
                 decimal itbisAmount = itbisBase * itbisRate;
