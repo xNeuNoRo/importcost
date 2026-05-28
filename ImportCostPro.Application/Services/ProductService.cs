@@ -36,7 +36,7 @@ namespace ImportCostPro.Application.Services
 
         public async Task<ProductResponse?> GetByIdAsync(int id)
         {
-            // Obtenemos el producto por ID con sus relaciones y validamos q exista
+            // Obtenemos el producto por ID con sus relaciones and validamos q exista
             var product = await _productRepository.GetByIdWithRelationsAsync(id);
             if (product == null)
             {
@@ -106,6 +106,22 @@ namespace ImportCostPro.Application.Services
                 throw new BusinessException(
                     $"El producto que intenta actualizar ya no existe en el sistema."
                 );
+            }
+
+            bool isReferenced = await _productRepository.IsProductReferencedInOrdersAsync(
+                request.Id
+            );
+            if (isReferenced)
+            {
+                if (
+                    entity.UnitWeight != request.UnitWeight
+                    || entity.TariffCategoryId != request.TariffCategoryId
+                )
+                {
+                    throw new BusinessException(
+                        "No se pueden modificar campos críticos como el peso unitario o la categoría arancelaria en un producto que ya cuenta con histórico de órdenes de importación."
+                    );
+                }
             }
 
             // Validamos q sea un pais existente y activo
