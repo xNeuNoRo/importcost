@@ -4,6 +4,7 @@ using ImportCostPro.Application.Exceptions;
 using ImportCostPro.Application.Extensions;
 using ImportCostPro.Persistence.Entities;
 using ImportCostPro.Persistence.Enums;
+using ImportCostPro.Persistence.Interfaces.Providers;
 using ImportCostPro.Persistence.Interfaces.Repositories;
 
 namespace ImportCostPro.Application.Services
@@ -15,13 +16,15 @@ namespace ImportCostPro.Application.Services
         private readonly IExchangeRateRepository _exchangeRateRepository;
         private readonly ITaxConfigurationRepository _taxConfigurationRepository;
         private readonly ICurrencyRepository _currencyRepository;
+        private readonly IDateTimeProvider _dateTimeProvider;
 
         public LandedCostService(
             IImportOrderRepository importOrderRepository,
             ICalculationResultRepository calculationResultRepository,
             IExchangeRateRepository exchangeRateRepository,
             ITaxConfigurationRepository taxConfigurationRepository,
-            ICurrencyRepository currencyRepository
+            ICurrencyRepository currencyRepository,
+            IDateTimeProvider dateTimeProvider
         )
         {
             _importOrderRepository = importOrderRepository;
@@ -29,6 +32,7 @@ namespace ImportCostPro.Application.Services
             _exchangeRateRepository = exchangeRateRepository;
             _taxConfigurationRepository = taxConfigurationRepository;
             _currencyRepository = currencyRepository;
+            _dateTimeProvider = dateTimeProvider;
         }
 
         public async Task<LandedCostCalculationResponse> ProcessCalculationAsync(
@@ -76,8 +80,8 @@ namespace ImportCostPro.Application.Services
                 );
             }
 
-            // Validamos que exista una configuracion de impuestos para poder aplicar l
-            // as tasas correspondientes en el cálculo
+            // Validamos que exista una configuracion de impuestos para
+            // poder aplicar las tasas correspondientes en el cálculo
             var taxConfig = await _taxConfigurationRepository.GetSingleConfigurationAsync();
             if (taxConfig == null)
             {
@@ -98,7 +102,7 @@ namespace ImportCostPro.Application.Services
                 var rate = await _exchangeRateRepository.GetLatestActiveRateAsync(
                     order.CurrencyId,
                     localCurrencyId,
-                    DateTime.UtcNow
+                    _dateTimeProvider.UtcNow
                 );
                 if (rate == null)
                 {
@@ -126,7 +130,7 @@ namespace ImportCostPro.Application.Services
                 var rate = await _exchangeRateRepository.GetLatestActiveRateAsync(
                     currencyId,
                     localCurrencyId,
-                    DateTime.UtcNow
+                    _dateTimeProvider.UtcNow
                 );
                 if (rate == null)
                 {
@@ -150,9 +154,10 @@ namespace ImportCostPro.Application.Services
                     TotalWeight = op.Quantity * op.Product.UnitWeight,
                     TotalVolume =
                         op.Quantity
-                        * (op.Product.Length ?? 1)
-                        * (op.Product.Width ?? 1)
-                        * (op.Product.Height ?? 1),
+                        * (op.Product.Length ?? 0m)
+                        * (op.Product.Width ?? 0m)
+                        * (op.Product.Height ?? 0m),
+
                     ProfitMarginRate = op.TargetProfitMargin,
                 })
                 .ToList();
@@ -275,7 +280,6 @@ namespace ImportCostPro.Application.Services
                     new CalculationResultDetail
                     {
                         ProductId = line.ProductId,
-                        Product = line.Product!,
                         Quantity = line.Quantity,
                         OriginalUnitPriceFob = line.OriginalUnitPriceFob,
                         LocalTotalFob = line.LocalTotalFob,
@@ -299,7 +303,6 @@ namespace ImportCostPro.Application.Services
             var calculationResult = new CalculationResult
             {
                 ImportOrderId = order.Id,
-                ImportOrder = order,
                 LocalCurrencyUsedId = localCurrencyId,
                 ExchangeRateUsed = exchangeRateUsed,
                 TotalOriginalFob = order.OrderProducts.Sum(x => x.Quantity * x.UnitFobPrice),
@@ -316,7 +319,7 @@ namespace ImportCostPro.Application.Services
                 TotalImportedQuantity = globalTotalQuantity,
                 HistoricalItbisRate = taxConfig.GeneralItbisRate,
                 HistoricalCustomsServiceRate = taxConfig.CustomsServiceRate,
-                CalculationDate = DateTime.UtcNow,
+                CalculationDate = _dateTimeProvider.UtcNow,
                 Details = resultDetails,
             };
 
