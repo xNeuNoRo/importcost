@@ -222,7 +222,11 @@ namespace ImportCostPro.Application.Services
                         ),
                     };
 
-                    decimal allocatedShare = localExpenseAmount * distributionFactor;
+                    decimal allocatedShare = Math.Round(
+                        localExpenseAmount * distributionFactor,
+                        2,
+                        MidpointRounding.AwayFromZero
+                    );
 
                     if (expense.ExpenseType == ExpenseType.InternationalFreight)
                         line.AllocatedFreight += allocatedShare;
@@ -241,14 +245,21 @@ namespace ImportCostPro.Application.Services
             {
                 // Cálculo del costo CIF local para esta línea,
                 // que es la suma del FOB local + gastos internacionales prorrateados
-                decimal localTotalCif =
-                    line.LocalTotalFob + line.AllocatedFreight + line.AllocatedInsurance;
+                decimal localTotalCif = Math.Round(
+                    line.LocalTotalFob + line.AllocatedFreight + line.AllocatedInsurance,
+                    2,
+                    MidpointRounding.AwayFromZero
+                );
 
                 // Cálculo de impuestos aduanales para esta línea. El monto del arancel se calcula
                 // aplicando el porcentaje de arancel correspondiente a la categoría arancelaria
                 // del producto sobre el valor CIF local.
                 decimal tariffPercent = line.Product?.TariffCategory?.CustomsDutyRate ?? 0m;
-                decimal customsDutyAmount = localTotalCif * (tariffPercent / 100m);
+                decimal customsDutyAmount = Math.Round(
+                    localTotalCif * (tariffPercent / 100m),
+                    2,
+                    MidpointRounding.AwayFromZero
+                );
 
                 // Cálculo del impuesto de excise para esta línea, si aplica. El monto del excise se calcula
                 // aplicando el porcentaje de excise correspondiente a la categoría arancelaria del producto
@@ -256,38 +267,64 @@ namespace ImportCostPro.Application.Services
                 decimal excisePercent = line.Product?.TariffCategory?.ExciseTaxRate ?? 0m;
                 decimal exciseTaxAmount =
                     excisePercent > 0
-                        ? (localTotalCif + customsDutyAmount) * (excisePercent / 100m)
+                        ? Math.Round(
+                            (localTotalCif + customsDutyAmount) * (excisePercent / 100m),
+                            2,
+                            MidpointRounding.AwayFromZero
+                        )
                         : 0m;
 
                 // Cálculo del monto del servicio aduanal para esta línea, si aplica. El monto del servicio aduanal se calcula
                 // aplicando el porcentaje de servicio aduanal configurado en la configuración de impuestos
                 // sobre el valor CIF local
-                decimal customsServiceAmount = localTotalCif * customsServiceRate;
+                decimal customsServiceAmount = Math.Round(
+                    localTotalCif * customsServiceRate,
+                    2,
+                    MidpointRounding.AwayFromZero
+                );
 
                 // Base imponible acumulada del ITBIS para esta línea,
                 // que incluye el valor CIF local + impuestos aduanales + impuestos de excise + servicio aduanal
-                decimal itbisBase =
-                    localTotalCif + customsDutyAmount + exciseTaxAmount + customsServiceAmount;
-                decimal itbisAmount = itbisBase * itbisRate;
+                decimal itbisBase = Math.Round(
+                    localTotalCif + customsDutyAmount + exciseTaxAmount + customsServiceAmount,
+                    2,
+                    MidpointRounding.AwayFromZero
+                );
+                decimal itbisAmount = Math.Round(
+                    itbisBase * itbisRate,
+                    2,
+                    MidpointRounding.AwayFromZero
+                );
 
                 // El costo de importación local total asignado a esta línea es
                 // la suma del valor CIF local + impuestos aduanales + impuestos de excise + servicio aduanal + gastos locales prorrateados asignados a esta línea
-                decimal localTotalLandedCost =
+                decimal localTotalLandedCost = Math.Round(
                     localTotalCif
-                    + customsDutyAmount
-                    + customsServiceAmount
-                    + exciseTaxAmount
-                    + itbisAmount
-                    + line.AllocatedLocalExpenses;
-                decimal unitLandedCost = localTotalLandedCost / line.Quantity;
+                        + customsDutyAmount
+                        + customsServiceAmount
+                        + exciseTaxAmount
+                        + itbisAmount
+                        + line.AllocatedLocalExpenses,
+                    2,
+                    MidpointRounding.AwayFromZero
+                );
+                decimal unitLandedCost = Math.Round(
+                    localTotalLandedCost / line.Quantity,
+                    2,
+                    MidpointRounding.AwayFromZero
+                );
 
                 // Cálculo del precio de venta sugerido para esta línea,
                 // aplicando el margen de ganancia objetivo sobre el costo de importación unitario.
-                decimal suggestedRetailPrice =
-                    line.ProfitMarginRate == 100m ? unitLandedCost * 2m
-                    : line.ProfitMarginRate > 0m
+                decimal marginFormulaResult =
+                    line.ProfitMarginRate > 0m
                         ? unitLandedCost / (1m - (line.ProfitMarginRate / 100m))
-                    : unitLandedCost;
+                        : unitLandedCost;
+
+                decimal suggestedRetailPrice =
+                    line.ProfitMarginRate == 100m
+                        ? Math.Round(unitLandedCost * 2m, 2, MidpointRounding.AwayFromZero)
+                        : Math.Round(marginFormulaResult, 2, MidpointRounding.AwayFromZero);
 
                 // Agregamos el detalle de cálculo para esta línea al resultado final
                 resultDetails.Add(
