@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace ImportCostPro.WebApp.Models.Currency
+namespace ImportCostPro.Application.ViewModels.CurrencyViewModels   
 {
     public class CurrencyViewModel
     {
