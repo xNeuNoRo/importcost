@@ -24,5 +24,6 @@ namespace ImportCostPro.Application.DTOs.Product.Responses
         public string TariffCategoryCode { get; set; } = null!;
         public string TariffCategoryDescription { get; set; } = null!;
         public decimal CustomsDutyRate { get; set; }
+        public decimal ExciseTaxRate { get; set; }
     }
 }

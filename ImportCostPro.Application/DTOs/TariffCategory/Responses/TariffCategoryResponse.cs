@@ -6,6 +6,7 @@ namespace ImportCostPro.Application.DTOs.TariffCategory.Responses
         public string Code { get; set; } = null!;
         public string Description { get; set; } = null!;
         public decimal CustomsDutyRate { get; set; }
+        public decimal ExciseTaxRate { get; set; }
         public bool IsActive { get; set; }
     }
 }
