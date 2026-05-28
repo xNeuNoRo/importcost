@@ -331,8 +331,19 @@ namespace ImportCostPro.Application.Services
             await _calculationResultRepository.AddAsync(calculationResult);
             await _importOrderRepository.UpdateStatusAsync(order.Id, OrderStatus.Calculated);
 
+            // Preparamos un diccionario para mapear rápidamente los datos de los
+            // productos durante la transformación a DTO de respuesta
+            var productsLookup = lineItems.ToDictionary(
+                x => x.ProductId,
+                x => (Code: x.Product?.ReferenceCode ?? "N/A", Name: x.Product?.Name ?? "N/A")
+            );
+
             // Devolvemos el resultado del cálculo mapeado a un DTO de respuesta
-            return calculationResult.ToResponse();
+            return calculationResult.ToResponse(
+                order.OrderNumber,
+                localCurrency.IsoCode,
+                productsLookup
+            );
         }
 
         /// <summary>

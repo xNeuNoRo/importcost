@@ -5,15 +5,20 @@ namespace ImportCostPro.Application.Extensions
 {
     public static class LandedCostExtensions
     {
-        public static LandedCostCalculationResponse ToResponse(this CalculationResult entity)
+        public static LandedCostCalculationResponse ToResponse(
+            this CalculationResult entity,
+            string orderNumber,
+            string localCurrencyIsoCode,
+            Dictionary<int, (string Code, string Name)> productsLookup
+        )
         {
             return new LandedCostCalculationResponse
             {
                 Id = entity.Id,
                 ImportOrderId = entity.ImportOrderId,
-                OrderNumber = entity.ImportOrder?.OrderNumber ?? string.Empty,
+                OrderNumber = orderNumber,
                 LocalCurrencyUsedId = entity.LocalCurrencyUsedId,
-                LocalCurrencyIsoCode = entity.LocalCurrencyUsed?.IsoCode ?? string.Empty,
+                LocalCurrencyIsoCode = localCurrencyIsoCode,
                 ExchangeRateUsed = entity.ExchangeRateUsed,
                 TotalOriginalFob = entity.TotalOriginalFob,
                 TotalLocalFob = entity.TotalLocalFob,
@@ -30,20 +35,30 @@ namespace ImportCostPro.Application.Extensions
                 HistoricalItbisRate = entity.HistoricalItbisRate,
                 HistoricalCustomsServiceRate = entity.HistoricalCustomsServiceRate,
                 CalculationDate = entity.CalculationDate,
-                Details = entity.Details.Select(d => d.ToDetailResponse()).ToList(),
+                Details = entity.Details.Select(d => d.ToDetailResponse(productsLookup)).ToList(),
             };
         }
 
         public static CalculationResultDetailResponse ToDetailResponse(
-            this CalculationResultDetail entity
+            this CalculationResultDetail entity,
+            Dictionary<int, (string Code, string Name)> productsLookup
         )
         {
+            string referenceCode = string.Empty;
+            string productName = string.Empty;
+
+            if (productsLookup.TryGetValue(entity.ProductId, out var productData))
+            {
+                referenceCode = productData.Code;
+                productName = productData.Name;
+            }
+
             return new CalculationResultDetailResponse
             {
                 Id = entity.Id,
                 ProductId = entity.ProductId,
-                ProductReferenceCode = entity.Product?.ReferenceCode ?? string.Empty,
-                ProductName = entity.Product?.Name ?? string.Empty,
+                ProductReferenceCode = referenceCode,
+                ProductName = productName,
                 Quantity = entity.Quantity,
                 OriginalUnitPriceFob = entity.OriginalUnitPriceFob,
                 LocalTotalFob = entity.LocalTotalFob,
