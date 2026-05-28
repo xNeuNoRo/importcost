@@ -281,11 +281,11 @@ namespace ImportCostPro.Application.Services
                     + line.AllocatedLocalExpenses;
                 decimal unitLandedCost = localTotalLandedCost / line.Quantity;
 
-                // Cálculo del precio de venta sugerido basado en el costo de importación y la tasa de margen de ganancia objetivo
+                // Cálculo del precio de venta sugerido para esta línea,
+                // aplicando el margen de ganancia objetivo sobre el costo de importación unitario.
                 decimal suggestedRetailPrice =
-                    line.ProfitMarginRate >= 100
-                        ? unitLandedCost * (1 + (line.ProfitMarginRate / 100m))
-                    : line.ProfitMarginRate > 0
+                    line.ProfitMarginRate == 100m ? unitLandedCost * 2m
+                    : line.ProfitMarginRate > 0m
                         ? unitLandedCost / (1m - (line.ProfitMarginRate / 100m))
                     : unitLandedCost;
 
