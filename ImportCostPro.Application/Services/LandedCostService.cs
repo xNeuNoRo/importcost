@@ -95,6 +95,10 @@ namespace ImportCostPro.Application.Services
             decimal customsServiceRate = taxConfig.CustomsServiceRate / 100m;
             decimal exchangeRateUsed = 1.0m;
 
+            // Lista para acumular los IDs de las tasas de cambio utilizadas durante el proceso,
+            // para luego marcarlas como usadas y evitar su reutilización en futuros cálculos.
+            var rateIdsToMark = new List<int>();
+
             // Si la moneda de la orden es diferente a la local,
             // necesitamos convertir los valores FOB a moneda local usando la tasa de cambio
             if (order.CurrencyId != localCurrencyId)
@@ -110,6 +114,9 @@ namespace ImportCostPro.Application.Services
                         "No se encontró una tasa de cambio activa para la moneda de la orden."
                     );
                 }
+
+                // Acumulamos el ID de la tasa en RAM para marcarla como usada al final del proceso
+                rateIdsToMark.Add(rate.Id);
                 exchangeRateUsed = rate.RateValue;
             }
 
@@ -138,6 +145,9 @@ namespace ImportCostPro.Application.Services
                         "Falta configurar una tasa de cambio activa para una de las monedas de los gastos."
                     );
                 }
+
+                // Acumulamos el ID de la tasa en RAM y guardamos el valor en el cache
+                rateIdsToMark.Add(rate.Id);
                 ratesCache[currencyId] = rate.RateValue;
             }
 
@@ -187,8 +197,8 @@ namespace ImportCostPro.Application.Services
                     localExpenseAmount = expense.OriginalAmount * ratesCache[expense.CurrencyId];
                 }
 
-                // Calculamos el factor de distribución para cada línea según l
-                // a base seleccionada y asignamos la parte correspondiente del gasto a cada línea
+                // Calculamos el factor de distribución para cada línea según la
+                // base seleccionada y asignamos la parte correspondiente del gasto a cada línea
                 foreach (var line in lineItems)
                 {
                     decimal distributionFactor = expense.DistributionBase switch
@@ -327,12 +337,24 @@ namespace ImportCostPro.Application.Services
                 Details = resultDetails,
             };
 
-            // Guardamos el resultado del cálculo en la base de datos y actualizamos el estado de la orden a Calculated
             await _calculationResultRepository.AddAsync(calculationResult);
-            await _importOrderRepository.UpdateStatusAsync(order.Id, OrderStatus.Calculated);
+            var updated = await _importOrderRepository.UpdateStatusAsync(
+                order.Id,
+                OrderStatus.Calculated
+            );
+            if (!updated)
+            {
+                throw new BusinessException(
+                    "Ocurrió un error al actualizar el estado de la orden después del cálculo."
+                );
+            }
 
-            // Preparamos un diccionario para mapear rápidamente los datos de los
-            // productos durante la transformación a DTO de respuesta
+            foreach (var rateId in rateIdsToMark)
+            {
+                await _exchangeRateRepository.MarkAsUsedAsync(rateId);
+            }
+
+            // Preparamos un diccionario para mapear rápidamente los datos de los productos
             var productsLookup = lineItems.ToDictionary(
                 x => x.ProductId,
                 x => (Code: x.Product?.ReferenceCode ?? "N/A", Name: x.Product?.Name ?? "N/A")
