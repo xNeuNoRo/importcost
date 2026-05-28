@@ -25,19 +25,33 @@ namespace ImportCostPro.Persistence.Entities
         /// </summary>
         public decimal ExciseTaxRate { get; private set; }
 
+        /// <summary>
+        /// Indica si la categoría arancelaria está sujeta al pago de ITBIS (Generalmente 18% en RD)
+        /// </summary>
+        public bool AppliesItbis { get; private set; }
+
+        /// <summary>
+        /// Indica si la categoría arancelaria está sujeta al pago del Impuesto Selectivo al Consumo (ISC)
+        /// </summary>
+        public bool AppliesExciseTax { get; private set; }
+
         public TariffCategory() { }
 
         private TariffCategory(
             string code,
             string description,
             decimal customsDutyRate,
-            decimal exciseTaxRate = 0m
+            decimal exciseTaxRate,
+            bool appliesItbis,
+            bool appliesExciseTax
         )
         {
             Code = code.Trim().ToUpperInvariant();
             Description = description.Trim();
             CustomsDutyRate = customsDutyRate;
             ExciseTaxRate = exciseTaxRate;
+            AppliesItbis = appliesItbis;
+            AppliesExciseTax = appliesExciseTax;
             IsActive = true;
         }
 
@@ -45,23 +59,36 @@ namespace ImportCostPro.Persistence.Entities
             string code,
             string description,
             decimal customsDutyRate,
-            decimal exciseTaxRate = 0m
+            decimal exciseTaxRate,
+            bool appliesItbis,
+            bool appliesExciseTax
         )
         {
-            return new TariffCategory(code, description, customsDutyRate, exciseTaxRate);
+            return new TariffCategory(
+                code,
+                description,
+                customsDutyRate,
+                exciseTaxRate,
+                appliesItbis,
+                appliesExciseTax
+            );
         }
 
         public void UpdateDetails(
             string code,
             string description,
             decimal customsDutyRate,
-            decimal exciseTaxRate
+            decimal exciseTaxRate,
+            bool appliesItbis,
+            bool appliesExciseTax
         )
         {
             Code = code.Trim().ToUpperInvariant();
             Description = description.Trim();
             CustomsDutyRate = customsDutyRate;
             ExciseTaxRate = exciseTaxRate;
+            AppliesItbis = appliesItbis;
+            AppliesExciseTax = appliesExciseTax;
         }
     }
 }

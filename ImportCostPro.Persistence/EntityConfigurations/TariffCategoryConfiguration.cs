@@ -23,6 +23,8 @@ namespace ImportCostPro.Persistence.EntityConfigurations
                 .IsRequired()
                 .HasPrecision(5, 2)
                 .HasDefaultValue(0m);
+            builder.Property(x => x.AppliesItbis).IsRequired().HasDefaultValue(true);
+            builder.Property(x => x.AppliesExciseTax).IsRequired().HasDefaultValue(false);
             builder.Property(x => x.IsActive).IsRequired().HasDefaultValue(true);
 
             #endregion

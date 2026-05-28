@@ -61,7 +61,9 @@ namespace ImportCostPro.Application.Services
                 normalizedCode,
                 normalizedDescription,
                 request.CustomsDutyRate,
-                request.ExciseTaxRate
+                request.ExciseTaxRate,
+                request.AppliesItbis,
+                request.AppliesExciseTax
             );
 
             await _tariffCategoryRepository.AddAsync(entity);
@@ -116,7 +118,9 @@ namespace ImportCostPro.Application.Services
                 normalizedCode,
                 normalizedDescription,
                 request.CustomsDutyRate,
-                request.ExciseTaxRate
+                request.ExciseTaxRate,
+                request.AppliesItbis,
+                request.AppliesExciseTax
             );
 
             await _tariffCategoryRepository.UpdateAsync(entity);
