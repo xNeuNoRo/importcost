@@ -108,10 +108,14 @@ namespace ImportCostPro.Application.Services
                 );
             }
 
-            if (entity.Status == OrderStatus.Closed || entity.Status == OrderStatus.Canceled)
+            if (
+                entity.Status == OrderStatus.Calculated
+                || entity.Status == OrderStatus.Closed
+                || entity.Status == OrderStatus.Canceled
+            )
             {
                 throw new BusinessException(
-                    "No se permite editar una orden que se encuentra en estado Closed o Canceled."
+                    $"No se permite editar una orden que se encuentra en estado {entity.Status}."
                 );
             }
 
