@@ -194,15 +194,19 @@ namespace ImportCostPro.Application.Services
                     decimal distributionFactor = expense.DistributionBase switch
                     {
                         DistributionBase.FobValue => line.LocalTotalFob / globalTotalLocalFob,
+
                         DistributionBase.Weight => globalTotalWeight > 0
                             ? line.TotalWeight / globalTotalWeight
-                            : 0,
+                            : (line.LocalTotalFob / globalTotalLocalFob),
+
                         DistributionBase.Volume => globalTotalVolume > 0
                             ? line.TotalVolume / globalTotalVolume
-                            : 0,
+                            : (line.LocalTotalFob / globalTotalLocalFob),
+
                         DistributionBase.Quantity => globalTotalQuantity > 0
                             ? line.Quantity / globalTotalQuantity
-                            : 0,
+                            : (line.LocalTotalFob / globalTotalLocalFob),
+
                         _ => throw new BusinessException(
                             "Base de distribución de prorrateo no soportada."
                         ),
