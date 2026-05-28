@@ -265,8 +265,9 @@ namespace ImportCostPro.Application.Services
                 // aplicando el porcentaje de excise correspondiente a la categoría arancelaria del producto
                 // sobre la suma del valor CIF local + aranceles
                 decimal excisePercent = line.Product?.TariffCategory?.ExciseTaxRate ?? 0m;
+                bool appliesExcise = line.Product?.TariffCategory?.AppliesExciseTax ?? false;
                 decimal exciseTaxAmount =
-                    excisePercent > 0
+                    appliesExcise && excisePercent > 0
                         ? Math.Round(
                             (localTotalCif + customsDutyAmount) * (excisePercent / 100m),
                             2,
@@ -290,11 +291,11 @@ namespace ImportCostPro.Application.Services
                     2,
                     MidpointRounding.AwayFromZero
                 );
-                decimal itbisAmount = Math.Round(
-                    itbisBase * itbisRate,
-                    2,
-                    MidpointRounding.AwayFromZero
-                );
+
+                bool appliesItbis = line.Product?.TariffCategory?.AppliesItbis ?? true;
+                decimal itbisAmount = appliesItbis
+                    ? Math.Round(itbisBase * itbisRate, 2, MidpointRounding.AwayFromZero)
+                    : 0m;
 
                 // El costo de importación local total asignado a esta línea es
                 // la suma del valor CIF local + impuestos aduanales + impuestos de excise + servicio aduanal + gastos locales prorrateados asignados a esta línea
