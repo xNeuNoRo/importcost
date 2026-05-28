@@ -18,6 +18,11 @@ namespace ImportCostPro.Persistence.Entities
         /// Tasa de arancel aduanero aplicable a esta categoría, expresada como un porcentaje (por ejemplo, 5.5 para 5.5%).
         /// </summary>
         public decimal CustomsDutyRate { get; private set; }
+
+        /// <summary>
+        /// Tasa de impuesto especial aplicable a esta categoría,
+        /// expresada como un porcentaje (por ejemplo, 10.0 para 10%).
+        /// </summary>
         public decimal ExciseTaxRate { get; private set; }
 
         public TariffCategory() { }
