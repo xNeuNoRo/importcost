@@ -115,6 +115,17 @@ namespace ImportCostPro.Application.Services
                 );
             }
 
+            if (existingImporter.TaxId != normalizedTaxID)
+            {
+                bool hasOrders = await _importerRepository.IsImporterReferencedAsync(request.Id);
+                if (hasOrders)
+                {
+                    throw new BusinessException(
+                        "No se puede modificar el RNC o identificación fiscal de un importador que ya tiene órdenes de importación registradas."
+                    );
+                }
+            }
+
             var countryExists = await _countryRepository.GetByIdAsync(request.CountryId);
             if (countryExists == null)
             {
