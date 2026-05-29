@@ -1,32 +1,30 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace ImportCostPro.Application.ViewModels.SupplierViewModels
 {
     public class CreateSupplierViewModel
     {
-        [Required(ErrorMessage = "El nombre del proveedor es obligatorio.")]
-        [StringLength(150, ErrorMessage = "El nombre no puede exceder los 150 caracteres.")]
-        [Display(Name = "Nombre")]
+        [Required(ErrorMessage = "El nombre del proveedor es requerido.")]
+        [MaxLength(150, ErrorMessage = "El nombre del proveedor debe tener un máximo de 150 caracteres.")]
+        [Display(Name = "Nombre del Proveedor")]
         public string Name { get; set; } = null!;
 
-        [Required(ErrorMessage = "Debe seleccionar un país de origen.")]
+        [Required(ErrorMessage = "El correo electrónico del proveedor es requerido.")]
+        [EmailAddress(ErrorMessage = "El correo electrónico debe tener un formato válido.")]
+        [MaxLength(100, ErrorMessage = "El correo electrónico debe tener un máximo de 100 caracteres.")]
+        [Display(Name = "Correo Electrónico")]
+        public string Email { get; set; } = null!;
+
+        [Required(ErrorMessage = "El país de origen seleccionado no es válido.")]
         [Display(Name = "País de Origen")]
         public int OriginCountryId { get; set; }
 
-        [Required(ErrorMessage = "Debe seleccionar una moneda predeterminada.")]
+        [Required(ErrorMessage = "La moneda predeterminada seleccionada no es válida.")]
         [Display(Name = "Moneda Predeterminada")]
         public int DefaultCurrencyId { get; set; }
 
-        [EmailAddress(ErrorMessage = "El formato del correo electrónico no es válido.")]
-        [StringLength(150, ErrorMessage = "El correo no puede exceder los 150 caracteres.")]
-        [Display(Name = "Correo Electrónico")]
-        public string? Email { get; set; }
-
-        [Phone(ErrorMessage = "El formato del teléfono no es válido.")]
-        [StringLength(20, ErrorMessage = "El teléfono no puede exceder los 20 caracteres.")]
+        [MaxLength(20, ErrorMessage = "El teléfono debe tener un máximo de 20 caracteres.")]
         [Display(Name = "Teléfono")]
         public string? PhoneNumber { get; set; }
-
     }
 }

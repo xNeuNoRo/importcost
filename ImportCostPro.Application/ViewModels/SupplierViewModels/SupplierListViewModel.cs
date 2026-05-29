@@ -6,16 +6,16 @@ namespace ImportCostPro.Application.ViewModels.SupplierViewModels
     {
         public int Id { get; set; }
 
-        [Display(Name = "Nombre")]
+        [Display(Name = "Nombre del Proveedor")]
         public string Name { get; set; } = null!;
 
-        [Display(Name = "País")]
+        [Display(Name = "País de Origen")]
         public string CountryName { get; set; } = null!;
 
-        [Display(Name = "Moneda")]
+        [Display(Name = "Moneda Principal")]
         public string CurrencyIsoCode { get; set; } = null!;
 
-        [Display(Name = "Correo")]
+        [Display(Name = "Correo Electrónico")]
         public string? Email { get; set; }
 
         [Display(Name = "Teléfono")]
