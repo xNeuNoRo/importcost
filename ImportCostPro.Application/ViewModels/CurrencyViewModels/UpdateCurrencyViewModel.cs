@@ -1,9 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace ImportCostPro.WebApp.Models.Currency
+namespace ImportCostPro.Application.ViewModels.CurrencyViewModels
 {
-    public class CurrencyCreateViewModel
+    public class UpdateCurrencyViewModel
     {
+        public int Id { get; set; }
+
         [Required(ErrorMessage = "El nombre de la moneda es requerido.")]
         [Display(Name = "Nombre de la moneda")]
         public string Name { get; set; } = null!;
@@ -23,6 +25,6 @@ namespace ImportCostPro.WebApp.Models.Currency
 
         [Required(ErrorMessage = "El estado es requerido.")]
         [Display(Name = "Estado")]
-        public bool IsActive { get; set; } = true;
+        public bool IsActive { get; set; }
     }
 }
