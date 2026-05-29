@@ -7,11 +7,11 @@ using Mapster;
 
 namespace ImportCostPro.Application.Services
 {
-    public class CountryServices
+    public class CountryService
     {
         private readonly ICountryRepository _countryRepository;
 
-        public CountryServices(ICountryRepository countryRepository)
+        public CountryService(ICountryRepository countryRepository)
         {
             _countryRepository = countryRepository;
         }

@@ -13,7 +13,7 @@ namespace ImportCostPro.Application
             services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 
             // Registramos los servicios de aplicación
-            services.AddScoped<CountryServices>();
+            services.AddScoped<CountryService>();
             services.AddScoped<CurrencyService>();
             services.AddScoped<ExchangeRateService>();
             services.AddScoped<ImporterService>();
