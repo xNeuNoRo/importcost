@@ -12,7 +12,7 @@ namespace ImportCostPro.Persistence.Repositories
 
         public async Task<Currency?> GetLocalCurrencyAsync()
         {
-            return await _dbSet.AsNoTracking().FirstOrDefaultAsync(c => c.IsLocalCurrency);
+            return await _dbSet.AsNoTracking().FirstOrDefaultAsync(c => c.IsLocalCurrency && c.IsActive);
         }
 
         public async Task<bool> ExistsByIsoCodeAsync(string isoCode, int? excludeId = null)

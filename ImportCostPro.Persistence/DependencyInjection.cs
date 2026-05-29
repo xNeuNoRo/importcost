@@ -1,5 +1,7 @@
 using ImportCostPro.Persistence.Contexts;
+using ImportCostPro.Persistence.Interfaces.Providers;
 using ImportCostPro.Persistence.Interfaces.Repositories;
+using ImportCostPro.Persistence.Providers;
 using ImportCostPro.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -39,6 +41,9 @@ namespace ImportCostPro.Persistence
             services.AddScoped<ISupplierRepository, SupplierRepository>();
             services.AddScoped<ITariffCategoryRepository, TariffCategoryRepository>();
             services.AddScoped<ITaxConfigurationRepository, TaxConfigurationRepository>();
+
+            // Providers
+            services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
 
             return services;
         }

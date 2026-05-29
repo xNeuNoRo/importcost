@@ -13,6 +13,14 @@ namespace ImportCostPro.Persistence.Repositories
         public ImportExpenseRepository(AppDbContext context)
             : base(context) { }
 
+        public async Task<ImportExpense?> GetByIdWithCurrencyAsync(int id)
+        {
+            return await _dbSet
+                .AsNoTracking()
+                .Include(e => e.Currency)
+                .FirstOrDefaultAsync(e => e.Id == id);
+        }
+
         public async Task<IEnumerable<ImportExpense>> GetExpensesByOrderIdAsync(int importOrderId)
         {
             return await _dbSet

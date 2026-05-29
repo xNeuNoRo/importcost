@@ -11,6 +11,14 @@ namespace ImportCostPro.Persistence.Repositories
         public OrderProductRepository(AppDbContext context)
             : base(context) { }
 
+        public async Task<OrderProduct?> GetByIdWithProductAsync(int id)
+        {
+            return await _dbSet
+                .AsNoTracking()
+                .Include(op => op.Product)
+                .FirstOrDefaultAsync(op => op.Id == id);
+        }
+
         public async Task<IEnumerable<OrderProduct>> GetProductsByOrderIdAsync(int importOrderId)
         {
             return await _dbSet

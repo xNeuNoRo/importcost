@@ -6,6 +6,11 @@ namespace ImportCostPro.Persistence.Interfaces.Repositories
     public interface IOrderProductRepository : IGenericRepository<OrderProduct>
     {
         /// <summary>
+        /// Obtiene un producto asociado a una orden de importación por su ID, incluyendo los detalles del producto.
+        /// </summary>
+        Task<OrderProduct?> GetByIdWithProductAsync(int id);
+
+        /// <summary>
         /// Obtiene los productos asociados a una orden de importación, incluyendo los detalles del producto.
         /// </summary>
         Task<IEnumerable<OrderProduct>> GetProductsByOrderIdAsync(int importOrderId);
