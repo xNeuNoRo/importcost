@@ -4,39 +4,37 @@ namespace ImportCostPro.Application.ViewModels.Importer
 {
     public class ImporterUpdateViewModel
     {
+        [Required(ErrorMessage = "El ID del importador no es válido.")]
         public int Id { get; set; }
 
-        [Required(ErrorMessage ="La razon social o nombre legal es requerida")]
-        [StringLength(150, ErrorMessage ="La Razon social no puede exceder los 150 caracteres")]
-        [Display(Name = "Razon Social")]
+        [Required(ErrorMessage = "El nombre o razón social es requerido.")]
+        [MaxLength(150, ErrorMessage = "El nombre o razón social debe tener un máximo de 150 caracteres.")]
+        [Display(Name = "Razón Social")]
         public string LegalName { get; set; } = null!;
 
-        
-        [Required(ErrorMessage ="El documento de intedidad fisca; (RNC/Tax Id) es requerido")]
-        [StringLength(150, ErrorMessage ="El RNC no puede exceder los 20")]
-        [Display(Name = "RNC")]
+        [Required(ErrorMessage = "El RNC o identificación fiscal es requerido.")]
+        [MaxLength(20, ErrorMessage = "El RNC o identificación fiscal debe tener un máximo de 20 caracteres.")]
+        [Display(Name = "RNC / Identificación Fiscal")]
         public string TaxId { get; set; } = null!;
 
-        [Required(ErrorMessage ="El pais es requerido")]
-        [Display(Name = "Pais")]
+        [Required(ErrorMessage = "El país seleccionado no es válido.")]
+        [Display(Name = "País")]
         public int CountryId { get; set;}
 
-        [StringLength(20, ErrorMessage ="El numero de telefono no puede exceder los 20 caracteres")]
-        [Display(Name = "Telefono")]
+        [MaxLength(20, ErrorMessage = "El teléfono debe tener un máximo de 20 caracteres.")]
+        [Display(Name = "Teléfono")]
         public string? PhoneNumber { get; set; }
 
-        [EmailAddress(ErrorMessage = "El formato del correo electrónico no es válido.")]
-        [StringLength(100, ErrorMessage = "El correo electrónico no puede exceder los 100 caracteres.")]
+        [EmailAddress(ErrorMessage = "El correo electrónico debe tener un formato válido.")]
+        [MaxLength(100, ErrorMessage = "El correo electrónico debe tener un máximo de 100 caracteres.")]
         [Display(Name = "Correo Electrónico")]
         public string? Email { get; set; }
 
-        [StringLength(250, ErrorMessage = "La dirección no puede exceder los 250 caracteres.")]
+        [MaxLength(250, ErrorMessage = "La dirección debe tener un máximo de 250 caracteres.")]
         [Display(Name = "Dirección")]
         public string? Address { get; set; }
 
-        [Required(ErrorMessage = "El estado es requerido.")]
         [Display(Name = "Estado")]
         public bool IsActive { get; set; }
-
     }
 }

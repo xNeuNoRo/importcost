@@ -6,13 +6,13 @@ namespace ImportCostPro.Application.ViewModels.Importer
     {
         public int Id { get; set; }
 
-        [Display(Name = "Razon Social")]
+        [Display(Name = "Razón Social")]
         public string LegalName { get; set; } = null!;
 
-        [Display(Name = "RNC")]
+        [Display(Name = "RNC / Identificación Fiscal")]
         public string TaxId { get; set; } = null!;
 
-        [Display(Name = "Pais")]
+        [Display(Name = "País")]
         public string CountryId { get; set; } = null!;
 
         [Display(Name = "Cód. ISO País")]
