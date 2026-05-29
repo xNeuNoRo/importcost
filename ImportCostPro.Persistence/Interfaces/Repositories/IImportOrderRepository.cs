@@ -7,12 +7,22 @@ namespace ImportCostPro.Persistence.Interfaces.Repositories
     // para restringir las operaciones disponibles por seguridad
     public interface IImportOrderRepository
     {
-        // SOLO USAREMOS EL ADDASYNC Y EL GETBYIDASYNC DE GENERICREPOSITORY
+        // SOLO USAREMOS EL ADDASYNC, UPDATEASYNC EL GETBYIDASYNC DE GENERICREPOSITORY
 
         /// <summary>
         /// Registra una nueva orden de importación en el sistema.
         /// </summary>
         Task AddAsync(ImportOrder entity);
+
+        /// <summary>
+        /// Actualiza una orden de importación existente en el sistema.
+        /// </summary>
+        Task UpdateAsync(ImportOrder entity);
+
+        /// <summary>
+        /// Elimina físicamente una orden de importación del sistema.
+        /// </summary>
+        Task<bool> DeleteAsync(int id);
 
         /// <summary>
         /// Recupera una orden básica por su identificador único para validaciones previas de estado.

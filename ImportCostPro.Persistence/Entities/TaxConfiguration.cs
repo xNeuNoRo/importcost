@@ -7,11 +7,30 @@ namespace ImportCostPro.Persistence.Entities
         /// <summary>
         /// Tasa general del ITBIS que se aplicará a los productos importados.
         /// </summary>
-        public required decimal GeneralItbisRate { get; set; }
+        public decimal GeneralItbisRate { get; private set; }
 
         /// <summary>
         /// Tasa del servicio aduanero que se aplicará a los productos importados.
         /// </summary>
-        public required decimal CustomsServiceRate { get; set; }
+        public decimal CustomsServiceRate { get; private set; }
+
+        protected TaxConfiguration() { }
+
+        private TaxConfiguration(decimal generalItbisRate, decimal customsServiceRate)
+        {
+            GeneralItbisRate = generalItbisRate;
+            CustomsServiceRate = customsServiceRate;
+        }
+
+        public static TaxConfiguration Create(decimal generalItbisRate, decimal customsServiceRate)
+        {
+            return new TaxConfiguration(generalItbisRate, customsServiceRate);
+        }
+
+        public void UpdateRates(decimal newItbisRate, decimal newCustomsRate)
+        {
+            GeneralItbisRate = newItbisRate;
+            CustomsServiceRate = newCustomsRate;
+        }
     }
 }
