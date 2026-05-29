@@ -95,63 +95,79 @@ namespace ImportCostPro.Application.Services
             decimal customsServiceRate = taxConfig.CustomsServiceRate / 100m;
             decimal exchangeRateUsed = 1.0m;
 
-            // Lista para acumular los IDs de las tasas de cambio utilizadas durante el proceso,
-            // para luego marcarlas como usadas y evitar su reutilización en futuros cálculos.
+            // Validar que existan los gastos obligatorios: Flete y Seguro
+            bool hasFreight = order.Expenses.Any(e =>
+                e.ExpenseType == ExpenseType.InternationalFreight
+            );
+            bool hasInsurance = order.Expenses.Any(e =>
+                e.ExpenseType == ExpenseType.InternationalInsurance
+            );
+
+            if (!hasFreight)
+            {
+                throw new BusinessException(
+                    "La orden debe tener un gasto de tipo Flete internacional registrado para calcular el landed cost."
+                );
+            }
+
+            if (!hasInsurance)
+            {
+                throw new BusinessException(
+                    "La orden debe tener un gasto de tipo Seguro internacional registrado para calcular el landed cost."
+                );
+            }
+
+            // Lista para acumular los IDs de las tasas de cambio utilizadas durante el proceso
             var rateIdsToMark = new List<int>();
 
             // Si la moneda de la orden es diferente a la local,
-            // necesitamos convertir los valores FOB a moneda local usando la tasa de cambio
+            // usamos la fecha de la orden para buscar la tasa
             if (order.CurrencyId != localCurrencyId)
             {
                 var rate = await _exchangeRateRepository.GetLatestActiveRateAsync(
                     order.CurrencyId,
                     localCurrencyId,
-                    _dateTimeProvider.UtcNow
+                    order.OrderDate
                 );
                 if (rate == null)
                 {
                     throw new BusinessException(
-                        "No se encontró una tasa de cambio activa para la moneda de la orden."
+                        $"No se encontró una tasa de cambio activa para la moneda de la orden ({order.Currency.IsoCode}) hacia la moneda local ({localCurrency.IsoCode}) para la fecha de la orden."
                     );
                 }
 
-                // Acumulamos el ID de la tasa en RAM para marcarla como usada al final del proceso
                 rateIdsToMark.Add(rate.Id);
                 exchangeRateUsed = rate.RateValue;
             }
 
-            // Para optimizar el rendimiento, especialmente en órdenes con muchos productos y gastos,
-            // precalculamos las tasas de cambio de las monedas de los gastos
-            // y las almacenamos en un diccionario para acceso rápido durante el prorrateo
-            var ratesCache = new Dictionary<int, decimal>();
-
-            // Identificamos las monedas extranjeras utilizadas en los gastos de la orden
-            var foreignCurrencyIds = order
-                .Expenses.Select(e => e.CurrencyId)
-                .Where(id => id != localCurrencyId)
-                .Distinct();
-
-            // Precalculamos las tasas de cambio para cada moneda extranjera y las almacenamos en el cache
-            foreach (var currencyId in foreignCurrencyIds)
+            // Cache de tasas de cambio para gastos, usando la fecha de cada gasto
+            var expenseRates = new Dictionary<int, decimal>();
+            foreach (var expense in order.Expenses)
             {
+                if (expense.CurrencyId == localCurrencyId)
+                {
+                    expenseRates[expense.Id] = 1.0m;
+                    continue;
+                }
+
                 var rate = await _exchangeRateRepository.GetLatestActiveRateAsync(
-                    currencyId,
+                    expense.CurrencyId,
                     localCurrencyId,
-                    _dateTimeProvider.UtcNow
+                    expense.ExpenseDate
                 );
+
                 if (rate == null)
                 {
                     throw new BusinessException(
-                        "Falta configurar una tasa de cambio activa para una de las monedas de los gastos."
+                        $"No existe una tasa de cambio activa desde la moneda del gasto '{expense.Description}' hacia la moneda local para la fecha del gasto."
                     );
                 }
 
-                // Acumulamos el ID de la tasa en RAM y guardamos el valor en el cache
                 rateIdsToMark.Add(rate.Id);
-                ratesCache[currencyId] = rate.RateValue;
+                expenseRates[expense.Id] = rate.RateValue;
             }
 
-            // Calculamos el costo de importación línea por línea, aplicando el prorrateo de gastos según la base seleccionada
+            // Calculamos el costo de importación línea por línea
             var lineItems = order
                 .OrderProducts.Select(op => new CalculationLineItem
                 {
@@ -178,45 +194,51 @@ namespace ImportCostPro.Application.Services
             decimal globalTotalVolume = lineItems.Sum(x => x.TotalVolume);
             decimal globalTotalQuantity = lineItems.Sum(x => x.Quantity);
 
-            // Validamos que el total local FOB sea mayor a cero
-            // para evitar divisiones por cero en el prorrateo basado en valor FOB
-            if (globalTotalLocalFob <= 0)
-            {
-                throw new BusinessException(
-                    "El valor total FOB de las líneas de la orden debe ser mayor a cero."
-                );
-            }
-
-            // Prorrateamos cada gasto de la orden según la base de distribución seleccionada y lo asignamos a cada línea
+            // Validamos bases de distribución según los gastos registrados
             foreach (var expense in order.Expenses)
             {
-                // Convertimos el monto del gasto a moneda local si es necesario usando el cache de tasas precalculadas
-                decimal localExpenseAmount = expense.OriginalAmount;
-                if (expense.CurrencyId != localCurrencyId)
+                switch (expense.DistributionBase)
                 {
-                    localExpenseAmount = expense.OriginalAmount * ratesCache[expense.CurrencyId];
+                    case DistributionBase.FobValue:
+                        if (globalTotalLocalFob <= 0)
+                            throw new BusinessException(
+                                "No se puede calcular el landed cost porque existen gastos distribuidos por valor FOB y el FOB total de la orden es 0."
+                            );
+                        break;
+                    case DistributionBase.Weight:
+                        if (globalTotalWeight <= 0)
+                            throw new BusinessException(
+                                "No se puede calcular el landed cost porque existen gastos distribuidos por peso y el peso total de la orden es 0 o algún producto no tiene peso configurado."
+                            );
+                        break;
+                    case DistributionBase.Volume:
+                        if (globalTotalVolume <= 0)
+                            throw new BusinessException(
+                                "No se puede calcular el landed cost porque existen gastos distribuidos por volumen y el volumen total de la orden es 0 o algún producto no tiene dimensiones configuradas."
+                            );
+                        break;
+                    case DistributionBase.Quantity:
+                        if (globalTotalQuantity <= 0)
+                            throw new BusinessException(
+                                "No se puede calcular el landed cost porque existen gastos distribuidos por cantidad y la cantidad total de productos es 0."
+                            );
+                        break;
                 }
+            }
 
-                // Calculamos el factor de distribución para cada línea según la
-                // base seleccionada y asignamos la parte correspondiente del gasto a cada línea
+            // Prorrateamos cada gasto
+            foreach (var expense in order.Expenses)
+            {
+                decimal localExpenseAmount = expense.OriginalAmount * expenseRates[expense.Id];
+
                 foreach (var line in lineItems)
                 {
                     decimal distributionFactor = expense.DistributionBase switch
                     {
                         DistributionBase.FobValue => line.LocalTotalFob / globalTotalLocalFob,
-
-                        DistributionBase.Weight => globalTotalWeight > 0
-                            ? line.TotalWeight / globalTotalWeight
-                            : (line.LocalTotalFob / globalTotalLocalFob),
-
-                        DistributionBase.Volume => globalTotalVolume > 0
-                            ? line.TotalVolume / globalTotalVolume
-                            : (line.LocalTotalFob / globalTotalLocalFob),
-
-                        DistributionBase.Quantity => globalTotalQuantity > 0
-                            ? line.Quantity / globalTotalQuantity
-                            : (line.LocalTotalFob / globalTotalLocalFob),
-
+                        DistributionBase.Weight => line.TotalWeight / globalTotalWeight,
+                        DistributionBase.Volume => line.TotalVolume / globalTotalVolume,
+                        DistributionBase.Quantity => line.Quantity / globalTotalQuantity,
                         _ => throw new BusinessException(
                             "Base de distribución de prorrateo no soportada."
                         ),
@@ -224,7 +246,7 @@ namespace ImportCostPro.Application.Services
 
                     decimal allocatedShare = Math.Round(
                         localExpenseAmount * distributionFactor,
-                        2,
+                        10, // Mayor precisión interna
                         MidpointRounding.AwayFromZero
                     );
 
@@ -237,23 +259,37 @@ namespace ImportCostPro.Application.Services
                 }
             }
 
-            // Creamos una lista para almacenar los detalles de cálculo de cada línea,
-            // que luego se asociarán al resultado final
+            // Redondeo final de gastos prorrateados a 2 decimales para el resultado oficial
+            foreach (var line in lineItems)
+            {
+                line.AllocatedFreight = Math.Round(
+                    line.AllocatedFreight,
+                    2,
+                    MidpointRounding.AwayFromZero
+                );
+                line.AllocatedInsurance = Math.Round(
+                    line.AllocatedInsurance,
+                    2,
+                    MidpointRounding.AwayFromZero
+                );
+                line.AllocatedLocalExpenses = Math.Round(
+                    line.AllocatedLocalExpenses,
+                    2,
+                    MidpointRounding.AwayFromZero
+                );
+            }
+
+            // Detalles de cálculo por línea
             var resultDetails = new List<CalculationResultDetail>();
 
             foreach (var line in lineItems)
             {
-                // Cálculo del costo CIF local para esta línea,
-                // que es la suma del FOB local + gastos internacionales prorrateados
                 decimal localTotalCif = Math.Round(
                     line.LocalTotalFob + line.AllocatedFreight + line.AllocatedInsurance,
                     2,
                     MidpointRounding.AwayFromZero
                 );
 
-                // Cálculo de impuestos aduanales para esta línea. El monto del arancel se calcula
-                // aplicando el porcentaje de arancel correspondiente a la categoría arancelaria
-                // del producto sobre el valor CIF local.
                 decimal tariffPercent = line.Product?.TariffCategory?.CustomsDutyRate ?? 0m;
                 decimal customsDutyAmount = Math.Round(
                     localTotalCif * (tariffPercent / 100m),
@@ -261,31 +297,22 @@ namespace ImportCostPro.Application.Services
                     MidpointRounding.AwayFromZero
                 );
 
-                // Cálculo del impuesto de excise para esta línea, si aplica. El monto del excise se calcula
-                // aplicando el porcentaje de excise correspondiente a la categoría arancelaria del producto
-                // sobre la suma del valor CIF local + aranceles
                 decimal excisePercent = line.Product?.TariffCategory?.ExciseTaxRate ?? 0m;
                 bool appliesExcise = line.Product?.TariffCategory?.AppliesExciseTax ?? false;
-                decimal exciseTaxAmount =
-                    appliesExcise && excisePercent > 0
-                        ? Math.Round(
-                            (localTotalCif + customsDutyAmount) * (excisePercent / 100m),
-                            2,
-                            MidpointRounding.AwayFromZero
-                        )
-                        : 0m;
+                decimal exciseTaxAmount = appliesExcise
+                    ? Math.Round(
+                        localTotalCif * (excisePercent / 100m),
+                        2,
+                        MidpointRounding.AwayFromZero
+                    )
+                    : 0m;
 
-                // Cálculo del monto del servicio aduanal para esta línea, si aplica. El monto del servicio aduanal se calcula
-                // aplicando el porcentaje de servicio aduanal configurado en la configuración de impuestos
-                // sobre el valor CIF local
                 decimal customsServiceAmount = Math.Round(
-                    localTotalCif * customsServiceRate,
+                    localTotalCif * (customsServiceRate),
                     2,
                     MidpointRounding.AwayFromZero
                 );
 
-                // Base imponible acumulada del ITBIS para esta línea,
-                // que incluye el valor CIF local + impuestos aduanales + impuestos de excise + servicio aduanal
                 decimal itbisBase = Math.Round(
                     localTotalCif + customsDutyAmount + exciseTaxAmount + customsServiceAmount,
                     2,
@@ -297,8 +324,6 @@ namespace ImportCostPro.Application.Services
                     ? Math.Round(itbisBase * itbisRate, 2, MidpointRounding.AwayFromZero)
                     : 0m;
 
-                // El costo de importación local total asignado a esta línea es
-                // la suma del valor CIF local + impuestos aduanales + impuestos de excise + servicio aduanal + gastos locales prorrateados asignados a esta línea
                 decimal localTotalLandedCost = Math.Round(
                     localTotalCif
                         + customsDutyAmount
@@ -309,23 +334,21 @@ namespace ImportCostPro.Application.Services
                     2,
                     MidpointRounding.AwayFromZero
                 );
+
                 decimal unitLandedCost = Math.Round(
                     localTotalLandedCost / line.Quantity,
                     2,
                     MidpointRounding.AwayFromZero
                 );
 
-                // Cálculo del precio de venta sugerido para esta línea,
-                // aplicando el margen de ganancia objetivo sobre el costo de importación unitario.
-                decimal marginFormulaResult =
-                    line.ProfitMarginRate > 0m
-                        ? unitLandedCost / (1m - (line.ProfitMarginRate / 100m))
-                        : unitLandedCost;
-
                 decimal suggestedRetailPrice =
-                    line.ProfitMarginRate == 100m
-                        ? Math.Round(unitLandedCost * 2m, 2, MidpointRounding.AwayFromZero)
-                        : Math.Round(marginFormulaResult, 2, MidpointRounding.AwayFromZero);
+                    line.ProfitMarginRate > 0m
+                        ? Math.Round(
+                            unitLandedCost / (1m - (line.ProfitMarginRate / 100m)),
+                            2,
+                            MidpointRounding.AwayFromZero
+                        )
+                        : unitLandedCost;
 
                 // Agregamos el detalle de cálculo para esta línea al resultado final
                 resultDetails.Add(
@@ -334,6 +357,7 @@ namespace ImportCostPro.Application.Services
                         ProductId = line.ProductId,
                         Quantity = line.Quantity,
                         OriginalUnitPriceFob = line.OriginalUnitPriceFob,
+                        OriginalTotalFob = line.Quantity * line.OriginalUnitPriceFob,
                         LocalTotalFob = line.LocalTotalFob,
                         AllocatedFreight = line.AllocatedFreight,
                         AllocatedInsurance = line.AllocatedInsurance,

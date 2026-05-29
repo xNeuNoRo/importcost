@@ -8,6 +8,7 @@ namespace ImportCostPro.Persistence.Entities
         public int ProductId { get; set; }
         public decimal Quantity { get; set; }
         public decimal OriginalUnitPriceFob { get; set; }
+        public decimal OriginalTotalFob { get; set; }
         public decimal LocalTotalFob { get; set; }
         public decimal AllocatedFreight { get; set; }
         public decimal AllocatedInsurance { get; set; }

@@ -13,16 +13,19 @@ namespace ImportCostPro.Application.Services
         private readonly IImportExpenseRepository _importExpenseRepository;
         private readonly IImportOrderRepository _importOrderRepository;
         private readonly ICurrencyRepository _currencyRepository;
+        private readonly IExchangeRateRepository _exchangeRateRepository;
 
         public ImportExpenseService(
             IImportExpenseRepository importExpenseRepository,
             IImportOrderRepository importOrderRepository,
-            ICurrencyRepository currencyRepository
+            ICurrencyRepository currencyRepository,
+            IExchangeRateRepository exchangeRateRepository
         )
         {
             _importExpenseRepository = importExpenseRepository;
             _importOrderRepository = importOrderRepository;
             _currencyRepository = currencyRepository;
+            _exchangeRateRepository = exchangeRateRepository;
         }
 
         public async Task<IEnumerable<ImportExpenseResponse>> GetExpensesByOrderIdAsync(
@@ -45,18 +48,7 @@ namespace ImportCostPro.Application.Services
 
         public async Task<ImportExpenseResponse> CreateAsync(CreateImportExpenseRequest request)
         {
-            string normalizedDescription = request.Description?.Trim() ?? string.Empty;
-
-            ValidateBasicRules(
-                normalizedDescription,
-                request.ExpenseType,
-                request.DistributionBase,
-                request.OriginalAmount,
-                nameof(request.Description),
-                nameof(request.ExpenseType),
-                nameof(request.DistributionBase),
-                nameof(request.OriginalAmount)
-            );
+            string normalizedDescription = request.Description.Trim();
 
             var orderStatus = await _importOrderRepository.GetStatusByIdAsync(
                 request.ImportOrderId
@@ -75,7 +67,7 @@ namespace ImportCostPro.Application.Services
             )
             {
                 throw new BusinessException(
-                    $"Está estrictamente prohibido agregar gastos logísticos a una orden en estado {orderStatus}."
+                    "No se puede registrar este gasto porque la orden ya fue calculada, cerrada o cancelada."
                 );
             }
 
@@ -84,7 +76,7 @@ namespace ImportCostPro.Application.Services
             {
                 throw new ValidationBusinessException(
                     nameof(request.CurrencyId),
-                    $"La moneda con ID {request.CurrencyId} no existe."
+                    "La moneda seleccionada debe existir en el sistema."
                 );
             }
 
@@ -92,8 +84,33 @@ namespace ImportCostPro.Application.Services
             {
                 throw new ValidationBusinessException(
                     nameof(request.CurrencyId),
-                    $"La moneda '{currency.Name}' se encuentra inactiva."
+                    "La moneda seleccionada debe estar activa."
                 );
+            }
+
+            // Validar tasa de cambio si la moneda no es la local
+            if (!currency.IsLocalCurrency)
+            {
+                var localCurrency = await _currencyRepository.GetLocalCurrencyAsync();
+                if (localCurrency == null)
+                {
+                    throw new BusinessException(
+                        "No se ha configurado una moneda local en el sistema."
+                    );
+                }
+
+                var rate = await _exchangeRateRepository.GetLatestActiveRateAsync(
+                    currency.Id,
+                    localCurrency.Id,
+                    request.ExpenseDate
+                );
+
+                if (rate == null)
+                {
+                    throw new BusinessException(
+                        "No existe una tasa de cambio activa desde la moneda del gasto hacia la moneda local para la fecha del gasto."
+                    );
+                }
             }
 
             if (
@@ -132,6 +149,7 @@ namespace ImportCostPro.Application.Services
                 ExpenseType = request.ExpenseType,
                 DistributionBase = request.DistributionBase,
                 OriginalAmount = request.OriginalAmount,
+                ExpenseDate = request.ExpenseDate.Date,
             };
 
             await _importExpenseRepository.AddAsync(entity);
@@ -142,7 +160,7 @@ namespace ImportCostPro.Application.Services
 
         public async Task<ImportExpenseResponse> UpdateAsync(UpdateImportExpenseRequest request)
         {
-            string normalizedDescription = request.Description?.Trim() ?? string.Empty;
+            string normalizedDescription = request.Description.Trim();
 
             var entity = await _importExpenseRepository.GetByIdAsync(request.Id);
             if (entity == null)
@@ -161,25 +179,33 @@ namespace ImportCostPro.Application.Services
             )
             {
                 throw new BusinessException(
-                    "No se permite modificar gastos logísticos de una orden en estado Calculated, Closed o Canceled."
+                    "No se puede modificar este gasto porque la orden ya fue calculada, cerrada o cancelada."
                 );
             }
 
-            ValidateBasicRules(
-                normalizedDescription,
-                entity.ExpenseType,
-                request.DistributionBase,
-                request.OriginalAmount,
-                nameof(request.Description),
-                "ExpenseType",
-                nameof(request.DistributionBase),
-                nameof(request.OriginalAmount)
-            );
+            // Validar tasa si cambio la fecha o si la moneda es extranjera
+            var currency = await _currencyRepository.GetByIdAsync(entity.CurrencyId);
+            if (currency != null && !currency.IsLocalCurrency)
+            {
+                var localCurrency = await _currencyRepository.GetLocalCurrencyAsync();
+                var rate = await _exchangeRateRepository.GetLatestActiveRateAsync(
+                    entity.CurrencyId,
+                    localCurrency!.Id,
+                    request.ExpenseDate
+                );
 
-            // Mantenemos la inmutabilidad relacional de los contratos purgados
+                if (rate == null)
+                {
+                    throw new BusinessException(
+                        "No existe una tasa de cambio activa desde la moneda del gasto hacia la moneda local para la fecha del gasto."
+                    );
+                }
+            }
+
             entity.Description = normalizedDescription;
             entity.DistributionBase = request.DistributionBase;
             entity.OriginalAmount = request.OriginalAmount;
+            entity.ExpenseDate = request.ExpenseDate.Date;
 
             await _importExpenseRepository.UpdateAsync(entity);
 
@@ -204,56 +230,12 @@ namespace ImportCostPro.Application.Services
             )
             {
                 throw new BusinessException(
-                    "No se permite eliminar gastos logísticos de una orden en estado Calculated, Closed o Canceled."
+                    "No se puede eliminar este gasto porque la orden ya fue calculada, cerrada o cancelada."
                 );
             }
 
             await _importExpenseRepository.DeleteAsync(id);
             return true;
-        }
-
-        private static void ValidateBasicRules(
-            string description,
-            ExpenseType expenseType,
-            DistributionBase distributionBase,
-            decimal originalAmount,
-            string descPropName,
-            string typePropName,
-            string basePropName,
-            string amountPropName
-        )
-        {
-            if (string.IsNullOrWhiteSpace(description))
-            {
-                throw new ValidationBusinessException(
-                    descPropName,
-                    "La descripción del gasto de importación es obligatoria."
-                );
-            }
-
-            if (!Enum.IsDefined(typeof(ExpenseType), expenseType))
-            {
-                throw new ValidationBusinessException(
-                    typePropName,
-                    "El tipo de gasto seleccionado no es válido."
-                );
-            }
-
-            if (!Enum.IsDefined(typeof(DistributionBase), distributionBase))
-            {
-                throw new ValidationBusinessException(
-                    basePropName,
-                    "La base de distribución seleccionada no es válida."
-                );
-            }
-
-            if (originalAmount <= 0)
-            {
-                throw new ValidationBusinessException(
-                    amountPropName,
-                    "El monto original del gasto logístico debe ser mayor a 0."
-                );
-            }
         }
     }
 }

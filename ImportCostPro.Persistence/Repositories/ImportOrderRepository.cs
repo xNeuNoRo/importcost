@@ -26,6 +26,12 @@ namespace ImportCostPro.Persistence.Repositories
             return await base.GetByIdAsync(id);
         }
 
+        public new async Task<bool> DeleteAsync(int id)
+        {
+            var rowsAffected = await _dbSet.Where(o => o.Id == id).ExecuteDeleteAsync();
+            return rowsAffected > 0;
+        }
+
         public async Task<IEnumerable<ImportOrder>> GetAllWithRelationsAsync()
         {
             return await _dbSet
@@ -34,6 +40,8 @@ namespace ImportCostPro.Persistence.Repositories
                 .Include(o => o.Supplier)
                 .Include(o => o.OriginCountry)
                 .Include(o => o.Currency)
+                .Include(o => o.OrderProducts)
+                .Include(o => o.CalculationResults)
                 .OrderByDescending(o => o.OrderDate)
                 .ToListAsync();
         }
@@ -46,6 +54,8 @@ namespace ImportCostPro.Persistence.Repositories
                 .Include(o => o.Supplier)
                 .Include(o => o.OriginCountry)
                 .Include(o => o.Currency)
+                .Include(o => o.OrderProducts)
+                .Include(o => o.CalculationResults)
                 .FirstOrDefaultAsync(o => o.Id == id);
         }
 

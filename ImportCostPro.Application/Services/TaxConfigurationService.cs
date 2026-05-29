@@ -1,6 +1,5 @@
 ﻿using ImportCostPro.Application.DTOs.TaxConfiguration.Requests;
 using ImportCostPro.Application.DTOs.TaxConfiguration.Responses;
-using ImportCostPro.Application.Exceptions;
 using ImportCostPro.Application.Extensions;
 using ImportCostPro.Persistence.Entities;
 using ImportCostPro.Persistence.Interfaces.Repositories;
@@ -38,22 +37,6 @@ namespace ImportCostPro.Application.Services
         {
             decimal normalizedItbis = request.ItbisPercentage;
             decimal normalizedCustoms = request.CustomsServiceRatePercentage;
-
-            if (normalizedItbis < 0 || normalizedItbis > 100)
-            {
-                throw new ValidationBusinessException(
-                    nameof(request.ItbisPercentage),
-                    "El porcentaje de ITBIS debe estar entre 0 y 100."
-                );
-            }
-
-            if (normalizedCustoms < 0 || normalizedCustoms > 100)
-            {
-                throw new ValidationBusinessException(
-                    nameof(request.CustomsServiceRatePercentage),
-                    "El porcentaje de servicio aduanal debe estar entre 0 y 100."
-                );
-            }
 
             var currentConfig = await _taxConfigurationRepository.GetSingleConfigurationAsync();
 

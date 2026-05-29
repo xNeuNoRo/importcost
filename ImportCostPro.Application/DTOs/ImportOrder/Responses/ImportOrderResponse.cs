@@ -22,5 +22,7 @@ namespace ImportCostPro.Application.DTOs.ImportOrder.Responses
         public OrderStatus Status { get; set; }
         public TransportMode TransportMode { get; set; }
         public DateTime OrderDate { get; set; }
+        public decimal FobTotal { get; set; }
+        public decimal TotalLandedCost { get; set; }
     }
 }

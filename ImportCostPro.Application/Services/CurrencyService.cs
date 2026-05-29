@@ -35,9 +35,9 @@ namespace ImportCostPro.Application.Services
 
         public async Task<CurrencyResponse> CreateAsync(CreateCurrencyRequest request)
         {
-            string normalizedIsoCode = request.IsoCode?.Trim().ToUpperInvariant() ?? string.Empty;
-            string normalizedName = request.Name?.Trim() ?? string.Empty;
-            string normalizedSymbol = request.Symbol?.Trim() ?? string.Empty;
+            string normalizedIsoCode = request.IsoCode.Trim().ToUpperInvariant();
+            string normalizedName = request.Name.Trim();
+            string normalizedSymbol = request.Symbol.Trim();
 
             if (await _currencyRepository.ExistsByIsoCodeAsync(normalizedIsoCode))
             {
@@ -71,9 +71,9 @@ namespace ImportCostPro.Application.Services
 
         public async Task<CurrencyResponse> UpdateAsync(UpdateCurrencyRequest request)
         {
-            string normalizedIsoCode = request.IsoCode?.Trim().ToUpperInvariant() ?? string.Empty;
-            string normalizedName = request.Name?.Trim() ?? string.Empty;
-            string normalizedSymbol = request.Symbol?.Trim() ?? string.Empty;
+            string normalizedIsoCode = request.IsoCode.Trim().ToUpperInvariant();
+            string normalizedName = request.Name.Trim();
+            string normalizedSymbol = request.Symbol.Trim();
 
             var existingCurrency = await _currencyRepository.GetByIdAsync(request.Id);
             if (existingCurrency == null)

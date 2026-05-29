@@ -33,35 +33,18 @@ namespace ImportCostPro.Application.Services
 
         public async Task<CountryResponse> CreateAsync(CreateCountryRequest request)
         {
-            string normalizedName = request.Name?.Trim() ?? string.Empty;
-            string normalizedIsoCode = request.IsoCode?.Trim().ToUpperInvariant() ?? string.Empty;
-
-            if (string.IsNullOrWhiteSpace(normalizedName))
-            {
-                throw new ValidationBusinessException(
-                    nameof(request.Name),
-                    "El nombre del país es requerido y no puede estar vacío."
-                );
-            }
-
-            if (normalizedIsoCode.Length != 3)
-            {
-                throw new ValidationBusinessException(
-                    nameof(request.IsoCode),
-                    "El código ISO del país debe tener exactamente 3 caracteres."
-                );
-            }
+            string normalizedName = request.Name.Trim();
+            string normalizedIsoCode = request.IsoCode.Trim().ToUpperInvariant();
 
             if (await _countryRepository.ExistsByIsoCodeAsync(normalizedIsoCode))
             {
                 throw new ValidationBusinessException(
                     nameof(request.IsoCode),
-                    $"El código ISO '{normalizedIsoCode}' ya se encuentra registrado para otro país."
+                    $"Ya existe un país registrado con este código ISO."
                 );
             }
 
             var country = request.Adapt<Country>();
-
             country.Name = normalizedName;
             country.IsoCode = normalizedIsoCode;
             country.IsActive = true;
@@ -73,24 +56,8 @@ namespace ImportCostPro.Application.Services
 
         public async Task<CountryResponse> UpdateAsync(UpdateCountryRequest request)
         {
-            string normalizedName = request.Name?.Trim() ?? string.Empty;
-            string normalizedIsoCode = request.IsoCode?.Trim().ToUpperInvariant() ?? string.Empty;
-
-            if (string.IsNullOrWhiteSpace(normalizedName))
-            {
-                throw new ValidationBusinessException(
-                    nameof(request.Name),
-                    "El nombre del país es requerido y no puede estar vacío."
-                );
-            }
-
-            if (normalizedIsoCode.Length != 3)
-            {
-                throw new ValidationBusinessException(
-                    nameof(request.IsoCode),
-                    "El código ISO del país debe tener exactamente 3 caracteres."
-                );
-            }
+            string normalizedName = request.Name.Trim();
+            string normalizedIsoCode = request.IsoCode.Trim().ToUpperInvariant();
 
             var existingCountry = await _countryRepository.GetByIdAsync(request.Id);
             if (existingCountry == null)
@@ -107,7 +74,7 @@ namespace ImportCostPro.Application.Services
             {
                 throw new ValidationBusinessException(
                     nameof(request.IsoCode),
-                    $"El código ISO '{normalizedIsoCode}' ya se encuentra registrado para otro país."
+                    $"Ya existe un país registrado con este código ISO."
                 );
             }
 

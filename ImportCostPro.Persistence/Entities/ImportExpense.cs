@@ -11,6 +11,7 @@ namespace ImportCostPro.Persistence.Entities
         public required ExpenseType ExpenseType { get; set; }
         public required DistributionBase DistributionBase { get; set; }
         public required decimal OriginalAmount { get; set; }
+        public required DateTime ExpenseDate { get; set; }
 
         // => Navigation Properties
         public ImportOrder ImportOrder { get; set; } = null!;

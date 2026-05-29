@@ -20,6 +20,11 @@ namespace ImportCostPro.Persistence.Interfaces.Repositories
         Task UpdateAsync(ImportOrder entity);
 
         /// <summary>
+        /// Elimina físicamente una orden de importación del sistema.
+        /// </summary>
+        Task<bool> DeleteAsync(int id);
+
+        /// <summary>
         /// Recupera una orden básica por su identificador único para validaciones previas de estado.
         /// </summary>
         Task<ImportOrder?> GetByIdAsync(int id);

@@ -43,24 +43,8 @@ namespace ImportCostPro.Application.Services
 
         public async Task<SupplierResponse> CreateAsync(CreateSupplierRequest request)
         {
-            string normalizedName = request.Name?.Trim() ?? string.Empty;
-            string normalizedEmail = request.Email?.Trim() ?? string.Empty;
-
-            if (string.IsNullOrWhiteSpace(normalizedName))
-            {
-                throw new ValidationBusinessException(
-                    nameof(request.Name),
-                    "El nombre del proveedor es requerido y no puede estar vacío."
-                );
-            }
-
-            if (string.IsNullOrWhiteSpace(normalizedEmail))
-            {
-                throw new ValidationBusinessException(
-                    nameof(request.Email),
-                    "El correo electrónico del proveedor es requerido y no puede estar vacío."
-                );
-            }
+            string normalizedName = request.Name.Trim();
+            string normalizedEmail = request.Email.Trim();
 
             var country = await _countryRepository.GetByIdAsync(request.OriginCountryId);
             if (country == null || !country.IsActive)
@@ -101,24 +85,8 @@ namespace ImportCostPro.Application.Services
 
         public async Task<SupplierResponse> UpdateAsync(UpdateSupplierRequest request)
         {
-            string normalizedName = request.Name?.Trim() ?? string.Empty;
-            string normalizedEmail = request.Email?.Trim() ?? string.Empty;
-
-            if (string.IsNullOrWhiteSpace(normalizedName))
-            {
-                throw new ValidationBusinessException(
-                    nameof(request.Name),
-                    "El nombre del proveedor es requerido y no puede estar vacío."
-                );
-            }
-
-            if (string.IsNullOrWhiteSpace(normalizedEmail))
-            {
-                throw new ValidationBusinessException(
-                    nameof(request.Email),
-                    "El correo electrónico del proveedor es requerido y no puede estar vacío."
-                );
-            }
+            string normalizedName = request.Name.Trim();
+            string normalizedEmail = request.Email.Trim();
 
             var entity = await _supplierRepository.GetByIdAsync(request.Id);
             if (entity == null)
@@ -147,19 +115,13 @@ namespace ImportCostPro.Application.Services
 
             if (isReferenced)
             {
-                if (entity.OriginCountryId != request.OriginCountryId)
+                if (
+                    entity.OriginCountryId != request.OriginCountryId
+                    || entity.DefaultCurrencyId != request.DefaultCurrencyId
+                )
                 {
-                    throw new ValidationBusinessException(
-                        nameof(request.OriginCountryId),
-                        "No se puede modificar el país de origen porque el proveedor tiene órdenes de importación registradas."
-                    );
-                }
-
-                if (entity.DefaultCurrencyId != request.DefaultCurrencyId)
-                {
-                    throw new ValidationBusinessException(
-                        nameof(request.DefaultCurrencyId),
-                        "No se puede modificar la moneda porque el proveedor tiene órdenes de importación registradas."
+                    throw new BusinessException(
+                        "No se puede modificar el país de origen ni la moneda principal de este proveedor porque ya tiene órdenes de importación registradas."
                     );
                 }
             }

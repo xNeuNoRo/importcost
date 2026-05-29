@@ -38,30 +38,15 @@ namespace ImportCostPro.Application.Services
 
         public async Task<ImporterResponse> CreateAsync(CreateImporterRequest request)
         {
-            string normalizedLegalName = request.LegalName?.Trim() ?? string.Empty;
-            string normalizedTaxID = request.TaxId?.Trim().ToUpperInvariant() ?? string.Empty;
-
-            if (string.IsNullOrWhiteSpace(normalizedLegalName))
-            {
-                throw new ValidationBusinessException(
-                    nameof(request.LegalName),
-                    "El nombre legal del importador es requerido."
-                );
-            }
-            if (string.IsNullOrWhiteSpace(normalizedTaxID))
-            {
-                throw new ValidationBusinessException(
-                    nameof(request.TaxId),
-                    "El RNC/Identificación fiscal es requerido."
-                );
-            }
+            string normalizedLegalName = request.LegalName.Trim();
+            string normalizedTaxID = request.TaxId.Trim().ToUpperInvariant();
 
             var countryExists = await _countryRepository.GetByIdAsync(request.CountryId);
-            if (countryExists == null)
+            if (countryExists == null || !countryExists.IsActive)
             {
                 throw new ValidationBusinessException(
                     nameof(request.CountryId),
-                    "El país seleccionado no es válido o no existe."
+                    "El país seleccionado no es válido o se encuentra inactivo."
                 );
             }
 
@@ -69,7 +54,7 @@ namespace ImportCostPro.Application.Services
             {
                 throw new ValidationBusinessException(
                     nameof(request.TaxId),
-                    "El RNC ingresado ya pertenece a otro importador."
+                    "Ya existe un importador registrado con este RNC o identificación fiscal."
                 );
             }
 
@@ -89,23 +74,8 @@ namespace ImportCostPro.Application.Services
 
         public async Task<ImporterResponse> UpdateAsync(UpdateImporterRequest request)
         {
-            string normalizedLegalName = request.LegalName?.Trim() ?? string.Empty;
-            string normalizedTaxID = request.TaxId?.Trim().ToUpperInvariant() ?? string.Empty;
-
-            if (string.IsNullOrWhiteSpace(normalizedLegalName))
-            {
-                throw new ValidationBusinessException(
-                    nameof(request.LegalName),
-                    "El nombre legal del importador es requerido."
-                );
-            }
-            if (string.IsNullOrWhiteSpace(normalizedTaxID))
-            {
-                throw new ValidationBusinessException(
-                    nameof(request.TaxId),
-                    "El RNC/Identificación fiscal es requerido."
-                );
-            }
+            string normalizedLegalName = request.LegalName.Trim();
+            string normalizedTaxID = request.TaxId.Trim().ToUpperInvariant();
 
             var existingImporter = await _importerRepository.GetByIdAsync(request.Id);
             if (existingImporter == null)
@@ -121,7 +91,7 @@ namespace ImportCostPro.Application.Services
                 if (hasOrders)
                 {
                     throw new BusinessException(
-                        "No se puede modificar el RNC o identificación fiscal de un importador que ya tiene órdenes de importación registradas."
+                        "No se puede modificar el RNC o identificación fiscal de este importador porque ya tiene órdenes de importación registradas."
                     );
                 }
             }

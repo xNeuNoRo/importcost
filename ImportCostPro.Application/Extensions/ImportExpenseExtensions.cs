@@ -17,6 +17,7 @@ namespace ImportCostPro.Application.Extensions
                 ExpenseType = entity.ExpenseType,
                 DistributionBase = entity.DistributionBase,
                 OriginalAmount = entity.OriginalAmount,
+                ExpenseDate = entity.ExpenseDate,
             };
         }
     }

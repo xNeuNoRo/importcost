@@ -48,7 +48,7 @@ namespace ImportCostPro.Application.Services
         public async Task<ProductResponse> CreateAsync(CreateProductRequest request)
         {
             // Sanitizamos y normalizamos el código de referencia para evitar duplicados por formato
-            request.ReferenceCode = request.ReferenceCode?.Trim().ToUpper() ?? string.Empty;
+            request.ReferenceCode = request.ReferenceCode.Trim().ToUpper();
 
             // Validamos q sea un pais existente y activo
             var country = await _countryRepository.GetByIdAsync(request.DefaultOriginCountryId);
@@ -80,7 +80,7 @@ namespace ImportCostPro.Application.Services
             {
                 throw new ValidationBusinessException(
                     nameof(request.ReferenceCode),
-                    $"El código de referencia '{request.ReferenceCode}' ya está registrado en el catálogo."
+                    "Ya existe un producto registrado con este código o referencia."
                 );
             }
 
@@ -97,7 +97,7 @@ namespace ImportCostPro.Application.Services
         public async Task<ProductResponse> UpdateAsync(UpdateProductRequest request)
         {
             // Sanitizamos y normalizamos el código de referencia para evitar duplicados por formato
-            request.ReferenceCode = request.ReferenceCode?.Trim().ToUpper() ?? string.Empty;
+            request.ReferenceCode = request.ReferenceCode.Trim().ToUpper();
 
             // Validamos q el producto exista
             var entity = await _productRepository.GetByIdAsync(request.Id);
@@ -155,7 +155,7 @@ namespace ImportCostPro.Application.Services
             {
                 throw new ValidationBusinessException(
                     nameof(request.ReferenceCode),
-                    $"El código de referencia '{request.ReferenceCode}' ya está registrado en otro producto."
+                    "Ya existe un producto registrado con este código o referencia."
                 );
             }
 
@@ -184,7 +184,7 @@ namespace ImportCostPro.Application.Services
             if (isReferenced)
             {
                 throw new BusinessException(
-                    $"No se puede eliminar el producto '{entity.Name}' porque cuenta con transacciones logísticas u órdenes asociadas."
+                    "No se puede eliminar este producto porque está asociado a una o más órdenes de importación."
                 );
             }
 

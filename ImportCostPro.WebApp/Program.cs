@@ -1,7 +1,14 @@
+using ImportCostPro.Application;
+using ImportCostPro.Persistence;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+// Registramos las capas de persistencia y aplicación
+builder.Services.AddPersistenceServices(builder.Configuration);
+builder.Services.AddApplicationServices();
 
 var app = builder.Build();
 

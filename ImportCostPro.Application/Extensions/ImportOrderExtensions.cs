@@ -22,6 +22,11 @@ namespace ImportCostPro.Application.Extensions
                 OriginCountryName = entity.OriginCountry?.Name ?? string.Empty,
                 CurrencyId = entity.CurrencyId,
                 CurrencyIsoCode = entity.Currency?.IsoCode ?? string.Empty,
+                FobTotal = entity.OrderProducts.Sum(op => op.Quantity * op.UnitFobPrice),
+                TotalLandedCost = entity
+                    .CalculationResults.OrderByDescending(c => c.CreatedAt)
+                    .Select(c => c.TotalImportCost)
+                    .FirstOrDefault(),
             };
         }
     }

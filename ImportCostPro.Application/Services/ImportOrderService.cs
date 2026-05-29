@@ -15,13 +15,17 @@ namespace ImportCostPro.Application.Services
         private readonly ISupplierRepository _supplierRepository;
         private readonly ICountryRepository _countryRepository;
         private readonly ICurrencyRepository _currencyRepository;
+        private readonly ICalculationResultRepository _calculationResultRepository;
+        private readonly IOrderProductRepository _orderProductRepository;
 
         public ImportOrderService(
             IImportOrderRepository importOrderRepository,
             IImporterRepository importerRepository,
             ISupplierRepository supplierRepository,
             ICountryRepository countryRepository,
-            ICurrencyRepository currencyRepository
+            ICurrencyRepository currencyRepository,
+            ICalculationResultRepository calculationResultRepository,
+            IOrderProductRepository orderProductRepository
         )
         {
             _importOrderRepository = importOrderRepository;
@@ -29,6 +33,8 @@ namespace ImportCostPro.Application.Services
             _supplierRepository = supplierRepository;
             _countryRepository = countryRepository;
             _currencyRepository = currencyRepository;
+            _calculationResultRepository = calculationResultRepository;
+            _orderProductRepository = orderProductRepository;
         }
 
         public async Task<IEnumerable<ImportOrderResponse>> GetAllAsync()
@@ -49,27 +55,21 @@ namespace ImportCostPro.Application.Services
 
         public async Task<ImportOrderResponse> CreateAsync(CreateImportOrderRequest request)
         {
-            string normalizedOrderNumber = request.OrderNumber?.Trim() ?? string.Empty;
-
-            ValidateBasicRules(
-                normalizedOrderNumber,
-                request.TransportMode,
-                nameof(request.OrderNumber),
-                nameof(request.TransportMode)
-            );
+            string normalizedOrderNumber = request.OrderNumber.Trim();
 
             await EnsureRelationsExistAsync(
                 request.ImporterId,
                 request.SupplierId,
                 request.OriginCountryId,
-                request.CurrencyId
+                request.CurrencyId,
+                isCreation: true
             );
 
             if (await _importOrderRepository.ExistsByOrderNumberAsync(normalizedOrderNumber))
             {
                 throw new ValidationBusinessException(
                     nameof(request.OrderNumber),
-                    $"El número de orden '{normalizedOrderNumber}' ya se encuentra registrado."
+                    "El número de orden ya se encuentra registrado."
                 );
             }
 
@@ -91,14 +91,7 @@ namespace ImportCostPro.Application.Services
 
         public async Task<ImportOrderResponse> UpdateAsync(UpdateImportOrderRequest request)
         {
-            string normalizedOrderNumber = request.OrderNumber?.Trim() ?? string.Empty;
-
-            ValidateBasicRules(
-                normalizedOrderNumber,
-                request.TransportMode,
-                nameof(request.OrderNumber),
-                nameof(request.TransportMode)
-            );
+            string normalizedOrderNumber = request.OrderNumber.Trim();
 
             var entity = await _importOrderRepository.GetByIdAsync(request.Id);
             if (entity == null)
@@ -108,22 +101,36 @@ namespace ImportCostPro.Application.Services
                 );
             }
 
-            if (
-                entity.Status == OrderStatus.Calculated
-                || entity.Status == OrderStatus.Closed
-                || entity.Status == OrderStatus.Canceled
-            )
+            if (entity.Status == OrderStatus.Closed || entity.Status == OrderStatus.Canceled)
             {
                 throw new BusinessException(
-                    $"No se permite editar una orden que se encuentra en estado {entity.Status}."
+                    "No se puede editar esta orden porque está cerrada o cancelada."
                 );
+            }
+
+            if (entity.Status == OrderStatus.Calculated)
+            {
+                if (
+                    entity.ImporterId != request.ImporterId
+                    || entity.SupplierId != request.SupplierId
+                    || entity.OriginCountryId != request.OriginCountryId
+                    || entity.CurrencyId != request.CurrencyId
+                    || entity.OrderDate != request.OrderDate.Date
+                    || entity.TransportMode != request.TransportMode
+                )
+                {
+                    throw new BusinessException(
+                        "No se pueden modificar estos datos porque la orden ya tiene un cálculo oficial de landed cost."
+                    );
+                }
             }
 
             await EnsureRelationsExistAsync(
                 request.ImporterId,
                 request.SupplierId,
                 request.OriginCountryId,
-                request.CurrencyId
+                request.CurrencyId,
+                isCreation: false
             );
 
             if (
@@ -135,7 +142,7 @@ namespace ImportCostPro.Application.Services
             {
                 throw new ValidationBusinessException(
                     nameof(request.OrderNumber),
-                    $"El número de orden '{normalizedOrderNumber}' ya está en uso por otra importación."
+                    "Ya existe otra orden registrada con este número."
                 );
             }
 
@@ -180,6 +187,65 @@ namespace ImportCostPro.Application.Services
                 );
             }
 
+            // Si la orden ya fue calculada, solo se le permite cambiar a estado Cerrada o Cancelada
+            if (newStatus == OrderStatus.Closed)
+            {
+                // Si la orden ya fue calculada, tiramos una excepcion
+                if (currentStatus != OrderStatus.Calculated)
+                {
+                    throw new BusinessException(
+                        "Solo se puede cerrar una orden que se encuentra en estado Calculada."
+                    );
+                }
+
+                // Obtenemos el cálculo oficial de landed cost para hacer validaciones antes de permitir cerrar la orden
+                var calculation =
+                    await _calculationResultRepository.GetLatestCalculatedResultWithDetailsAsync(
+                        id
+                    );
+
+                // Validamos que exista un cálculo oficial registrado para esta orden
+                if (calculation == null)
+                {
+                    throw new BusinessException(
+                        "No se puede cerrar esta orden porque no tiene un cálculo oficial de landed cost guardado."
+                    );
+                }
+
+                // Validamos que la orden tenga productos registrados y que el costo total de
+                // importación del cálculo oficial sea mayor a 0
+                var products = await _orderProductRepository.GetProductsByOrderIdAsync(id);
+                if (products == null || !products.Any())
+                {
+                    throw new BusinessException(
+                        "No se puede cerrar esta orden porque no tiene productos registrados."
+                    );
+                }
+                if (calculation.TotalImportCost <= 0)
+                {
+                    throw new BusinessException(
+                        "No se puede cerrar esta orden porque el costo total de importación del cálculo oficial es 0."
+                    );
+                }
+            }
+
+            // Solo se permite calcular una orden que se encuentra en estado Abierta
+            if (newStatus == OrderStatus.Calculated && currentStatus != OrderStatus.Open)
+            {
+                throw new BusinessException(
+                    "Solo se puede calcular una orden que se encuentra en estado Abierta."
+                );
+            }
+
+            // No se puede reabrir una orden que ya fue calculada o cancelada
+            if (newStatus == OrderStatus.Open)
+            {
+                throw new BusinessException(
+                    "No se puede reabrir una orden que ya fue calculada o cancelada."
+                );
+            }
+
+            // Actualizamos el estado de la orden
             var updated = await _importOrderRepository.UpdateStatusAsync(id, newStatus);
             if (!updated)
             {
@@ -191,66 +257,68 @@ namespace ImportCostPro.Application.Services
             return true;
         }
 
-        private static void ValidateBasicRules(
-            string orderNumber,
-            TransportMode transportMode,
-            string orderNumberPropertyName,
-            string transportModePropertyName
-        )
+        public async Task<bool> DeleteAsync(int id)
         {
-            if (string.IsNullOrWhiteSpace(orderNumber))
+            var entity = await _importOrderRepository.GetByIdAsync(id);
+            if (entity == null)
             {
-                throw new ValidationBusinessException(
-                    orderNumberPropertyName,
-                    "El número de la orden de importación es obligatorio."
+                throw new BusinessException($"La orden de importación con ID {id} no existe.");
+            }
+
+            // Solo se pueden eliminar órdenes que no estén en estado Calculada, Cerrada o Cancelada
+            var hasCalculation =
+                await _calculationResultRepository.GetLatestCalculatedResultWithDetailsAsync(id);
+            if (hasCalculation != null)
+            {
+                throw new BusinessException(
+                    "No se puede eliminar una orden que ya tiene un cálculo oficial de landed cost guardado."
                 );
             }
 
-            if (!Enum.IsDefined(typeof(TransportMode), transportMode))
-            {
-                throw new ValidationBusinessException(
-                    transportModePropertyName,
-                    "El medio de transporte seleccionado no es válido para el sistema de importación."
-                );
-            }
+            return await _importOrderRepository.DeleteAsync(id);
         }
 
         private async Task EnsureRelationsExistAsync(
             int importerId,
             int supplierId,
             int originCountryId,
-            int currencyId
+            int currencyId,
+            bool isCreation
         )
         {
-            if (!await _importerRepository.ExistsByIdAsync(importerId))
+            var importer = await _importerRepository.GetByIdAsync(importerId);
+            if (importer == null || (isCreation && !importer.IsActive))
             {
                 throw new ValidationBusinessException(
                     nameof(CreateImportOrderRequest.ImporterId),
-                    $"El importador con ID {importerId} no existe."
+                    "El importador seleccionado debe existir y estar activo."
                 );
             }
 
-            if (!await _supplierRepository.ExistsByIdAsync(supplierId))
+            var supplier = await _supplierRepository.GetByIdAsync(supplierId);
+            if (supplier == null || (isCreation && !supplier.IsActive))
             {
                 throw new ValidationBusinessException(
                     nameof(CreateImportOrderRequest.SupplierId),
-                    $"El proveedor con ID {supplierId} no existe."
+                    "El proveedor seleccionado debe existir y estar activo."
                 );
             }
 
-            if (!await _countryRepository.ExistsByIdAsync(originCountryId))
+            var country = await _countryRepository.GetByIdAsync(originCountryId);
+            if (country == null || (isCreation && !country.IsActive))
             {
                 throw new ValidationBusinessException(
                     nameof(CreateImportOrderRequest.OriginCountryId),
-                    $"El país de origen con ID {originCountryId} no existe."
+                    "El país seleccionado debe existir y estar activo."
                 );
             }
 
-            if (!await _currencyRepository.ExistsByIdAsync(currencyId))
+            var currency = await _currencyRepository.GetByIdAsync(currencyId);
+            if (currency == null || (isCreation && !currency.IsActive))
             {
                 throw new ValidationBusinessException(
                     nameof(CreateImportOrderRequest.CurrencyId),
-                    $"La moneda con ID {currencyId} no existe."
+                    "La moneda seleccionada debe existir y estar activa."
                 );
             }
         }

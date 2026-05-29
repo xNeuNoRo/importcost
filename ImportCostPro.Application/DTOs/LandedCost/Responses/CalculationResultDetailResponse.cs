@@ -8,6 +8,7 @@ namespace ImportCostPro.Application.DTOs.LandedCost.Responses
         public string ProductName { get; set; } = null!;
         public decimal Quantity { get; set; }
         public decimal OriginalUnitPriceFob { get; set; }
+        public decimal OriginalTotalFob { get; set; }
         public decimal LocalTotalFob { get; set; }
         public decimal AllocatedFreight { get; set; }
         public decimal AllocatedInsurance { get; set; }

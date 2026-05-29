@@ -10,5 +10,6 @@ namespace ImportCostPro.Application.DTOs.ImportExpense.Requests
         public ExpenseType ExpenseType { get; set; }
         public DistributionBase DistributionBase { get; set; }
         public decimal OriginalAmount { get; set; }
+        public DateTime ExpenseDate { get; set; }
     }
 }

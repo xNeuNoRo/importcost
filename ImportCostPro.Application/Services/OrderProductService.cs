@@ -47,15 +47,6 @@ namespace ImportCostPro.Application.Services
 
         public async Task<OrderProductResponse> CreateAsync(CreateOrderProductRequest request)
         {
-            ValidateBasicRules(
-                request.Quantity,
-                request.UnitFobPrice,
-                request.TargetProfitMargin,
-                nameof(request.Quantity),
-                nameof(request.UnitFobPrice),
-                nameof(request.TargetProfitMargin)
-            );
-
             var orderStatus = await _importOrderRepository.GetStatusByIdAsync(
                 request.ImportOrderId
             );
@@ -66,10 +57,14 @@ namespace ImportCostPro.Application.Services
                 );
             }
 
-            if (orderStatus == OrderStatus.Closed || orderStatus == OrderStatus.Canceled)
+            if (
+                orderStatus == OrderStatus.Calculated
+                || orderStatus == OrderStatus.Closed
+                || orderStatus == OrderStatus.Canceled
+            )
             {
                 throw new BusinessException(
-                    "Está prohibido agregar productos a una orden en estado Closed o Canceled."
+                    $"Está prohibido realizar esta acción en una orden con estado {orderStatus}."
                 );
             }
 
@@ -99,7 +94,7 @@ namespace ImportCostPro.Application.Services
             {
                 throw new ValidationBusinessException(
                     nameof(request.ProductId),
-                    "Este producto ya se encuentra registrado en la orden de importación. Si desea modificar su cantidad o precio, proceda a editar el registro existente."
+                    "Este producto ya fue agregado a la orden. Si desea modificar la cantidad, precio o margen, debe editar el producto ya agregado."
                 );
             }
 
@@ -120,15 +115,6 @@ namespace ImportCostPro.Application.Services
 
         public async Task<OrderProductResponse> UpdateAsync(UpdateOrderProductRequest request)
         {
-            ValidateBasicRules(
-                request.Quantity,
-                request.UnitFobPrice,
-                request.TargetProfitMargin,
-                nameof(request.Quantity),
-                nameof(request.UnitFobPrice),
-                nameof(request.TargetProfitMargin)
-            );
-
             var entity = await _orderProductRepository.GetByIdAsync(request.Id);
             if (entity == null)
             {
@@ -138,10 +124,14 @@ namespace ImportCostPro.Application.Services
             }
 
             var orderStatus = await _importOrderRepository.GetStatusByIdAsync(entity.ImportOrderId);
-            if (orderStatus == OrderStatus.Closed || orderStatus == OrderStatus.Canceled)
+            if (
+                orderStatus == OrderStatus.Calculated
+                || orderStatus == OrderStatus.Closed
+                || orderStatus == OrderStatus.Canceled
+            )
             {
                 throw new BusinessException(
-                    "No se permite modificar líneas de productos de una orden que se encuentra en estado Closed o Canceled."
+                    "No se puede modificar este producto porque la orden ya fue calculada, cerrada o cancelada."
                 );
             }
 
@@ -166,49 +156,19 @@ namespace ImportCostPro.Application.Services
             }
 
             var orderStatus = await _importOrderRepository.GetStatusByIdAsync(entity.ImportOrderId);
-            if (orderStatus == OrderStatus.Closed || orderStatus == OrderStatus.Canceled)
+            if (
+                orderStatus == OrderStatus.Calculated
+                || orderStatus == OrderStatus.Closed
+                || orderStatus == OrderStatus.Canceled
+            )
             {
                 throw new BusinessException(
-                    "No se permite eliminar líneas de productos de una orden que se encuentra en estado Closed o Canceled."
+                    "No se puede eliminar este producto porque la orden ya fue calculada, cerrada o cancelada."
                 );
             }
 
             await _orderProductRepository.DeleteAsync(id);
             return true;
-        }
-
-        private static void ValidateBasicRules(
-            decimal quantity,
-            decimal unitFobPrice,
-            decimal targetProfitMargin,
-            string quantityPropName,
-            string pricePropName,
-            string marginPropName
-        )
-        {
-            if (quantity <= 0)
-            {
-                throw new ValidationBusinessException(
-                    quantityPropName,
-                    "La cantidad del producto debe ser mayor a 0."
-                );
-            }
-
-            if (unitFobPrice <= 0)
-            {
-                throw new ValidationBusinessException(
-                    pricePropName,
-                    "El precio FOB unitario del producto debe ser mayor a 0."
-                );
-            }
-
-            if (targetProfitMargin < 0.01m || targetProfitMargin > 100)
-            {
-                throw new ValidationBusinessException(
-                    marginPropName,
-                    "El margen de ganancia esperado debe ser configurado entre 0.01% y 100%."
-                );
-            }
         }
     }
 }
