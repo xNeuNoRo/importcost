@@ -117,7 +117,7 @@ namespace ImportCostPro.Application.Services
             {
                 throw new ValidationBusinessException(
                     nameof(request.TaxId),
-                    "El RNC ingresado ya está siendo utilizado por otro importador."
+                    "Ya existe un importador registrado con este RNC o identificación fiscal."
                 );
             }
 
@@ -154,7 +154,7 @@ namespace ImportCostPro.Application.Services
             if (await _importerRepository.IsImporterReferencedAsync(id))
             {
                 throw new BusinessException(
-                    $"No se puede eliminar: el importador '{existingImporter.LegalName}' posee órdenes de importación históricas."
+                    "No se puede eliminar este importador porque tiene órdenes de importación registradas."
                 );
             }
 
