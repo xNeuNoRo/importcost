@@ -1,31 +1,26 @@
-using System.Diagnostics;
-using ImportCostPro.Application.ViewModels;
+using ImportCostPro.Application.Services;
 using Microsoft.AspNetCore.Mvc;
 
-namespace ImportCostPro.WebApp.Controllers;
-
-public class HomeController : Controller
+namespace ImportCostPro.WebApp.Controllers
 {
-    private readonly ILogger<HomeController> _logger;
-
-    public HomeController(ILogger<HomeController> logger)
+    public class HomeController : Controller
     {
-        _logger = logger;
-    }
+        private readonly DashboardService _dashboardService;
 
-    public IActionResult Index()
-    {
-        return View();
-    }
+        public HomeController(DashboardService dashboardService)
+        {
+            _dashboardService = dashboardService;
+        }
 
-    public IActionResult Privacy()
-    {
-        return View();
-    }
+        public async Task<IActionResult> Index()
+        {
+            var viewModel = await _dashboardService.GetStatisticsAsync();
+            return View(viewModel);
+        }
 
-    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-    public IActionResult Error()
-    {
-        return View();
+        public IActionResult Privacy()
+        {
+            return View();
+        }
     }
 }

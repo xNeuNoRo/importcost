@@ -87,5 +87,28 @@ namespace ImportCostPro.Persistence.Repositories
                     setters.SetProperty(e => e.IsUsedInOfficialCalculation, _ => true)
                 );
         }
+
+        public async Task<int> GetActiveCurrenciesMissingRateCountAsync(DateTime date)
+        {
+            var targetDate = date.Date;
+
+            // Obtenemos el ID de la moneda local (base de conversión)
+            var localCurrencyId = await _context.Set<Currency>()
+                .Where(c => c.IsLocalCurrency)
+                .Select(c => c.Id)
+                .FirstOrDefaultAsync();
+
+            if (localCurrencyId == 0) return 0;
+
+            // Contamos las monedas extranjeras activas que no tienen una tasa de cambio registrada para la fecha actual o futura
+            return await _context.Set<Currency>()
+                .Where(c => c.IsActive && !c.IsLocalCurrency)
+                .Where(c => !_context.Set<ExchangeRate>().Any(e => 
+                    e.FromCurrencyId == c.Id && 
+                    e.ToCurrencyId == localCurrencyId && 
+                    e.IsActive && 
+                    e.EffectiveDate >= targetDate))
+                .CountAsync();
+        }
     }
 }

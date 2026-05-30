@@ -107,5 +107,10 @@ namespace ImportCostPro.Persistence.Repositories
                 .Where(o => o.Id == id)
                 .FirstOrDefaultAsync();
         }
+
+        public async Task<int> CountByStatusAsync(OrderStatus status)
+        {
+            return await _dbSet.CountAsync(o => o.Status == status);
+        }
     }
 }

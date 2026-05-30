@@ -35,5 +35,12 @@ namespace ImportCostPro.Persistence.Repositories
                 .OrderByDescending(x => x.CalculationDate)
                 .FirstOrDefaultAsync();
         }
+
+        public async Task<decimal> GetMonthlyTotalImportCostAsync(int month, int year)
+        {
+            return await _dbSet
+                .Where(x => x.CalculationDate.Month == month && x.CalculationDate.Year == year)
+                .SumAsync(x => x.TotalImportCost);
+        }
     }
 }
