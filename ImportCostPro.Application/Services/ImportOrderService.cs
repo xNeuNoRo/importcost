@@ -119,7 +119,7 @@ namespace ImportCostPro.Application.Services
                 )
                 {
                     throw new BusinessException(
-                        "No se pueden modificar estos datos porque la orden ya tiene un cálculo oficial de landed cost."
+                        "No se pueden modificar estos datos porque la orden ya tiene una Liquidación de Costos oficial."
                     );
                 }
             }
@@ -191,7 +191,7 @@ namespace ImportCostPro.Application.Services
                 if (currentStatus != OrderStatus.Calculated)
                 {
                     throw new BusinessException(
-                        "Solo se puede cerrar una orden que se encuentra en estado Calculada."
+                        "Solo se puede cerrar una orden que se encuentra en estado Liquidada."
                     );
                 }
 
@@ -203,7 +203,7 @@ namespace ImportCostPro.Application.Services
                 if (calculation == null)
                 {
                     throw new BusinessException(
-                        "No se puede cerrar esta orden porque no tiene un cálculo oficial de landed cost guardado."
+                        "No se puede cerrar esta orden porque no tiene una Liquidación de Costos oficial guardada."
                     );
                 }
 
@@ -217,7 +217,7 @@ namespace ImportCostPro.Application.Services
                 if (calculation.TotalImportCost <= 0)
                 {
                     throw new BusinessException(
-                        "No se puede cerrar esta orden porque el costo total de importación del cálculo oficial es 0."
+                        "No se puede cerrar esta orden porque el costo total de importación de la Liquidación de Costos oficial es 0."
                     );
                 }
             }
@@ -225,14 +225,14 @@ namespace ImportCostPro.Application.Services
             if (newStatus == OrderStatus.Calculated && currentStatus != OrderStatus.Open)
             {
                 throw new BusinessException(
-                    "Solo se puede calcular una orden que se encuentra en estado Abierta."
+                    "Solo se puede liquidar una orden que se encuentra en estado Abierta."
                 );
             }
 
             if (newStatus == OrderStatus.Open)
             {
                 throw new BusinessException(
-                    "No se puede reabrir una orden que ya fue calculada o cancelada."
+                    "No se puede reabrir una orden que ya fue liquidada o anulada."
                 );
             }
 

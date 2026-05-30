@@ -61,6 +61,11 @@ namespace ImportCostPro.Application.ViewModels.LandedCostViewModels
         [DisplayFormat(DataFormatString = "{0:C2}")]
         public decimal TotalImportCost { get; set; }
 
+        [Display(Name = "Cantidad Total Importada")]
+        public decimal TotalImportedQuantity { get; set; }
+
+        public Persistence.Enums.OrderStatus OrderStatus { get; set; }
+
         public List<CalculationResultDetailViewModel> Details { get; set; } = new();
     }
 }

@@ -31,7 +31,7 @@ namespace ImportCostPro.WebApp.Controllers
             var openOrdersList = openOrders.Where(o => o.Status == Persistence.Enums.OrderStatus.Open);
             
             ViewBag.Orders = new SelectList(openOrdersList, "Id", "OrderNumber");
-            ViewData["Title"] = "Cálculo de Landed Cost";
+            ViewData["Title"] = "Liquidación de Costos";
             return View();
         }
 

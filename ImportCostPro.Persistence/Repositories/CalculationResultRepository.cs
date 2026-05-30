@@ -29,6 +29,7 @@ namespace ImportCostPro.Persistence.Repositories
         {
             return await _dbSet
                 .AsNoTracking()
+                .Include(x => x.ImportOrder)
                 .Include(x => x.Details)
                     .ThenInclude(d => d.Product)
                 .Where(x => x.ImportOrderId == importOrderId)

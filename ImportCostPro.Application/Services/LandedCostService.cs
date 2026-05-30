@@ -68,7 +68,7 @@ namespace ImportCostPro.Application.Services
             if (order.Status == OrderStatus.Closed || order.Status == OrderStatus.Canceled)
             {
                 throw new BusinessException(
-                    $"No es posible procesar cálculos en una orden con estado {order.Status}."
+                    $"No es posible procesar liquidaciones en una orden con estado {order.Status}."
                 );
             }
 
@@ -106,14 +106,14 @@ namespace ImportCostPro.Application.Services
             if (!hasFreight)
             {
                 throw new BusinessException(
-                    "La orden debe tener un gasto de tipo Flete internacional registrado para calcular el landed cost."
+                    "La orden debe tener un gasto de tipo Flete internacional registrado para realizar la Liquidación de Costos."
                 );
             }
 
             if (!hasInsurance)
             {
                 throw new BusinessException(
-                    "La orden debe tener un gasto de tipo Seguro internacional registrado para calcular el landed cost."
+                    "La orden debe tener un gasto de tipo Seguro internacional registrado para realizar la Liquidación de Costos."
                 );
             }
 
@@ -202,19 +202,19 @@ namespace ImportCostPro.Application.Services
                     case DistributionBase.FobValue:
                         if (globalTotalLocalFob <= 0)
                             throw new BusinessException(
-                                "No se puede calcular el landed cost porque existen gastos distribuidos por valor FOB y el FOB total de la orden es 0."
+                                "No se puede realizar la Liquidación de Costos porque existen gastos distribuidos por valor FOB y el FOB total de la orden es 0."
                             );
                         break;
                     case DistributionBase.Weight:
                         if (globalTotalWeight <= 0)
                             throw new BusinessException(
-                                "No se puede calcular el landed cost porque existen gastos distribuidos por peso y el peso total de la orden es 0 o algún producto no tiene peso configurado."
+                                "No se puede realizar la Liquidación de Costos porque existen gastos distribuidos por peso y el peso total de la orden es 0 o algún producto no tiene peso configurado."
                             );
                         break;
                     case DistributionBase.Volume:
                         if (globalTotalVolume <= 0)
                             throw new BusinessException(
-                                "No se puede calcular el landed cost porque existen gastos distribuidos por volumen y el volumen total de la orden es 0 o algún producto no tiene dimensiones configuradas."
+                                "No se puede realizar la Liquidación de Costos porque existen gastos distribuidos por volumen y el volumen total de la orden es 0 o algún producto no tiene dimensiones configuradas."
                             );
                         break;
                     case DistributionBase.Quantity:
@@ -408,7 +408,7 @@ namespace ImportCostPro.Application.Services
             if (!updated)
             {
                 throw new BusinessException(
-                    "Ocurrió un error al actualizar el estado de la orden después del cálculo."
+                    "Ocurrió un error al actualizar el estado de la orden después de la liquidación."
                 );
             }
 

@@ -1,6 +1,8 @@
 @model ImportCostPro.Application.ViewModels.LandedCostViewModels.LandedCostCalculationViewModel
+@using ImportCostPro.Persistence.Enums
 @{
     ViewData["Title"] = $"Resultado Liquidación - {Model.OrderNumber}";
+    bool isClosed = Model.OrderStatus == OrderStatus.Closed;
 }
 
 <div class="mb-6 animate__animated animate__fadeIn">
@@ -8,12 +10,19 @@
         <div>
             <a asp-controller="ImportOrder" asp-action="Index" class="inline-flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-blue-600 transition-colors cursor-pointer">
                 <i data-lucide="arrow-left" class="w-4 h-4"></i>
-                Volver al listado de órdenes
+                Volver atrás
             </a>
             <h1 class="text-2xl font-bold text-gray-900 mt-2">Liquidación Oficial: Orden @Model.OrderNumber</h1>
             <p class="text-sm text-gray-500">Determinación del costo unitario puesto en almacén y desglose de gravámenes.</p>
         </div>
         <div class="flex items-center gap-3">
+            @if (Model.OrderStatus == OrderStatus.Calculated)
+            {
+                <button type="button" onclick="confirmClose(@Model.ImportOrderId)" class="inline-flex items-center justify-center gap-2 px-5 py-2 bg-emerald-600 text-white text-sm font-bold rounded-xl hover:bg-emerald-700 transition-all cursor-pointer shadow-sm shadow-emerald-200 hover-scale active:scale-95">
+                    <i data-lucide="lock" class="w-4 h-4"></i>
+                    Cerrar orden
+                </button>
+            }
             <button onclick="window.print()" class="inline-flex items-center justify-center gap-2 px-4 py-2 bg-white text-gray-700 text-sm font-semibold rounded-lg border border-gray-200 hover:bg-gray-50 transition-all cursor-pointer shadow-sm">
                 <i data-lucide="printer" class="w-4 h-4"></i>
                 Imprimir Reporte
@@ -78,24 +87,20 @@
         <div class="flex items-center justify-between mb-2">
             <span class="text-[10px] font-bold text-blue-600 uppercase tracking-widest">Costo Puesto en Almacén</span>
             <div class="p-1.5 bg-blue-600 text-white rounded-lg">
-                <i data-lucide="trending-up" class="w-4 h-4"></i>
+                <i data-lucide="check-circle" class="w-4 h-4"></i>
             </div>
         </div>
         <div class="flex flex-col">
             <span class="text-xl font-black text-blue-700">@Model.TotalImportCost.ToString("C2")</span>
-            <span class="text-[10px] text-blue-400 mt-1 font-medium">Liquidación Final</span>
+            <span class="text-[10px] text-blue-400 mt-1 font-bold">@Model.TotalImportedQuantity.ToString("N0") Unidades Totales</span>
         </div>
     </div>
 </div>
 
-@* Tabla de Detalle por Producto *@
+@* Tabla Detallada *@
 <div class="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden mb-8 animate__animated animate__fadeInUp animate__delay-1s">
-    <div class="px-6 py-4 border-b border-gray-200 bg-gray-50/50 flex items-center justify-between">
-        <h3 class="text-sm font-bold text-gray-900 flex items-center gap-2">
-            <i data-lucide="list" class="w-4 h-4 text-blue-600"></i>
-            Desglose Detallado por Artículo
-        </h3>
-        <span class="text-[10px] font-bold bg-white px-2 py-1 rounded border border-gray-200 text-gray-500 uppercase">Expresado en @Model.LocalCurrencyIsoCode</span>
+    <div class="bg-gray-50/50 px-6 py-4 border-b border-gray-200">
+        <h3 class="text-sm font-bold text-gray-900 uppercase tracking-widest">Desglose Analítico por Artículo</h3>
     </div>
     
     <div class="overflow-x-auto">
@@ -155,16 +160,13 @@
                             <span class="text-xs font-mono text-purple-600">@item.ItbisAmount.ToString("N2")</span>
                         </td>
                         <td class="px-4 py-4 text-right">
-                            <span class="text-xs font-mono text-gray-600">@item.AllocatedLocalExpenses.ToString("N2")</span>
+                            <span class="text-xs font-mono text-gray-500">@item.AllocatedLocalExpenses.ToString("N2")</span>
                         </td>
-                        <td class="px-4 py-4 text-right bg-blue-50/20">
+                        <td class="px-4 py-4 text-right bg-blue-50/20 font-bold">
                             <span class="text-xs font-mono font-black text-blue-700">@item.UnitLandedCost.ToString("N2")</span>
                         </td>
-                        <td class="px-4 py-4 text-right bg-blue-50/20">
-                            <div class="flex flex-col items-end">
-                                <span class="text-xs font-mono font-black text-emerald-700">@item.SuggestedRetailPrice.ToString("N2")</span>
-                                <span class="text-[9px] font-bold text-emerald-500">(@item.ProfitMarginRate.ToString("N0")%)</span>
-                            </div>
+                        <td class="px-4 py-4 text-right bg-emerald-50/20 font-bold">
+                            <span class="text-xs font-mono text-emerald-700">@item.SuggestedRetailPrice.ToString("N2")</span>
                         </td>
                     </tr>
                 }
@@ -173,29 +175,11 @@
     </div>
 </div>
 
-@* Tabla de Resumen de Totales *@
+@* Pie de Reporte Fiscal *@
 <div class="max-w-xl ml-auto animate__animated animate__fadeInUp animate__delay-1s">
-    <div class="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
-        <div class="px-6 py-4 border-b border-gray-200 bg-gray-50/50">
-            <h3 class="text-sm font-bold text-gray-900">Resumen de Liquidación Aduanera</h3>
-        </div>
-        <div class="p-6 space-y-4">
-            <div class="flex justify-between items-center text-sm">
-                <span class="text-gray-500">Valor FOB Total de Orden</span>
-                <span class="font-mono font-bold text-gray-900">@Model.TotalLocalFob.ToString("C2")</span>
-            </div>
-            <div class="flex justify-between items-center text-sm">
-                <span class="text-gray-500">Flete Internacional Consolidado</span>
-                <span class="font-mono font-bold text-gray-900">@Model.TotalFreight.ToString("C2")</span>
-            </div>
-            <div class="flex justify-between items-center text-sm">
-                <span class="text-gray-500">Seguro Internacional Consolidado</span>
-                <span class="font-mono font-bold text-gray-900">@Model.TotalInsurance.ToString("C2")</span>
-            </div>
-            <div class="border-t border-dashed border-gray-200 pt-2 flex justify-between items-center text-sm font-bold">
-                <span class="text-gray-900 uppercase">VALOR CIF DECLARADO</span>
-                <span class="font-mono text-indigo-600">@Model.TotalCif.ToString("C2")</span>
-            </div>
+    <div class="bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
+        <h4 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Resumen Impositivo y Gastos</h4>
+        <div class="space-y-3">
             <div class="flex justify-between items-center text-sm">
                 <span class="text-gray-500">Total Gravámenes Arancelarios</span>
                 <span class="font-mono font-bold text-rose-600">@Model.TotalTariff.ToString("C2")</span>
@@ -230,6 +214,50 @@
 @section Scripts {
     <script>
         lucide.createIcons();
+
+        function confirmClose(id) {
+            Swal.fire({
+                title: 'Cerrar orden de importación',
+                text: '¿Está seguro que desea cerrar esta orden de importación? Una vez cerrada, no podrá modificar sus datos, productos, gastos ni resultado de cálculo.',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#10b981',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'Aceptar',
+                cancelButtonText: 'Cancelar',
+                reverseButtons: true,
+                customClass: {
+                    confirmButton: 'rounded-xl px-6 py-2.5 text-sm font-bold ml-2',
+                    cancelButton: 'rounded-xl px-6 py-2.5 text-sm font-bold'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = '@Url.Action("ChangeStatus", "ImportOrder")';
+                    
+                    const idInput = document.createElement('input');
+                    idInput.type = 'hidden';
+                    idInput.name = 'id';
+                    idInput.value = id;
+                    
+                    const statusInput = document.createElement('input');
+                    statusInput.type = 'hidden';
+                    statusInput.name = 'newStatus';
+                    statusInput.value = '@OrderStatus.Closed';
+                    
+                    const antiForgeryToken = document.querySelector('input[name="__RequestVerificationToken"]');
+                    if (antiForgeryToken) {
+                        form.appendChild(antiForgeryToken.cloneNode());
+                    }
+                    
+                    form.appendChild(idInput);
+                    form.appendChild(statusInput);
+                    document.body.appendChild(form);
+                    form.submit();
+                }
+            });
+        }
     </script>
 }
 

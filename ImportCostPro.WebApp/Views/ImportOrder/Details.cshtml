@@ -8,7 +8,7 @@
 <div class="mb-6 animate__animated animate__fadeIn">
     <a asp-action="Index" class="inline-flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-blue-600 transition-colors cursor-pointer">
         <i data-lucide="arrow-left" class="w-4 h-4"></i>
-        Volver al listado
+        Volver atrás
     </a>
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mt-2">
         <div>
@@ -40,6 +40,13 @@
                     Editar Cabecera
                 </a>
             }
+            @if (Model.Status == OrderStatus.Calculated)
+            {
+                <button type="button" onclick="confirmClose(@Model.Id)" class="inline-flex items-center justify-center gap-2 px-5 py-2 bg-emerald-600 text-white text-sm font-bold rounded-xl hover:bg-emerald-700 transition-all cursor-pointer shadow-sm shadow-emerald-200 hover-scale active:scale-95">
+                    <i data-lucide="lock" class="w-4 h-4"></i>
+                    Cerrar orden
+                </button>
+            }
         </div>
     </div>
 </div>
@@ -58,21 +65,19 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-12">
                     <div>
                         <span class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Importador Responsable</span>
-                        <span class="text-sm font-semibold text-gray-800">@ViewBag.Importers?.ToString() ?? "Cargando..."</span>
-                        @* Nota: En detalles usualmente queremos el nombre, no el ID. 
-                           Como el VM tiene Ids, necesitamos que el controlador pueble los nombres o usar el response DTO *@
+                        <span class="text-sm font-semibold text-gray-800">@ViewBag.ImporterName ?? "N/A"</span>
                     </div>
                     <div>
                         <span class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Proveedor de Origen</span>
-                        <span class="text-sm font-semibold text-gray-800">@ViewBag.Suppliers?.ToString()</span>
+                        <span class="text-sm font-semibold text-gray-800">@ViewBag.SupplierName ?? "N/A"</span>
                     </div>
                     <div>
                         <span class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">País de Exportación</span>
-                        <span class="text-sm font-semibold text-gray-800">@ViewBag.Countries?.ToString()</span>
+                        <span class="text-sm font-semibold text-gray-800">@ViewBag.CountryName ?? "N/A"</span>
                     </div>
                     <div>
                         <span class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Moneda de Negociación</span>
-                        <span class="text-sm font-semibold text-gray-800 font-mono">@ViewBag.Currencies?.ToString()</span>
+                        <span class="text-sm font-semibold text-gray-800 font-mono">@ViewBag.CurrencyIsoCode ?? "N/A"</span>
                     </div>
                     <div>
                         <span class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Vía de Transporte</span>
@@ -117,7 +122,7 @@
     <div class="space-y-6">
         @if (isCalculated)
         {
-            <div class="bg-linear-to-br from-blue-600 to-indigo-700 rounded-3xl p-8 text-white shadow-xl shadow-blue-100">
+            <div class="bg-gradient-to-br from-blue-600 to-indigo-700 rounded-3xl p-8 text-white shadow-xl shadow-blue-100">
                 <div class="flex items-center gap-3 mb-6">
                     <div class="p-2 bg-white/10 rounded-xl">
                         <i data-lucide="calculator" class="w-5 h-5 text-blue-200"></i>
@@ -127,8 +132,8 @@
                 
                 <p class="text-[10px] text-blue-200 uppercase font-bold tracking-tighter mb-1">Costo Total Puesto en Almacén</p>
                 <div class="flex items-baseline gap-2 mb-8">
-                    <span class="text-3xl font-black">RD$</span>
-                    <span class="text-4xl font-black">---</span> @* Necesitamos pasar el total real al ViewBag o usar un modelo compuesto *@
+                    <span class="text-3xl font-black">@ViewBag.LocalCurrencySymbol</span>
+                    <span class="text-4xl font-black">@ViewBag.TotalImportCost.ToString("N2")</span>
                 </div>
 
                 <a asp-controller="LandedCost" asp-action="Details" asp-route-orderId="@Model.Id" class="w-full inline-flex items-center justify-center gap-2 px-6 py-3 bg-white text-blue-700 font-bold rounded-xl hover:bg-blue-50 transition-all hover-scale shadow-lg">
@@ -175,5 +180,49 @@
 @section Scripts {
     <script>
         lucide.createIcons();
+
+        function confirmClose(id) {
+            Swal.fire({
+                title: 'Cerrar orden de importación',
+                text: '¿Está seguro que desea cerrar esta orden de importación? Una vez cerrada, no podrá modificar sus datos, productos, gastos ni resultado de cálculo.',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#10b981',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'Aceptar',
+                cancelButtonText: 'Cancelar',
+                reverseButtons: true,
+                customClass: {
+                    confirmButton: 'rounded-xl px-6 py-2.5 text-sm font-bold ml-2',
+                    cancelButton: 'rounded-xl px-6 py-2.5 text-sm font-bold'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = '@Url.Action("ChangeStatus")';
+                    
+                    const idInput = document.createElement('input');
+                    idInput.type = 'hidden';
+                    idInput.name = 'id';
+                    idInput.value = id;
+                    
+                    const statusInput = document.createElement('input');
+                    statusInput.type = 'hidden';
+                    statusInput.name = 'newStatus';
+                    statusInput.value = '@OrderStatus.Closed';
+                    
+                    const antiForgeryToken = document.querySelector('input[name="__RequestVerificationToken"]');
+                    if (antiForgeryToken) {
+                        form.appendChild(antiForgeryToken.cloneNode());
+                    }
+                    
+                    form.appendChild(idInput);
+                    form.appendChild(statusInput);
+                    document.body.appendChild(form);
+                    form.submit();
+                }
+            });
+        }
     </script>
 }

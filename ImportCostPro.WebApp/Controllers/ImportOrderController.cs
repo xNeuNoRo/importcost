@@ -1,8 +1,10 @@
 using ImportCostPro.Application.DTOs.ImportOrder.Requests;
 using ImportCostPro.Application.Exceptions;
+using ImportCostPro.Application.Extensions;
 using ImportCostPro.Application.Services;
 using ImportCostPro.Application.ViewModels.ImportOrderViewModels;
 using ImportCostPro.Persistence.Enums;
+using ImportCostPro.Persistence.Interfaces.Repositories;
 using Mapster;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -16,19 +18,22 @@ namespace ImportCostPro.WebApp.Controllers
         private readonly SupplierService _supplierService;
         private readonly CountryService _countryService;
         private readonly CurrencyService _currencyService;
+        private readonly ICalculationResultRepository _calculationResultRepository;
 
         public ImportOrderController(
             ImportOrderService importOrderService,
             ImporterService importerService,
             SupplierService supplierService,
             CountryService countryService,
-            CurrencyService currencyService)
+            CurrencyService currencyService,
+            ICalculationResultRepository calculationResultRepository)
         {
             _importOrderService = importOrderService;
             _importerService = importerService;
             _supplierService = supplierService;
             _countryService = countryService;
             _currencyService = currencyService;
+            _calculationResultRepository = calculationResultRepository;
         }
 
         public async Task<IActionResult> Index()
@@ -101,6 +106,30 @@ namespace ImportCostPro.WebApp.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
+            ViewBag.ImporterName = order.ImporterName;
+            ViewBag.SupplierName = order.SupplierName;
+            ViewBag.CountryName = order.OriginCountryName;
+            ViewBag.CurrencyIsoCode = order.CurrencyIsoCode;
+            ViewBag.LocalCurrencySymbol = "RD$"; // Valor por defecto o inyectar CurrencyService
+
+            if (order.Status == OrderStatus.Calculated || order.Status == OrderStatus.Closed)
+            {
+                var calculation = await _calculationResultRepository.GetLatestCalculatedResultWithDetailsAsync(id);
+                if (calculation != null)
+                {
+                    ViewBag.TotalImportCost = calculation.TotalImportCost;
+                    ViewBag.LocalCurrencySymbol = calculation.LocalCurrencyUsed?.Symbol ?? "RD$";
+                }
+                else
+                {
+                    ViewBag.TotalImportCost = 0m;
+                }
+            }
+            else
+            {
+                ViewBag.TotalImportCost = 0m;
+            }
+
             var viewModel = order.Adapt<UpdateImportOrderViewModel>();
             return View(viewModel);
         }
@@ -167,7 +196,13 @@ namespace ImportCostPro.WebApp.Controllers
             try
             {
                 await _importOrderService.ChangeStatusAsync(id, newStatus);
-                TempData["SuccessMessage"] = $"Estado de la orden actualizado a {newStatus}.";
+                string message = newStatus switch
+                {
+                    OrderStatus.Closed => "Orden finalizada y cerrada oficialmente.",
+                    OrderStatus.Canceled => "La orden ha sido anulada correctamente.",
+                    _ => $"El estado de la orden ha sido actualizado a {newStatus.GetDisplayName()}."
+                };
+                TempData["SuccessMessage"] = message;
             }
             catch (BusinessException ex)
             {
