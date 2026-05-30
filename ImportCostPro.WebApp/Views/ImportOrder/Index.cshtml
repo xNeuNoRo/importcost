@@ -7,7 +7,7 @@
 <div class="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 animate__animated animate__fadeIn">
     <div>
         <h1 class="text-2xl font-bold text-gray-900">Órdenes de Importación</h1>
-        <p class="text-sm text-gray-500">Gestione el flujo de importación desde el registro hasta el cálculo de costos.</p>
+        <p class="text-sm text-gray-500">Gestione el flujo de importación desde el registro hasta la liquidación de costos.</p>
     </div>
     <a asp-action="Create" class="inline-flex items-center justify-center gap-2.5 px-6 py-2.5 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition-all shadow-sm shadow-blue-200 cursor-pointer hover-scale btn-fancy">
         <i data-lucide="plus" class="w-5 h-5"></i>
@@ -39,7 +39,7 @@
                     <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Orden</th>
                     <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Importador / Proveedor</th>
                     <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-center">Estado</th>
-                    <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">Totales (FOB / Landed)</th>
+                    <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">Totales (FOB / Liquidado)</th>
                     <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">Acciones</th>
                 </tr>
             </thead>
@@ -48,7 +48,7 @@
                 {
                     <tr>
                         <td colspan="5" class="px-6 py-12 text-center text-gray-500 italic">
-                            No se encontraron órdenes registradas.
+                            No se encontraron órdenes registradas en el sistema.
                         </td>
                     </tr>
                 }
@@ -85,7 +85,7 @@
                                 };
                             }
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold border uppercase tracking-wider @statusClass">
-                                @item.Status
+                                @item.Status.GetDisplayName()
                             </span>
                         </td>
                         <td class="px-6 py-4 text-right">
@@ -93,11 +93,11 @@
                                 <span class="text-sm font-mono font-bold text-gray-700">@item.FobTotal.ToString("C2")</span>
                                 @if (item.TotalLandedCost > 0)
                                 {
-                                    <span class="text-[10px] font-bold text-emerald-600 uppercase tracking-tighter">Landed: @item.TotalLandedCost.ToString("C2")</span>
+                                    <span class="text-[10px] font-bold text-emerald-600 uppercase tracking-tighter">Liquidado: @item.TotalLandedCost.ToString("C2")</span>
                                 }
                                 else
                                 {
-                                    <span class="text-[10px] text-gray-400 uppercase tracking-tighter">Sin cálculo</span>
+                                    <span class="text-[10px] text-gray-400 uppercase tracking-tighter">Pendiente</span>
                                 }
                             </div>
                         </td>
@@ -105,7 +105,7 @@
                             <div class="flex items-center justify-end gap-2">
                                 @if (item.Status == OrderStatus.Calculated || item.Status == OrderStatus.Closed)
                                 {
-                                    <a asp-controller="LandedCost" asp-action="Details" asp-route-orderId="@item.Id" class="p-2.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all cursor-pointer hover-scale" title="Ver Resultados">
+                                    <a asp-controller="LandedCost" asp-action="Details" asp-route-orderId="@item.Id" class="p-2.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all cursor-pointer hover-scale" title="Ver Liquidación">
                                         <i data-lucide="file-text" class="w-5 h-5"></i>
                                     </a>
                                 }
@@ -114,7 +114,7 @@
                                 </a>
                                 @if (item.Status == OrderStatus.Open)
                                 {
-                                    <button type="button" onclick="confirmDelete(@item.Id, '@item.OrderNumber')" class="p-2.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all cursor-pointer hover-scale" title="Eliminar Orden">
+                                    <button type="button" onclick="confirmDelete(@item.Id, '@item.OrderNumber')" class="p-2.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all cursor-pointer hover-scale" title="Anular Orden">
                                         <i data-lucide="trash-2" class="w-5 h-5"></i>
                                     </button>
                                 }
@@ -131,13 +131,13 @@
     <script>
         function confirmDelete(id, number) {
             Swal.fire({
-                title: '¿Eliminar orden?',
-                text: `¿Está seguro que desea eliminar la orden "${number}"? Esta acción no se puede deshacer.`,
+                title: '¿Anular orden?',
+                text: `¿Está seguro que desea anular la orden "${number}"? Esta acción no se puede deshacer.`,
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#ef4444',
                 cancelButtonColor: '#6b7280',
-                confirmButtonText: 'Sí, eliminar',
+                confirmButtonText: 'Sí, anular',
                 cancelButtonText: 'Cancelar',
                 reverseButtons: true,
                 customClass: {

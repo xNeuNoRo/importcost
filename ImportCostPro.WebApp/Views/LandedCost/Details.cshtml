@@ -1,6 +1,6 @@
 @model ImportCostPro.Application.ViewModels.LandedCostViewModels.LandedCostCalculationViewModel
 @{
-    ViewData["Title"] = $"Resultado Landed Cost - {Model.OrderNumber}";
+    ViewData["Title"] = $"Resultado Liquidación - {Model.OrderNumber}";
 }
 
 <div class="mb-6 animate__animated animate__fadeIn">
@@ -10,8 +10,8 @@
                 <i data-lucide="arrow-left" class="w-4 h-4"></i>
                 Volver al listado de órdenes
             </a>
-            <h1 class="text-2xl font-bold text-gray-900 mt-2">Cálculo Oficial: Orden @Model.OrderNumber</h1>
-            <p class="text-sm text-gray-500">Costo total importado detallado por producto y resumen de gravámenes.</p>
+            <h1 class="text-2xl font-bold text-gray-900 mt-2">Liquidación Oficial: Orden @Model.OrderNumber</h1>
+            <p class="text-sm text-gray-500">Determinación del costo unitario puesto en almacén y desglose de gravámenes.</p>
         </div>
         <div class="flex items-center gap-3">
             <button onclick="window.print()" class="inline-flex items-center justify-center gap-2 px-4 py-2 bg-white text-gray-700 text-sm font-semibold rounded-lg border border-gray-200 hover:bg-gray-50 transition-all cursor-pointer shadow-sm">
@@ -34,33 +34,33 @@
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8 animate__animated animate__fadeInUp animate__faster">
     <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
         <div class="flex items-center justify-between mb-2">
-            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Inversión FOB (Local)</span>
+            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Valor FOB Total (Local)</span>
             <div class="p-1.5 bg-blue-50 text-blue-600 rounded-lg">
                 <i data-lucide="banknote" class="w-4 h-4"></i>
             </div>
         </div>
         <div class="flex flex-col">
             <span class="text-xl font-black text-gray-900">@Model.TotalLocalFob.ToString("C2")</span>
-            <span class="text-[10px] text-gray-400 mt-1 font-medium">Tasa: @Model.ExchangeRateUsed.ToString("N4") (@Model.LocalCurrencyIsoCode)</span>
+            <span class="text-[10px] text-gray-400 mt-1 font-medium">Tasa aplicada: @Model.ExchangeRateUsed.ToString("N4") (@Model.LocalCurrencyIsoCode)</span>
         </div>
     </div>
 
     <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
         <div class="flex items-center justify-between mb-2">
-            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Total CIF</span>
+            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Valor CIF Total</span>
             <div class="p-1.5 bg-indigo-50 text-indigo-600 rounded-lg">
                 <i data-lucide="ship" class="w-4 h-4"></i>
             </div>
         </div>
         <div class="flex flex-col">
             <span class="text-xl font-black text-gray-900">@Model.TotalCif.ToString("C2")</span>
-            <span class="text-[10px] text-gray-400 mt-1 font-medium">Flete + Seguro incluidos</span>
+            <span class="text-[10px] text-gray-400 mt-1 font-medium">Incluye Flete y Seguro</span>
         </div>
     </div>
 
     <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
         <div class="flex items-center justify-between mb-2">
-            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Total Impuestos</span>
+            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Total Impuestos Pagados</span>
             <div class="p-1.5 bg-purple-50 text-purple-600 rounded-lg">
                 <i data-lucide="calculator" class="w-4 h-4"></i>
             </div>
@@ -70,20 +70,20 @@
                 var totalTaxes = Model.TotalTariff + Model.TotalExciseTax + Model.TotalCustomsService + Model.TotalItbis;
             }
             <span class="text-xl font-black text-gray-900">@totalTaxes.ToString("C2")</span>
-            <span class="text-[10px] text-gray-400 mt-1 font-medium">Arancel, ISC, Tasa e ITBIS</span>
+            <span class="text-[10px] text-gray-400 mt-1 font-medium">Arancel + ISC + Tasas + ITBIS</span>
         </div>
     </div>
 
     <div class="bg-white p-5 rounded-2xl border border-blue-100 shadow-md shadow-blue-50">
         <div class="flex items-center justify-between mb-2">
-            <span class="text-[10px] font-bold text-blue-600 uppercase tracking-widest">Costo Importado Total</span>
+            <span class="text-[10px] font-bold text-blue-600 uppercase tracking-widest">Costo Puesto en Almacén</span>
             <div class="p-1.5 bg-blue-600 text-white rounded-lg">
                 <i data-lucide="trending-up" class="w-4 h-4"></i>
             </div>
         </div>
         <div class="flex flex-col">
             <span class="text-xl font-black text-blue-700">@Model.TotalImportCost.ToString("C2")</span>
-            <span class="text-[10px] text-blue-400 mt-1 font-medium">Landed Cost Final</span>
+            <span class="text-[10px] text-blue-400 mt-1 font-medium">Liquidación Final</span>
         </div>
     </div>
 </div>
@@ -93,9 +93,9 @@
     <div class="px-6 py-4 border-b border-gray-200 bg-gray-50/50 flex items-center justify-between">
         <h3 class="text-sm font-bold text-gray-900 flex items-center gap-2">
             <i data-lucide="list" class="w-4 h-4 text-blue-600"></i>
-            Desglose de Costos por Producto
+            Desglose Detallado por Artículo
         </h3>
-        <span class="text-[10px] font-bold bg-white px-2 py-1 rounded border border-gray-200 text-gray-500 uppercase">Valores en @Model.LocalCurrencyIsoCode</span>
+        <span class="text-[10px] font-bold bg-white px-2 py-1 rounded border border-gray-200 text-gray-500 uppercase">Expresado en @Model.LocalCurrencyIsoCode</span>
     </div>
     
     <div class="overflow-x-auto">
@@ -104,15 +104,15 @@
                 <tr class="bg-gray-100/50 text-[10px] font-bold text-gray-500 uppercase tracking-wider">
                     <th class="px-4 py-3 border-b border-gray-200">Producto</th>
                     <th class="px-4 py-3 border-b border-gray-200 text-center">Cant.</th>
-                    <th class="px-4 py-3 border-b border-gray-200 text-right">FOB Unit (Org)</th>
+                    <th class="px-4 py-3 border-b border-gray-200 text-right">FOB Unit.</th>
                     <th class="px-4 py-3 border-b border-gray-200 text-right">Flete Asig.</th>
                     <th class="px-4 py-3 border-b border-gray-200 text-right">Seguro Asig.</th>
-                    <th class="px-4 py-3 border-b border-gray-200 text-right">CIF Local</th>
+                    <th class="px-4 py-3 border-b border-gray-200 text-right">Valor CIF</th>
                     <th class="px-4 py-3 border-b border-gray-200 text-right">Arancel</th>
-                    <th class="px-4 py-3 border-b border-gray-200 text-right">ISC</th>
+                    <th class="px-4 py-3 border-b border-gray-200 text-right">Selectivo</th>
                     <th class="px-4 py-3 border-b border-gray-200 text-right">Tasa Serv.</th>
                     <th class="px-4 py-3 border-b border-gray-200 text-right">ITBIS</th>
-                    <th class="px-4 py-3 border-b border-gray-200 text-right">Gastos Loc.</th>
+                    <th class="px-4 py-3 border-b border-gray-200 text-right">Otros Gast.</th>
                     <th class="px-4 py-3 border-b border-gray-200 text-right bg-blue-50/30">Costo Unit.</th>
                     <th class="px-4 py-3 border-b border-gray-200 text-right bg-blue-50/30">P. Venta Sug.</th>
                 </tr>
@@ -177,27 +177,27 @@
 <div class="max-w-xl ml-auto animate__animated animate__fadeInUp animate__delay-1s">
     <div class="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
         <div class="px-6 py-4 border-b border-gray-200 bg-gray-50/50">
-            <h3 class="text-sm font-bold text-gray-900">Resumen de Liquidación</h3>
+            <h3 class="text-sm font-bold text-gray-900">Resumen de Liquidación Aduanera</h3>
         </div>
         <div class="p-6 space-y-4">
             <div class="flex justify-between items-center text-sm">
-                <span class="text-gray-500">FOB Total de Orden</span>
+                <span class="text-gray-500">Valor FOB Total de Orden</span>
                 <span class="font-mono font-bold text-gray-900">@Model.TotalLocalFob.ToString("C2")</span>
             </div>
             <div class="flex justify-between items-center text-sm">
-                <span class="text-gray-500">Flete Internacional Total</span>
+                <span class="text-gray-500">Flete Internacional Consolidado</span>
                 <span class="font-mono font-bold text-gray-900">@Model.TotalFreight.ToString("C2")</span>
             </div>
             <div class="flex justify-between items-center text-sm">
-                <span class="text-gray-500">Seguro Internacional Total</span>
+                <span class="text-gray-500">Seguro Internacional Consolidado</span>
                 <span class="font-mono font-bold text-gray-900">@Model.TotalInsurance.ToString("C2")</span>
             </div>
             <div class="border-t border-dashed border-gray-200 pt-2 flex justify-between items-center text-sm font-bold">
-                <span class="text-gray-900">VALOR CIF TOTAL</span>
+                <span class="text-gray-900 uppercase">VALOR CIF DECLARADO</span>
                 <span class="font-mono text-indigo-600">@Model.TotalCif.ToString("C2")</span>
             </div>
             <div class="flex justify-between items-center text-sm">
-                <span class="text-gray-500">Total Aranceles</span>
+                <span class="text-gray-500">Total Gravámenes Arancelarios</span>
                 <span class="font-mono font-bold text-rose-600">@Model.TotalTariff.ToString("C2")</span>
             </div>
             <div class="flex justify-between items-center text-sm">
@@ -205,7 +205,7 @@
                 <span class="font-mono font-bold text-amber-600">@Model.TotalExciseTax.ToString("C2")</span>
             </div>
             <div class="flex justify-between items-center text-sm">
-                <span class="text-gray-500">Total Tasa Servicio Aduanal</span>
+                <span class="text-gray-500">Total Tasa Servicio de Aduanas</span>
                 <span class="font-mono font-bold text-gray-700">@Model.TotalCustomsService.ToString("C2")</span>
             </div>
             <div class="flex justify-between items-center text-sm">
@@ -213,13 +213,13 @@
                 <span class="font-mono font-bold text-purple-600">@Model.TotalItbis.ToString("C2")</span>
             </div>
             <div class="flex justify-between items-center text-sm">
-                <span class="text-gray-500">Otros Gastos Locales</span>
+                <span class="text-gray-500">Gastos Locales y Operativos</span>
                 <span class="font-mono font-bold text-gray-900">@Model.TotalLocalExpenses.ToString("C2")</span>
             </div>
-            <div class="mt-4 p-4 bg-blue-600 rounded-xl flex justify-between items-center text-white">
+            <div class="mt-4 p-4 bg-blue-600 rounded-xl flex justify-between items-center text-white shadow-lg shadow-blue-100">
                 <div class="flex flex-col">
-                    <span class="text-[10px] font-bold uppercase tracking-wider opacity-80">Costo Total de Importación</span>
-                    <span class="text-xs opacity-80">Landed Cost Consolidado</span>
+                    <span class="text-[10px] font-bold uppercase tracking-wider opacity-80">Costo de Importación Consolidado</span>
+                    <span class="text-xs opacity-80">Total Puesto en Almacén</span>
                 </div>
                 <span class="text-xl font-black">@Model.TotalImportCost.ToString("C2")</span>
             </div>
@@ -247,7 +247,7 @@
             border: none !important;
             box-shadow: none !important;
         }
-        .shadow-sm, .shadow-md {
+        .shadow-sm, .shadow-md, .shadow-lg {
             box-shadow: none !important;
         }
         .max-w-xl {

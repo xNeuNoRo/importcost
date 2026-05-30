@@ -1,10 +1,10 @@
 @{
-    ViewData["Title"] = "Cálculo de Landed Cost";
+    ViewData["Title"] = "Liquidación de Costos";
 }
 
 <div class="mb-6 animate__animated animate__fadeIn">
-    <h1 class="text-2xl font-bold text-gray-900">Procesar Landed Cost</h1>
-    <p class="text-sm text-gray-500">Seleccione una orden abierta para calcular el costo real final de importación.</p>
+    <h1 class="text-2xl font-bold text-gray-900">Liquidación de Costos de Importación</h1>
+    <p class="text-sm text-gray-500">Seleccione una orden abierta para determinar el costo real final de los artículos importados.</p>
 </div>
 
 @if (TempData["ErrorMessage"] != null)
@@ -23,8 +23,8 @@
                     <i data-lucide="calculator" class="w-8 h-8"></i>
                 </div>
                 <div>
-                    <h2 class="text-xl font-bold">Motor de Cálculo</h2>
-                    <p class="text-blue-100 text-sm">El sistema validará todos los requisitos antes de procesar.</p>
+                    <h2 class="text-xl font-bold">Motor de Liquidación</h2>
+                    <p class="text-blue-100 text-sm">El sistema validará los requisitos fiscales y logísticos antes de proceder.</p>
                 </div>
             </div>
         </div>
@@ -37,7 +37,7 @@
                         <i data-lucide="package-search" class="w-4 h-4"></i>
                     </div>
                     <select id="orderId" name="orderId" asp-items="ViewBag.Orders" class="block w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none cursor-pointer">
-                        <option value="">Seleccione una orden abierta...</option>
+                        <option value="">Seleccione una orden para liquidar...</option>
                     </select>
                 </div>
             </div>
@@ -45,20 +45,20 @@
             <div class="bg-amber-50 border border-amber-100 rounded-xl p-4">
                 <h3 class="text-xs font-bold text-amber-800 uppercase tracking-widest mb-2 flex items-center gap-2">
                     <i data-lucide="info" class="w-3.5 h-3.5"></i>
-                    Requisitos para el cálculo
+                    Requisitos Previos
                 </h3>
                 <ul class="text-xs text-amber-700 space-y-1.5 list-disc list-inside">
-                    <li>La orden debe tener productos registrados con sus pesos y dimensiones.</li>
-                    <li>Debe existir al menos un gasto de <strong>Flete Internacional</strong>.</li>
-                    <li>Debe existir al menos un gasto de <strong>Seguro Internacional</strong>.</li>
-                    <li>Todas las monedas extranjeras deben tener una tasa de cambio vigente.</li>
+                    <li>La orden debe contener productos con pesos y dimensiones registrados.</li>
+                    <li>Debe existir un gasto de <strong>Flete Internacional</strong> registrado.</li>
+                    <li>Debe existir un gasto de <strong>Seguro Internacional</strong> registrado.</li>
+                    <li>Las divisas extranjeras deben contar con una tasa de cambio vigente a la fecha.</li>
                 </ul>
             </div>
 
             <div class="pt-4">
                 <button type="submit" class="w-full inline-flex items-center justify-center gap-2.5 px-8 py-3.5 bg-blue-600 text-white text-base font-bold rounded-xl hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-200 transition-all cursor-pointer hover-scale active:scale-95">
                     <i data-lucide="play" class="w-5 h-5"></i>
-                    Iniciar Cálculo Oficial
+                    Ejecutar Liquidación Oficial
                 </button>
             </div>
         </form>
@@ -67,11 +67,10 @@
 
 @section Scripts {
     <script>
-        // Animación simple para el botón al enviar
         document.querySelector('form').addEventListener('submit', function() {
             const btn = this.querySelector('button[type="submit"]');
             btn.disabled = true;
-            btn.innerHTML = '<i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i> Procesando cálculo...';
+            btn.innerHTML = '<i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i> Procesando liquidación...';
             lucide.createIcons();
         });
     </script>

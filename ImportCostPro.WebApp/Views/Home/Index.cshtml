@@ -5,7 +5,7 @@
 <div class="animate__animated animate__fadeIn">
     <div class="mb-8">
         <h1 class="text-3xl font-black text-gray-900 tracking-tight">Bienvenido a ImportCost <span class="text-blue-600">Pro</span></h1>
-        <p class="text-gray-500 mt-2 text-lg">Supervisión en tiempo real de sus importaciones y costos logísticos.</p>
+        <p class="text-gray-500 mt-2 text-lg">Supervisión en tiempo real de sus importaciones y liquidaciones logísticas.</p>
     </div>
 
     @* KPIs Rápidos *@
@@ -36,7 +36,7 @@
             </div>
             <div class="flex flex-col">
                 <span class="text-2xl font-black text-gray-900">156</span>
-                <span class="text-sm font-medium text-gray-400 uppercase tracking-widest mt-1">Proveedores Activos</span>
+                <span class="text-sm font-medium text-gray-400 uppercase tracking-widest mt-1">Proveedores Externos</span>
             </div>
         </div>
 
@@ -51,7 +51,7 @@
             </div>
             <div class="flex flex-col">
                 <span class="text-2xl font-black text-gray-900">RD$ 4.2M</span>
-                <span class="text-sm font-medium text-gray-400 uppercase tracking-widest mt-1">Costo Landed Mensual</span>
+                <span class="text-sm font-medium text-gray-400 uppercase tracking-widest mt-1">Inversión Liquidada</span>
             </div>
         </div>
 
@@ -66,7 +66,7 @@
             </div>
             <div class="flex flex-col">
                 <span class="text-2xl font-black text-gray-900">3</span>
-                <span class="text-sm font-medium text-gray-400 uppercase tracking-widest mt-1">Tasas por Vencer</span>
+                <span class="text-sm font-medium text-gray-400 uppercase tracking-widest mt-1">Tasas por Actualizar</span>
             </div>
         </div>
     </div>
@@ -79,18 +79,18 @@
                     <i data-lucide="anchor" class="w-64 h-64"></i>
                 </div>
                 <div class="relative z-10">
-                    <h2 class="text-2xl font-bold mb-4">¿Listo para un nuevo cálculo?</h2>
-                    <p class="text-blue-100 mb-8 max-w-md">Inicie una nueva orden de importación y el sistema le guiará paso a paso hasta obtener el costo landed final.</p>
+                    <h2 class="text-2xl font-bold mb-4">¿Desea liquidar una nueva importación?</h2>
+                    <p class="text-blue-100 mb-8 max-w-md">Registre su orden de compra y el sistema automatizará el cálculo del costo real puesto en sus almacenes.</p>
                     <a asp-controller="ImportOrder" asp-action="Create" class="inline-flex items-center gap-2 px-6 py-3 bg-white text-blue-700 font-bold rounded-xl hover:bg-blue-50 transition-all hover-scale shadow-lg">
                         <i data-lucide="plus" class="w-5 h-5"></i>
-                        Crear Nueva Orden
+                        Nueva Orden de Importación
                     </a>
                 </div>
             </div>
 
             <div class="bg-white border border-gray-200 rounded-3xl shadow-sm overflow-hidden">
                 <div class="px-6 py-5 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
-                    <h3 class="text-sm font-bold text-gray-900 uppercase tracking-widest">Atajos de Configuración</h3>
+                    <h3 class="text-sm font-bold text-gray-900 uppercase tracking-widest">Configuraciones de Soporte</h3>
                     <i data-lucide="settings" class="w-4 h-4 text-gray-400"></i>
                 </div>
                 <div class="p-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -99,8 +99,8 @@
                             <i data-lucide="coins" class="w-5 h-5"></i>
                         </div>
                         <div>
-                            <span class="block text-sm font-bold text-gray-900">Monedas</span>
-                            <span class="text-xs text-gray-400">Configure divisas base</span>
+                            <span class="block text-sm font-bold text-gray-900">Divisas</span>
+                            <span class="text-xs text-gray-400">Manejo de monedas base</span>
                         </div>
                     </a>
                     <a asp-controller="TaxConfiguration" asp-action="Index" class="flex items-center gap-4 p-4 rounded-2xl hover:bg-gray-50 border border-transparent hover:border-gray-100 transition-all">
@@ -108,8 +108,8 @@
                             <i data-lucide="percent" class="w-5 h-5"></i>
                         </div>
                         <div>
-                            <span class="block text-sm font-bold text-gray-900">Impuestos</span>
-                            <span class="text-xs text-gray-400">ITBIS y Tasa Aduanal</span>
+                            <span class="block text-sm font-bold text-gray-900">Impuestos Globales</span>
+                            <span class="text-xs text-gray-400">Tasas de ITBIS y Aduanas</span>
                         </div>
                     </a>
                 </div>
@@ -121,23 +121,23 @@
             <div class="bg-white border border-gray-200 rounded-3xl shadow-sm p-6">
                 <h3 class="text-sm font-bold text-gray-900 mb-6 flex items-center gap-2">
                     <i data-lucide="activity" class="w-4 h-4 text-blue-600"></i>
-                    Estado del Sistema
+                    Estado del Motor Logístico
                 </h3>
                 <div class="space-y-6">
                     <div class="flex gap-4">
                         <div class="w-1 h-12 bg-emerald-500 rounded-full"></div>
                         <div>
                             <span class="block text-xs font-bold text-gray-400 uppercase tracking-widest">Base de Datos</span>
-                            <span class="text-sm font-semibold text-gray-700">Conectado y Sincronizado</span>
-                            <span class="block text-[10px] text-gray-400 mt-1">Latencia: 14ms</span>
+                            <span class="text-sm font-semibold text-gray-700">Repositorio Sincronizado</span>
+                            <span class="block text-[10px] text-gray-400 mt-1">Conexión Segura (SSL)</span>
                         </div>
                     </div>
                     <div class="flex gap-4">
                         <div class="w-1 h-12 bg-blue-500 rounded-full"></div>
                         <div>
                             <span class="block text-xs font-bold text-gray-400 uppercase tracking-widest">Capa de Aplicación</span>
-                            <span class="text-sm font-semibold text-gray-700">Validaciones Fluent: Activas</span>
-                            <span class="block text-[10px] text-gray-400 mt-1">Versión: 1.0.0-Stable</span>
+                            <span class="text-sm font-semibold text-gray-700">Reglas de Negocio: Activas</span>
+                            <span class="block text-[10px] text-gray-400 mt-1">Motor de Prorrateo V1.0</span>
                         </div>
                     </div>
                 </div>
@@ -148,9 +148,9 @@
                     <div class="p-2 bg-white/10 rounded-xl">
                         <i data-lucide="shield-check" class="w-5 h-5 text-indigo-300"></i>
                     </div>
-                    <span class="text-xs font-bold uppercase tracking-widest text-indigo-200">Seguridad Auditoría</span>
+                    <span class="text-xs font-bold uppercase tracking-widest text-indigo-200">Seguridad Financiera</span>
                 </div>
-                <p class="text-sm text-indigo-100 leading-relaxed">Cada cálculo oficial genera una traza histórica inmutable para auditorías de costos e impuestos.</p>
+                <p class="text-sm text-indigo-100 leading-relaxed">Todas las liquidaciones oficiales se almacenan con precisión de 10 decimales para garantizar la integridad fiscal.</p>
             </div>
         </div>
     </div>

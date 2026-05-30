@@ -23,66 +23,71 @@
                 </div>
             }
 
-            <div class="space-y-6">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="group">
-                        <label asp-for="Name" class="block text-sm font-semibold text-gray-700 mb-2 group-focus-within:text-blue-600 transition-colors"></label>
-                        <div class="relative">
-                            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400 group-focus-within:text-blue-500 transition-colors">
-                                <i data-lucide="coins" class="w-4 h-4"></i>
+            <div class="space-y-8">
+                @* Sección: Información Básica *@
+                <div>
+                    <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2 border-b border-gray-100 pb-2">
+                        <i data-lucide="coins" class="w-5 h-5 text-blue-600"></i>
+                        Detalles de la Divisa
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="group">
+                            <label asp-for="Name" class="block text-sm font-semibold text-gray-700 mb-2 group-focus-within:text-blue-600 transition-colors"></label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400 group-focus-within:text-blue-500 transition-colors">
+                                    <i data-lucide="info" class="w-4 h-4"></i>
+                                </div>
+                                <input asp-for="Name" class="block w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm placeholder:text-gray-400 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none" placeholder="Ej: Dólar Estadounidense" />
                             </div>
-                            <input asp-for="Name" class="block w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm placeholder:text-gray-400 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none" placeholder="Ej: Dólar Estadounidense" />
+                            <span asp-validation-for="Name" class="mt-1.5 text-xs text-red-600 font-medium"></span>
                         </div>
-                        <span asp-validation-for="Name" class="mt-1.5 text-xs text-red-600 font-medium"></span>
-                    </div>
 
-                    <div class="group">
-                        <label asp-for="IsoCode" class="block text-sm font-semibold text-gray-700 mb-2 group-focus-within:text-blue-600 transition-colors"></label>
-                        <div class="relative">
-                            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400 group-focus-within:text-blue-500 transition-colors">
-                                <i data-lucide="hash" class="w-4 h-4"></i>
+                        <div class="group">
+                            <label asp-for="IsoCode" class="block text-sm font-semibold text-gray-700 mb-2 group-focus-within:text-blue-600 transition-colors"></label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400 group-focus-within:text-blue-500 transition-colors">
+                                    <i data-lucide="hash" class="w-4 h-4"></i>
+                                </div>
+                                <input asp-for="IsoCode" class="block w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm placeholder:text-gray-400 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none uppercase" placeholder="Ej: USD" />
                             </div>
-                            <input asp-for="IsoCode" class="block w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm placeholder:text-gray-400 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none uppercase" placeholder="Ej: USD" />
+                            <span asp-validation-for="IsoCode" class="mt-1.5 text-xs text-red-600 font-medium"></span>
                         </div>
-                        <span asp-validation-for="IsoCode" class="mt-1.5 text-xs text-red-600 font-medium"></span>
+
+                        <div class="group">
+                            <label asp-for="Symbol" class="block text-sm font-semibold text-gray-700 mb-2 group-focus-within:text-blue-600 transition-colors"></label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400 group-focus-within:text-blue-500 transition-colors">
+                                    <i data-lucide="type" class="w-4 h-4"></i>
+                                </div>
+                                <input asp-for="Symbol" class="block w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm placeholder:text-gray-400 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none" placeholder="Ej: $" />
+                            </div>
+                            <span asp-validation-for="Symbol" class="mt-1.5 text-xs text-red-600 font-medium"></span>
+                        </div>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="group">
-                        <label asp-for="Symbol" class="block text-sm font-semibold text-gray-700 mb-2 group-focus-within:text-blue-600 transition-colors"></label>
-                        <div class="relative">
-                            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400 group-focus-within:text-blue-500 transition-colors">
-                                <i data-lucide="type" class="w-4 h-4"></i>
+                @* Sección: Configuración Adicional *@
+                <div>
+                    <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2 border-b border-gray-100 pb-2">
+                        <i data-lucide="settings" class="w-5 h-5 text-blue-600"></i>
+                        Configuración Adicional
+                    </h3>
+                    <div class="flex flex-col gap-4">
+                        <label class="flex items-center gap-3 cursor-pointer group w-fit">
+                            <div class="relative">
+                                <input type="checkbox" asp-for="IsLocalCurrency" class="peer sr-only" />
+                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600 transition-colors"></div>
                             </div>
-                            <input asp-for="Symbol" class="block w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm placeholder:text-gray-400 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none" placeholder="Ej: $" />
-                        </div>
-                        <span asp-validation-for="Symbol" class="mt-1.5 text-xs text-red-600 font-medium"></span>
-                    </div>
+                            <span class="text-sm font-medium text-gray-600 group-hover:text-gray-900 transition-colors">Marcar como moneda local base</span>
+                        </label>
 
-                    @* Sección: Configuración Adicional *@
-                    <div class="space-y-4">
-                        <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2 border-b border-gray-100 pb-2">
-                            <i data-lucide="settings" class="w-5 h-5 text-blue-600"></i>
-                            Configuración Adicional
-                        </h3>
-                        <div class="flex flex-col gap-4">
-                            <label class="flex items-center gap-3 cursor-pointer group w-fit">
-                                <div class="relative">
-                                    <input type="checkbox" asp-for="IsLocalCurrency" class="peer sr-only" />
-                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600 transition-colors"></div>
-                                </div>
-                                <span class="text-sm font-medium text-gray-600 group-hover:text-gray-900 transition-colors">Marcar como moneda local base</span>
-                            </label>
-
-                            <label class="flex items-center gap-3 cursor-pointer group w-fit">
-                                <div class="relative">
-                                    <input type="checkbox" asp-for="IsActive" class="peer sr-only" />
-                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600 transition-colors"></div>
-                                </div>
-                                <span id="status-text" class="text-sm font-medium text-gray-600 group-hover:text-gray-900 transition-colors">Habilitar para uso</span>
-                            </label>
-                        </div>
+                        <label class="flex items-center gap-3 cursor-pointer group w-fit">
+                            <div class="relative">
+                                <input type="checkbox" asp-for="IsActive" class="peer sr-only" />
+                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600 transition-colors"></div>
+                            </div>
+                            <span id="status-text" class="text-sm font-medium text-gray-600 group-hover:text-gray-900 transition-colors">Habilitar para uso</span>
+                        </label>
                     </div>
                 </div>
             </div>
