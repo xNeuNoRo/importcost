@@ -1,0 +1,78 @@
+@{
+    ViewData["Title"] = "Cálculo de Landed Cost";
+}
+
+<div class="mb-6 animate__animated animate__fadeIn">
+    <h1 class="text-2xl font-bold text-gray-900">Procesar Landed Cost</h1>
+    <p class="text-sm text-gray-500">Seleccione una orden abierta para calcular el costo real final de importación.</p>
+</div>
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl flex items-center gap-3 text-red-700 shadow-sm animate__animated animate__shakeX">
+        <i data-lucide="alert-circle" class="w-5 h-5 shrink-0"></i>
+        <p class="text-sm font-medium">@TempData["ErrorMessage"]</p>
+    </div>
+}
+
+<div class="max-w-2xl animate__animated animate__fadeInUp animate__faster">
+    <div class="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-300">
+        <div class="bg-blue-600 px-6 py-8 text-white">
+            <div class="flex items-center gap-4">
+                <div class="p-3 bg-white/10 rounded-xl backdrop-blur-sm">
+                    <i data-lucide="calculator" class="w-8 h-8"></i>
+                </div>
+                <div>
+                    <h2 class="text-xl font-bold">Motor de Cálculo</h2>
+                    <p class="text-blue-100 text-sm">El sistema validará todos los requisitos antes de procesar.</p>
+                </div>
+            </div>
+        </div>
+
+        <form asp-action="Calculate" method="post" class="p-6 sm:p-8 space-y-6">
+            <div class="group">
+                <label for="orderId" class="block text-sm font-semibold text-gray-700 mb-2 group-focus-within:text-blue-600 transition-colors">Orden de Importación Pendiente</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400 group-focus-within:text-blue-500 transition-colors">
+                        <i data-lucide="package-search" class="w-4 h-4"></i>
+                    </div>
+                    <select id="orderId" name="orderId" asp-items="ViewBag.Orders" class="block w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none cursor-pointer">
+                        <option value="">Seleccione una orden abierta...</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="bg-amber-50 border border-amber-100 rounded-xl p-4">
+                <h3 class="text-xs font-bold text-amber-800 uppercase tracking-widest mb-2 flex items-center gap-2">
+                    <i data-lucide="info" class="w-3.5 h-3.5"></i>
+                    Requisitos para el cálculo
+                </h3>
+                <ul class="text-xs text-amber-700 space-y-1.5 list-disc list-inside">
+                    <li>La orden debe tener productos registrados con sus pesos y dimensiones.</li>
+                    <li>Debe existir al menos un gasto de <strong>Flete Internacional</strong>.</li>
+                    <li>Debe existir al menos un gasto de <strong>Seguro Internacional</strong>.</li>
+                    <li>Todas las monedas extranjeras deben tener una tasa de cambio vigente.</li>
+                </ul>
+            </div>
+
+            <div class="pt-4">
+                <button type="submit" class="w-full inline-flex items-center justify-center gap-2.5 px-8 py-3.5 bg-blue-600 text-white text-base font-bold rounded-xl hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-200 transition-all cursor-pointer hover-scale active:scale-95">
+                    <i data-lucide="play" class="w-5 h-5"></i>
+                    Iniciar Cálculo Oficial
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Animación simple para el botón al enviar
+        document.querySelector('form').addEventListener('submit', function() {
+            const btn = this.querySelector('button[type="submit"]');
+            btn.disabled = true;
+            btn.innerHTML = '<i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i> Procesando cálculo...';
+            lucide.createIcons();
+        });
+    </script>
+}

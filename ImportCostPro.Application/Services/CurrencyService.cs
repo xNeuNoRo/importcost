@@ -47,6 +47,14 @@ namespace ImportCostPro.Application.Services
                 );
             }
 
+            if (await _currencyRepository.ExistsByNameAsync(normalizedName))
+            {
+                throw new ValidationBusinessException(
+                    nameof(request.Name),
+                    $"El nombre de moneda '{normalizedName}' ya se encuentra registrado."
+                );
+            }
+
             if (request.IsLocalCurrency && await _currencyRepository.AnyLocalCurrencyAsync())
             {
                 throw new ValidationBusinessException(
@@ -80,6 +88,14 @@ namespace ImportCostPro.Application.Services
             {
                 throw new BusinessException(
                     "La moneda que intenta actualizar ya no existe en el sistema."
+                );
+            }
+
+            if (await _currencyRepository.ExistsByNameAsync(normalizedName, request.Id))
+            {
+                throw new ValidationBusinessException(
+                    nameof(request.Name),
+                    $"El nombre de moneda '{normalizedName}' ya está siendo utilizado por otra divisa."
                 );
             }
 

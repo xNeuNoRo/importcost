@@ -184,12 +184,12 @@ namespace ImportCostPro.Application.Services
             }
 
             // Validar tasa si cambio la fecha o si la moneda es extranjera
-            var currency = await _currencyRepository.GetByIdAsync(entity.CurrencyId);
+            var currency = await _currencyRepository.GetByIdAsync(request.CurrencyId);
             if (currency != null && !currency.IsLocalCurrency)
             {
                 var localCurrency = await _currencyRepository.GetLocalCurrencyAsync();
                 var rate = await _exchangeRateRepository.GetLatestActiveRateAsync(
-                    entity.CurrencyId,
+                    request.CurrencyId,
                     localCurrency!.Id,
                     request.ExpenseDate
                 );
@@ -202,7 +202,41 @@ namespace ImportCostPro.Application.Services
                 }
             }
 
+            // Validar unicidad de flete/seguro si cambió el tipo
+            if (request.ExpenseType != entity.ExpenseType)
+            {
+                if (
+                    request.ExpenseType == ExpenseType.InternationalFreight
+                    && await _importExpenseRepository.HasExpenseTypeAsync(
+                        entity.ImportOrderId,
+                        ExpenseType.InternationalFreight
+                    )
+                )
+                {
+                    throw new ValidationBusinessException(
+                        nameof(request.ExpenseType),
+                        "Ya existe un gasto de flete internacional registrado para esta orden."
+                    );
+                }
+
+                if (
+                    request.ExpenseType == ExpenseType.InternationalInsurance
+                    && await _importExpenseRepository.HasExpenseTypeAsync(
+                        entity.ImportOrderId,
+                        ExpenseType.InternationalInsurance
+                    )
+                )
+                {
+                    throw new ValidationBusinessException(
+                        nameof(request.ExpenseType),
+                        "Ya existe un gasto de seguro internacional registrado para esta orden."
+                    );
+                }
+            }
+
             entity.Description = normalizedDescription;
+            entity.ExpenseType = request.ExpenseType;
+            entity.CurrencyId = request.CurrencyId;
             entity.DistributionBase = request.DistributionBase;
             entity.OriginalAmount = request.OriginalAmount;
             entity.ExpenseDate = request.ExpenseDate.Date;

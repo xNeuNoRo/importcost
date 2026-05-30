@@ -58,6 +58,14 @@ namespace ImportCostPro.Application.Services
                 );
             }
 
+            if (await _importerRepository.ExistsLegalNameAsync(normalizedLegalName))
+            {
+                throw new ValidationBusinessException(
+                    nameof(request.LegalName),
+                    "Ya existe un importador registrado con esta razón social."
+                );
+            }
+
             var importer = request.Adapt<Importer>();
             importer.LegalName = normalizedLegalName;
             importer.TaxId = normalizedTaxID;
@@ -110,6 +118,14 @@ namespace ImportCostPro.Application.Services
                 throw new ValidationBusinessException(
                     nameof(request.TaxId),
                     "El RNC ingresado ya está siendo utilizado por otro importador."
+                );
+            }
+
+            if (await _importerRepository.ExistsLegalNameAsync(normalizedLegalName, excludeId: request.Id))
+            {
+                throw new ValidationBusinessException(
+                    nameof(request.LegalName),
+                    "La razón social ingresada ya está siendo utilizada por otro importador."
                 );
             }
 
