@@ -108,7 +108,7 @@ namespace ImportCostPro.Application.Services
             if (await _countryRepository.IsCountryReferencedAsync(id))
             {
                 throw new BusinessException(
-                    $"No se puede eliminar el país '{existingCountry.Name}' porque está siendo referenciado por otras entidades."
+                    "No se puede eliminar este país porque está asociado a otros registros del sistema."
                 );
             }
 
