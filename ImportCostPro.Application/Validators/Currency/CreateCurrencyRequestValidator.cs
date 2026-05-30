@@ -9,7 +9,7 @@ namespace ImportCostPro.Application.Validators.Currency
         {
             RuleFor(x => x.Name)
                 .NotEmpty().WithMessage("El nombre de la moneda es requerido.")
-                .MaximumLength(100).WithMessage("El nombre de la moneda no debe exceder los 100 caracteres.");
+                .MaximumLength(150).WithMessage("El nombre de la moneda no debe exceder los 150 caracteres.");
 
             RuleFor(x => x.IsoCode)
                 .NotEmpty().WithMessage("El código ISO de la moneda es requerido.")

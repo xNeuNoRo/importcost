@@ -182,7 +182,7 @@ namespace ImportCostPro.Application.Services
             if (await _currencyRepository.IsCurrencyReferencedAsync(id))
             {
                 throw new BusinessException(
-                    $"No es posible eliminar la divisa '{currency.Name}' debido a que cuenta con tasas de cambio u órdenes de importación asociadas."
+                    "No se puede eliminar esta moneda porque está asociada a otros registros del sistema."
                 );
             }
 
