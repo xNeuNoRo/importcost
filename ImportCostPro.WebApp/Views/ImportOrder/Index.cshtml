@@ -102,17 +102,21 @@
                                             <td class="px-6 py-4 text-right">
                                                 <div class="flex flex-col">
                                                     <span class="text-sm font-mono font-bold text-gray-700">@item.FobTotal.ToString("C2")</span>
-                                                    @if (item.TotalLandedCost > 0)
+                                                    @if (item.TotalLandedCost > 0 && (item.Status == OrderStatus.Calculated || item.Status == OrderStatus.Closed))
                                                     {
-                                                        <span class="text-[10px] font-bold text-emerald-600 uppercase tracking-tighter">Liquidado:
-                                                            @item.TotalLandedCost.ToString("C2")</span>
-                                                        }
-                                else
-                                                        {
-                                                            <span class="text-[10px] text-gray-400 uppercase tracking-tighter">Pendiente</span>
-                                                        }
-                                                    </div>
-                                                </td>
+                                                        <span class="text-[10px] font-bold text-emerald-600 uppercase tracking-tighter">Liquidado: @item.TotalLandedCost.ToString("C2")</span>
+                                                    }
+                                                    else if (item.Status == OrderStatus.Canceled)
+                                                    {
+                                                        <span class="text-[10px] text-red-400 uppercase font-bold tracking-tighter">Anulada</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="text-[10px] text-gray-400 uppercase tracking-tighter">Pendiente</span>
+                                                    }
+                                                </div>
+                                            </td>
+
                                                 <td class="px-6 py-4 text-right whitespace-nowrap">
                                                     <div class="flex items-center justify-end gap-1.5">
                                                         <a asp-action="Details" asp-route-id="@item.Id"

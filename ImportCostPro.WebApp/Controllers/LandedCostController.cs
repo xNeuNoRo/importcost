@@ -2,6 +2,7 @@ using ImportCostPro.Application.DTOs.LandedCost.Requests;
 using ImportCostPro.Application.Exceptions;
 using ImportCostPro.Application.Services;
 using ImportCostPro.Application.ViewModels.LandedCostViewModels;
+using ImportCostPro.Persistence.Enums;
 using ImportCostPro.Persistence.Interfaces.Repositories;
 using Mapster;
 using Microsoft.AspNetCore.Mvc;
@@ -28,7 +29,7 @@ namespace ImportCostPro.WebApp.Controllers
         public async Task<IActionResult> Index()
         {
             var openOrders = await _importOrderService.GetAllAsync();
-            var openOrdersList = openOrders.Where(o => o.Status == Persistence.Enums.OrderStatus.Open);
+            var openOrdersList = openOrders.Where(o => o.Status == OrderStatus.Open);
             
             ViewBag.Orders = new SelectList(openOrdersList, "Id", "OrderNumber");
             ViewData["Title"] = "Liquidación de Costos";

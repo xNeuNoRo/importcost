@@ -1,5 +1,6 @@
 using ImportCostPro.Persistence.Contexts;
 using ImportCostPro.Persistence.Entities;
+using ImportCostPro.Persistence.Enums;
 using ImportCostPro.Persistence.Interfaces.Repositories;
 using Microsoft.EntityFrameworkCore;
 
@@ -40,7 +41,10 @@ namespace ImportCostPro.Persistence.Repositories
         public async Task<decimal> GetMonthlyTotalImportCostAsync(int month, int year)
         {
             return await _dbSet
-                .Where(x => x.CalculationDate.Month == month && x.CalculationDate.Year == year)
+                .Include(x => x.ImportOrder)
+                .Where(x => x.CalculationDate.Month == month 
+                    && x.CalculationDate.Year == year
+                    && x.ImportOrder.Status == OrderStatus.Closed)
                 .SumAsync(x => x.TotalImportCost);
         }
     }

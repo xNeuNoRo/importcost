@@ -1,3 +1,4 @@
+using ImportCostPro.Persistence.Enums;
 using System.ComponentModel.DataAnnotations;
 
 namespace ImportCostPro.Application.ViewModels.LandedCostViewModels
@@ -64,7 +65,7 @@ namespace ImportCostPro.Application.ViewModels.LandedCostViewModels
         [Display(Name = "Cantidad Total Importada")]
         public decimal TotalImportedQuantity { get; set; }
 
-        public Persistence.Enums.OrderStatus OrderStatus { get; set; }
+        public OrderStatus OrderStatus { get; set; }
 
         public List<CalculationResultDetailViewModel> Details { get; set; } = new();
     }
