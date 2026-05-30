@@ -110,6 +110,8 @@ namespace ImportCostPro.Application.Services
                 request.AppliesExciseTax
             );
 
+            entity.IsActive = request.IsActive;
+
             await _tariffCategoryRepository.UpdateAsync(entity);
 
             return entity.ToResponse();

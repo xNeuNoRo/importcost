@@ -135,7 +135,10 @@
                                 <i data-lucide="globe" class="w-5 h-5"></i> Países
                             </a>
                             <a asp-controller="Currency" asp-action="Index" class="@GetActiveClasses("Currency")">
-                                <i data-lucide="coins" class="w-5 h-5"></i> Monedas y Tasas
+                                <i data-lucide="coins" class="w-5 h-5"></i> Monedas
+                            </a>
+                            <a asp-controller="ExchangeRate" asp-action="Index" class="@GetActiveClasses("ExchangeRate")">
+                                <i data-lucide="trending-up" class="w-5 h-5"></i> Tasas de Cambio
                             </a>
                             <a asp-controller="TariffCategory" asp-action="Index" class="@GetActiveClasses("TariffCategory")">
                                 <i data-lucide="book-open" class="w-5 h-5"></i> Cat. Arancelarias

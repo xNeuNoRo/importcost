@@ -99,6 +99,14 @@ namespace ImportCostPro.Application.Services
             decimal normalizedRateValue = request.RateValue;
             DateTime normalizedEffectiveDate = request.EffectiveDate.Date;
 
+            if (normalizedFromCurrencyId == normalizedToCurrencyId)
+            {
+                throw new ValidationBusinessException(
+                    nameof(request.FromCurrencyId),
+                    "La moneda origen no puede ser igual a la moneda destino."
+                );
+            }
+
             var entity = await _exchangeRateRepository.GetByIdAsync(request.Id);
             if (entity == null)
             {
@@ -153,6 +161,8 @@ namespace ImportCostPro.Application.Services
                 normalizedRateValue,
                 normalizedEffectiveDate
             );
+
+            entity.IsActive = request.IsActive;
 
             await _exchangeRateRepository.UpdateAsync(entity);
 
