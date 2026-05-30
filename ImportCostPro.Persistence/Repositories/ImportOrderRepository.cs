@@ -16,9 +16,20 @@ namespace ImportCostPro.Persistence.Repositories
             await base.AddAsync(entity);
         }
 
+        public new Task UpdateAsync(ImportOrder entity)
+        {
+            return base.UpdateAsync(entity);
+        }
+
         public new async Task<ImportOrder?> GetByIdAsync(int id)
         {
             return await base.GetByIdAsync(id);
+        }
+
+        public new async Task<bool> DeleteAsync(int id)
+        {
+            var rowsAffected = await _dbSet.Where(o => o.Id == id).ExecuteDeleteAsync();
+            return rowsAffected > 0;
         }
 
         public async Task<IEnumerable<ImportOrder>> GetAllWithRelationsAsync()
@@ -29,6 +40,8 @@ namespace ImportCostPro.Persistence.Repositories
                 .Include(o => o.Supplier)
                 .Include(o => o.OriginCountry)
                 .Include(o => o.Currency)
+                .Include(o => o.OrderProducts)
+                .Include(o => o.CalculationResults)
                 .OrderByDescending(o => o.OrderDate)
                 .ToListAsync();
         }
@@ -41,6 +54,8 @@ namespace ImportCostPro.Persistence.Repositories
                 .Include(o => o.Supplier)
                 .Include(o => o.OriginCountry)
                 .Include(o => o.Currency)
+                .Include(o => o.OrderProducts)
+                .Include(o => o.CalculationResults)
                 .FirstOrDefaultAsync(o => o.Id == id);
         }
 
