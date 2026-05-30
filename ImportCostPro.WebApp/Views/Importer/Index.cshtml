@@ -1,11 +1,12 @@
 @model IEnumerable<ImportCostPro.Application.ViewModels.Importer.ImporterViewModel>
 @{
-    ViewData["Title"] = "Mantenimiento de Importadores";
+    ViewData["Title"] = "Importadores";
 }
 
 <div class="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 animate__animated animate__fadeIn">
     <div>
         <h1 class="text-2xl font-bold text-gray-900">Importadores</h1>
+
         <p class="text-sm text-gray-500">Gestione las entidades legales que realizan las importaciones.</p>
     </div>
     <a asp-action="Create"

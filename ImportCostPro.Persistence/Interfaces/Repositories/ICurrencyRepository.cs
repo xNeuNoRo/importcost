@@ -26,7 +26,7 @@ namespace ImportCostPro.Persistence.Interfaces.Repositories
 
         /// <summary>
         /// Verifica si la moneda está referenciada por otras entidades del sistema
-        /// (tasas, proveedores, órdenes, gastos, resultados de landed cost, etc.).
+        /// (tasas, proveedores, órdenes, gastos, resultados de liquidación, etc.).
         /// </summary>
         Task<bool> IsCurrencyReferencedAsync(int currencyId);
     }

@@ -195,7 +195,7 @@ namespace ImportCostPro.Application.Services
             if (await _exchangeRateRepository.IsExchangeRateReferencedAsync(id))
             {
                 throw new BusinessException(
-                    "No se puede eliminar esta tasa de cambio porque ya fue utilizada en un cálculo oficial de landed cost."
+                    "No se puede eliminar esta tasa de cambio porque ya fue utilizada en una Liquidación de Costos oficial."
                 );
             }
 

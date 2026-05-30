@@ -220,8 +220,9 @@ namespace ImportCostPro.Application.Services
                     case DistributionBase.Quantity:
                         if (globalTotalQuantity <= 0)
                             throw new BusinessException(
-                                "No se puede calcular el landed cost porque existen gastos distribuidos por cantidad y la cantidad total de productos es 0."
+                                "No se puede realizar la Liquidación de Costos porque existen gastos distribuidos por cantidad y la cantidad total de productos es 0."
                             );
+
                         break;
                 }
             }

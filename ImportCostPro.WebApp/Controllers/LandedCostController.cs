@@ -50,7 +50,7 @@ namespace ImportCostPro.WebApp.Controllers
                 var request = new ProcessCalculationRequest { ImportOrderId = orderId };
                 var response = await _landedCostService.ProcessCalculationAsync(request);
                 
-                TempData["SuccessMessage"] = "Cálculo de Landed Cost procesado y guardado correctamente.";
+                TempData["SuccessMessage"] = "Liquidación de Costos procesada y guardada correctamente.";
                 return RedirectToAction(nameof(Details), new { orderId });
             }
             catch (BusinessException ex)
@@ -75,7 +75,7 @@ namespace ImportCostPro.WebApp.Controllers
             }
 
             var viewModel = result.Adapt<LandedCostCalculationViewModel>();
-            ViewData["Title"] = $"Resultado Landed Cost - Orden {viewModel.OrderNumber}";
+            ViewData["Title"] = $"Resultado de Liquidación - Orden {viewModel.OrderNumber}";
             return View(viewModel);
         }
     }

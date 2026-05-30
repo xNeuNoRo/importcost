@@ -1,11 +1,12 @@
 @model IEnumerable<ImportCostPro.Application.ViewModels.CountryViewModels.CountryViewModel>
 @{
-    ViewData["Title"] = "Mantenimiento de Países";
+    ViewData["Title"] = "Países Registrados";
 }
 
 <div class="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 animate__animated animate__fadeIn">
     <div>
-        <h1 class="text-2xl font-bold text-gray-900">Países</h1>
+        <h1 class="text-2xl font-bold text-gray-900">Países Registrados</h1>
+
         <p class="text-sm text-gray-500">Gestione el catálogo de países para importaciones.</p>
     </div>
     <a asp-action="Create"

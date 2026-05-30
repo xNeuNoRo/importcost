@@ -92,6 +92,19 @@ namespace ImportCostPro.WebApp.Controllers
             return View(viewModel);
         }
 
+        public async Task<IActionResult> Details(int id)
+        {
+            var order = await _importOrderService.GetByIdAsync(id);
+            if (order == null)
+            {
+                TempData["ErrorMessage"] = "La orden solicitada no existe.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            var viewModel = order.Adapt<UpdateImportOrderViewModel>();
+            return View(viewModel);
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(UpdateImportOrderViewModel viewModel)

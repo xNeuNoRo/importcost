@@ -5,143 +5,179 @@
 }
 
 <div class="mb-6 animate__animated animate__fadeIn">
-    <a asp-action="Index" class="inline-flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-blue-600 transition-colors cursor-pointer">
+    <a asp-action="Index"
+       class="inline-flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-blue-600 transition-colors cursor-pointer">
         <i data-lucide="arrow-left" class="w-4 h-4"></i>
-        Volver al listado
+        Volver atrás
     </a>
     <h1 class="text-2xl font-bold text-gray-900 mt-2">Crear Nueva Orden</h1>
     <p class="text-sm text-gray-500">Inicie un nuevo proceso de importación registrando los datos base de la orden.</p>
 </div>
 
 <div class="max-w-4xl animate__animated animate__fadeInUp animate__faster">
-    <div class="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-300">
+    <div
+        class="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-300">
         <form asp-action="Create" method="post" class="p-6 sm:p-8">
             @if (!ViewData.ModelState.IsValid)
             {
-                <div asp-validation-summary="All" class="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm animate__animated animate__shakeX">
+                <div asp-validation-summary="All"
+                     class="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm animate__animated animate__shakeX">
                 </div>
             }
 
             <div class="space-y-8">
                 @* Sección: Identificación de la Orden *@
                 <div>
-                    <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2 border-b border-gray-100 pb-2">
+                    <h3
+                        class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2 border-b border-gray-100 pb-2">
                         <i data-lucide="file-text" class="w-5 h-5 text-blue-600"></i>
                         Identificación y Fecha
                     </h3>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div class="group">
-                            <label asp-for="OrderNumber" class="block text-sm font-semibold text-gray-700 mb-2 group-focus-within:text-blue-600 transition-colors"></label>
+                            <label asp-for="OrderNumber"
+                                   class="block text-sm font-semibold text-gray-700 mb-2 group-focus-within:text-blue-600 transition-colors"></label>
                             <div class="relative">
-                                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400 group-focus-within:text-blue-500 transition-colors">
+                                <div
+                                    class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400 group-focus-within:text-blue-500 transition-colors">
                                     <i data-lucide="hash" class="w-4 h-4"></i>
                                 </div>
-                                <input asp-for="OrderNumber" class="block w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm placeholder:text-gray-400 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none uppercase" placeholder="Ej: IMP-2026-001" />
+                                <input asp-for="OrderNumber"
+                                       class="block w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm placeholder:text-gray-400 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none uppercase"
+                                       placeholder="Ej: IMP-2026-001" />
                             </div>
-                            <span asp-validation-for="OrderNumber" class="mt-1.5 text-xs text-red-600 font-medium"></span>
+                            <span asp-validation-for="OrderNumber"
+                                  class="mt-1.5 text-xs text-red-600 font-medium"></span>
                         </div>
 
                         <div class="group">
-                            <label asp-for="OrderDate" class="block text-sm font-semibold text-gray-700 mb-2 group-focus-within:text-blue-600 transition-colors"></label>
+                            <label asp-for="OrderDate"
+                                   class="block text-sm font-semibold text-gray-700 mb-2 group-focus-within:text-blue-600 transition-colors"></label>
                             <div class="relative">
-                                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400 group-focus-within:text-blue-500 transition-colors">
+                                <div
+                                    class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400 group-focus-within:text-blue-500 transition-colors">
                                     <i data-lucide="calendar" class="w-4 h-4"></i>
                                 </div>
-                                <input asp-for="OrderDate" class="block w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none" />
+                                <input asp-for="OrderDate"
+                                       class="block w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none" />
                             </div>
                             <span asp-validation-for="OrderDate" class="mt-1.5 text-xs text-red-600 font-medium"></span>
                         </div>
 
                         <div class="group">
-                            <label asp-for="TransportMode" class="block text-sm font-semibold text-gray-700 mb-2 group-focus-within:text-blue-600 transition-colors"></label>
+                            <label asp-for="TransportMode"
+                                   class="block text-sm font-semibold text-gray-700 mb-2 group-focus-within:text-blue-600 transition-colors"></label>
                             <div class="relative">
-                                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400 group-focus-within:text-blue-500 transition-colors">
+                                <div
+                                    class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400 group-focus-within:text-blue-500 transition-colors">
                                     <i data-lucide="ship" class="w-4 h-4"></i>
                                 </div>
-                                <select asp-for="TransportMode" asp-items="Html.GetEnumSelectList<TransportMode>()" class="block w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none cursor-pointer">
+                                <select asp-for="TransportMode" asp-items="Html.GetEnumSelectList<TransportMode>()"
+                                        class="block w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none cursor-pointer">
                                     <option value="">Seleccione vía...</option>
                                 </select>
                             </div>
-                            <span asp-validation-for="TransportMode" class="mt-1.5 text-xs text-red-600 font-medium"></span>
+                            <span asp-validation-for="TransportMode"
+                                  class="mt-1.5 text-xs text-red-600 font-medium"></span>
                         </div>
                     </div>
                 </div>
 
                 @* Sección: Actores del Proceso *@
                 <div>
-                    <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2 border-b border-gray-100 pb-2">
+                    <h3
+                        class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2 border-b border-gray-100 pb-2">
                         <i data-lucide="users" class="w-5 h-5 text-blue-600"></i>
                         Entidades Relacionadas
                     </h3>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="group">
-                            <label asp-for="ImporterId" class="block text-sm font-semibold text-gray-700 mb-2 group-focus-within:text-blue-600 transition-colors"></label>
+                            <label asp-for="ImporterId"
+                                   class="block text-sm font-semibold text-gray-700 mb-2 group-focus-within:text-blue-600 transition-colors"></label>
                             <div class="relative">
-                                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400 group-focus-within:text-blue-500 transition-colors">
+                                <div
+                                    class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400 group-focus-within:text-blue-500 transition-colors">
                                     <i data-lucide="building" class="w-4 h-4"></i>
                                 </div>
-                                <select asp-for="ImporterId" asp-items="ViewBag.Importers" class="block w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none cursor-pointer">
+                                <select asp-for="ImporterId" asp-items="ViewBag.Importers"
+                                        class="block w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none cursor-pointer">
                                     <option value="">Seleccione importador...</option>
                                 </select>
                             </div>
-                            <span asp-validation-for="ImporterId" class="mt-1.5 text-xs text-red-600 font-medium"></span>
+                            <span asp-validation-for="ImporterId"
+                                  class="mt-1.5 text-xs text-red-600 font-medium"></span>
                         </div>
 
                         <div class="group">
-                            <label asp-for="SupplierId" class="block text-sm font-semibold text-gray-700 mb-2 group-focus-within:text-blue-600 transition-colors"></label>
+                            <label asp-for="SupplierId"
+                                   class="block text-sm font-semibold text-gray-700 mb-2 group-focus-within:text-blue-600 transition-colors"></label>
                             <div class="relative">
-                                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400 group-focus-within:text-blue-500 transition-colors">
+                                <div
+                                    class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400 group-focus-within:text-blue-500 transition-colors">
                                     <i data-lucide="truck" class="w-4 h-4"></i>
                                 </div>
-                                <select asp-for="SupplierId" asp-items="ViewBag.Suppliers" class="block w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none cursor-pointer">
+                                <select asp-for="SupplierId" asp-items="ViewBag.Suppliers"
+                                        class="block w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none cursor-pointer">
                                     <option value="">Seleccione proveedor...</option>
                                 </select>
                             </div>
-                            <span asp-validation-for="SupplierId" class="mt-1.5 text-xs text-red-600 font-medium"></span>
+                            <span asp-validation-for="SupplierId"
+                                  class="mt-1.5 text-xs text-red-600 font-medium"></span>
                         </div>
 
                         <div class="group">
-                            <label asp-for="OriginCountryId" class="block text-sm font-semibold text-gray-700 mb-2 group-focus-within:text-blue-600 transition-colors"></label>
+                            <label asp-for="OriginCountryId"
+                                   class="block text-sm font-semibold text-gray-700 mb-2 group-focus-within:text-blue-600 transition-colors"></label>
                             <div class="relative">
-                                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400 group-focus-within:text-blue-500 transition-colors">
+                                <div
+                                    class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400 group-focus-within:text-blue-500 transition-colors">
                                     <i data-lucide="globe" class="w-4 h-4"></i>
                                 </div>
-                                <select asp-for="OriginCountryId" asp-items="ViewBag.Countries" class="block w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none cursor-pointer">
+                                <select asp-for="OriginCountryId" asp-items="ViewBag.Countries"
+                                        class="block w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none cursor-pointer">
                                     <option value="">Seleccione país de origen...</option>
                                 </select>
                             </div>
-                            <span asp-validation-for="OriginCountryId" class="mt-1.5 text-xs text-red-600 font-medium"></span>
+                            <span asp-validation-for="OriginCountryId"
+                                  class="mt-1.5 text-xs text-red-600 font-medium"></span>
                         </div>
 
                         <div class="group">
-                            <label asp-for="CurrencyId" class="block text-sm font-semibold text-gray-700 mb-2 group-focus-within:text-blue-600 transition-colors">Moneda de Negociación</label>
-                            <div class="relative">
-                                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400 group-focus-within:text-blue-500 transition-colors">
-                                    <i data-lucide="coins" class="w-4 h-4"></i>
+                            <label asp-for="CurrencyId"
+                                   class="block text-sm font-semibold text-gray-700 mb-2 group-focus-within:text-blue-600 transition-colors">Moneda
+                                de Negociación</label>
+                                <div class="relative">
+                                    <div
+                                        class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400 group-focus-within:text-blue-500 transition-colors">
+                                        <i data-lucide="coins" class="w-4 h-4"></i>
+                                    </div>
+                                    <select asp-for="CurrencyId" asp-items="ViewBag.Currencies"
+                                            class="block w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none cursor-pointer">
+                                        <option value="">Seleccione moneda...</option>
+                                    </select>
                                 </div>
-                                <select asp-for="CurrencyId" asp-items="ViewBag.Currencies" class="block w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none cursor-pointer">
-                                    <option value="">Seleccione moneda...</option>
-                                </select>
+                                <span asp-validation-for="CurrencyId"
+                                      class="mt-1.5 text-xs text-red-600 font-medium"></span>
                             </div>
-                            <span asp-validation-for="CurrencyId" class="mt-1.5 text-xs text-red-600 font-medium"></span>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="mt-10 pt-6 border-t border-gray-100 flex items-center justify-end gap-3">
-                <a asp-action="Index" class="px-5 py-2.5 text-sm font-semibold text-gray-600 hover:bg-gray-100 rounded-xl transition-all cursor-pointer">
-                    Cancelar
-                </a>
-                <button type="submit" class="inline-flex items-center justify-center gap-2.5 px-8 py-2.5 bg-blue-600 text-white text-sm font-bold rounded-xl hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-200 transition-all cursor-pointer hover-scale active:scale-95">
-                    <i data-lucide="save" class="w-5 h-5"></i>
-                    Crear Orden
-                </button>
-            </div>
-        </form>
+                <div class="mt-10 pt-6 border-t border-gray-100 flex items-center justify-end gap-3">
+                    <a asp-action="Index"
+                       class="px-5 py-2.5 text-sm font-semibold text-gray-600 hover:bg-gray-100 rounded-xl transition-all cursor-pointer">
+                        Volver atrás
+                    </a>
+                    <button type="submit"
+                            class="inline-flex items-center justify-center gap-2.5 px-8 py-2.5 bg-blue-600 text-white text-sm font-bold rounded-xl hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-200 transition-all cursor-pointer hover-scale active:scale-95">
+                        <i data-lucide="save" class="w-5 h-5"></i>
+                        Crear orden
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
-</div>
 
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-}
+    @section Scripts {
+        <partial name="_ValidationScriptsPartial" />
+    }

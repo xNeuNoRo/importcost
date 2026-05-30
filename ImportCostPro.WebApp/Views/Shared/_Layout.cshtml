@@ -15,70 +15,88 @@
 
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    
+
     <style>
         .page-entry {
-            animation: fadeIn 0.4s ease-out;
+        animation: fadeIn 0.4s ease-out;
         }
 
         @@keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        from {
+        opacity: 0;
+        transform: translateY(10px);
+        }
+
+        to {
+        opacity: 1;
+        transform: translateY(0);
+        }
         }
 
         .hover-scale {
-            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+        transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
         .hover-scale:hover {
-            transform: scale(1.05);
+        transform: scale(1.05);
         }
 
         .btn-fancy {
-            position: relative;
-            overflow: hidden;
+        position: relative;
+        overflow: hidden;
         }
 
         .btn-fancy::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 5px;
-            height: 5px;
-            background: rgba(255, 255, 255, .5);
-            opacity: 0;
-            border-radius: 100%;
-            transform: scale(1, 1) translate(-50%);
-            transform-origin: 50% 50%;
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 5px;
+        height: 5px;
+        background: rgba(255, 255, 255, .5);
+        opacity: 0;
+        border-radius: 100%;
+        transform: scale(1, 1) translate(-50%);
+        transform-origin: 50% 50%;
         }
 
         .btn-fancy:focus:not(:active)::after {
-            animation: ripple 1s ease-out;
+        animation: ripple 1s ease-out;
         }
 
         @@keyframes ripple {
-            0% { transform: scale(0, 0); opacity: 0.5; }
-            20% { transform: scale(25, 25); opacity: 0.3; }
-            100% { opacity: 0; transform: scale(40, 40); }
+        0% {
+        transform: scale(0, 0);
+        opacity: 0.5;
+        }
+
+        20% {
+        transform: scale(25, 25);
+        opacity: 0.3;
+        }
+
+        100% {
+        opacity: 0;
+        transform: scale(40, 40);
+        }
         }
 
         .cursor-pointer {
-            cursor: pointer !important;
+        cursor: pointer !important;
         }
     </style>
 </head>
 
 @{
     string currentController = ViewContext.RouteData.Values["Controller"]?.ToString() ?? "";
-    
+
     string GetActiveClasses(string targetController)
     {
         bool isActive = string.Equals(currentController, targetController, StringComparison.OrdinalIgnoreCase);
-        
-        return isActive 
-            ? "flex items-center gap-3 px-3 py-2 bg-blue-50 text-blue-700 rounded-lg font-medium border-r-4 border-blue-600 transition-all shadow-sm shadow-blue-100/50" 
-            : "flex items-center gap-3 px-3 py-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg font-medium transition-all";
+
+        return isActive
+                    ? "flex items-center gap-3 px-3 py-2 bg-blue-50 text-blue-700 rounded-lg font-medium border-r-4 border-blue-600 transition-all shadow-sm shadow-blue-100/50"
+                    : "flex items-center gap-3 px-3 py-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg font-medium transition-all";
     }
 }
 
@@ -100,7 +118,8 @@
                     <span class="text-lg font-bold text-gray-900 tracking-tight">ImportCost<span
                         class="text-blue-600">Pro</span></span>
                     </a>
-                    <button id="close-sidebar-btn" class="md:hidden text-gray-500 hover:bg-gray-100 p-1 rounded-md cursor-pointer">
+                    <button id="close-sidebar-btn"
+                            class="md:hidden text-gray-500 hover:bg-gray-100 p-1 rounded-md cursor-pointer">
                         <i data-lucide="x" class="w-5 h-5"></i>
                     </button>
                 </div>
@@ -108,7 +127,7 @@
                 <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-6 custom-scrollbar">
 
                     <div>
-                        <p class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">General</p>
+                        <p class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Operaciones</p>
                         <div class="space-y-1">
                             <a asp-controller="Home" asp-action="Index" class="@GetActiveClasses("Home")">
                                 <i data-lucide="layout-dashboard" class="w-5 h-5"></i> Panel Principal
@@ -123,105 +142,110 @@
                     </div>
 
                     <div>
-                        <p class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Gestión de Catálogos</p>
-                        <div class="space-y-1">
-                            <a asp-controller="Product" asp-action="Index" class="@GetActiveClasses("Product")">
-                                <i data-lucide="box" class="w-5 h-5"></i> Catálogo de Productos
-                            </a>
-                            <a asp-controller="Importer" asp-action="Index" class="@GetActiveClasses("Importer")">
-                                <i data-lucide="users" class="w-5 h-5"></i> Importadores
-                            </a>
-                            <a asp-controller="Supplier" asp-action="Index" class="@GetActiveClasses("Supplier")">
-                                <i data-lucide="truck" class="w-5 h-5"></i> Proveedores Externos
-                            </a>
-                            <a asp-controller="Country" asp-action="Index" class="@GetActiveClasses("Country")">
-                                <i data-lucide="globe" class="w-5 h-5"></i> Países Registrados
-                            </a>
-                            <a asp-controller="Currency" asp-action="Index" class="@GetActiveClasses("Currency")">
-                                <i data-lucide="coins" class="w-5 h-5"></i> Divisas y Monedas
-                            </a>
-                            <a asp-controller="ExchangeRate" asp-action="Index" class="@GetActiveClasses("ExchangeRate")">
-                                <i data-lucide="trending-up" class="w-5 h-5"></i> Tasas de Cambio
-                            </a>
-                            <a asp-controller="TariffCategory" asp-action="Index" class="@GetActiveClasses("TariffCategory")">
-                                <i data-lucide="book-open" class="w-5 h-5"></i> Categorías Arancelarias
-                            </a>
+                        <p class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Gestión de
+                            Catálogos</p>
+                            <div class="space-y-1">
+                                <a asp-controller="Product" asp-action="Index" class="@GetActiveClasses("Product")">
+                                    <i data-lucide="box" class="w-5 h-5"></i> Catálogo de Productos
+                                </a>
+                                <a asp-controller="Importer" asp-action="Index" class="@GetActiveClasses("Importer")">
+                                    <i data-lucide="users" class="w-5 h-5"></i> Importadores
+                                </a>
+                                <a asp-controller="Supplier" asp-action="Index" class="@GetActiveClasses("Supplier")">
+                                    <i data-lucide="truck" class="w-5 h-5"></i> Proveedores Externos
+                                </a>
+                                <a asp-controller="Country" asp-action="Index" class="@GetActiveClasses("Country")">
+                                    <i data-lucide="globe" class="w-5 h-5"></i> Países Registrados
+                                </a>
+                                <a asp-controller="Currency" asp-action="Index" class="@GetActiveClasses("Currency")">
+                                    <i data-lucide="coins" class="w-5 h-5"></i> Divisas y Monedas
+                                </a>
+                                <a asp-controller="ExchangeRate" asp-action="Index" class="@GetActiveClasses("ExchangeRate")">
+                                    <i data-lucide="trending-up" class="w-5 h-5"></i> Tasas de Cambio
+                                </a>
+                                <a asp-controller="TariffCategory" asp-action="Index"
+                                   class="@GetActiveClasses("TariffCategory")">
+                                    <i data-lucide="book-open" class="w-5 h-5"></i> Categorías Arancelarias
+                                </a>
+                            </div>
                         </div>
+
+                        <div>
+                            <p class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Configuración
+                                Fiscal</p>
+                                <div class="space-y-1">
+                                    <a asp-controller="TaxConfiguration" asp-action="Index"
+                                       class="@GetActiveClasses("TaxConfiguration")">
+                                        <i data-lucide="settings-2" class="w-5 h-5"></i> Tasas de Impuestos
+                                    </a>
+                                </div>
+                            </div>
+                        </nav>
+                    </aside>
+
+                    <div class="flex-1 flex flex-col h-screen overflow-hidden min-w-0">
+
+                        <header
+                            class="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4 sm:px-6 z-10 shrink-0">
+
+                            <div class="flex items-center gap-4">
+                                <button id="open-sidebar-btn"
+                                        class="md:hidden p-2 text-gray-500 hover:bg-gray-100 rounded-md transition-colors cursor-pointer">
+                                    <i data-lucide="menu" class="w-5 h-5"></i>
+                                </button>
+                                <div class="hidden sm:flex items-center text-sm text-gray-500">
+                                    <span class="text-gray-900 font-medium">@ViewData["Title"]</span>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center gap-3 pl-4 border-l border-gray-200">
+                                <div class="hidden sm:flex flex-col items-end">
+                                    <span class="text-sm font-semibold text-gray-900 leading-tight">Usuario Administrador</span>
+                                    <span class="text-xs text-gray-500 leading-tight">Acceso Total</span>
+                                </div>
+                                <div
+                                    class="w-9 h-9 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-sm border border-blue-200">
+                                    ADM
+                                </div>
+                                <button class="text-gray-400 hover:text-gray-600 p-1 cursor-pointer">
+                                    <i data-lucide="chevron-down" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                        </header>
+
+                        <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50">
+                            <div class="p-4 sm:p-6 md:p-8 max-w-7xl mx-auto page-entry">
+                                @RenderBody()
+                            </div>
+                        </main>
+
                     </div>
+                </div>
 
-                    <div>
-                        <p class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Configuración Fiscal</p>
-                        <div class="space-y-1">
-                            <a asp-controller="TaxConfiguration" asp-action="Index" class="@GetActiveClasses("TaxConfiguration")">
-                                <i data-lucide="settings-2" class="w-5 h-5"></i> Tasas de Impuestos
-                            </a>
-                        </div>
-                    </div>
-                </nav>
-            </aside>
+                <script src="~/lib/jquery/dist/jquery.min.js"></script>
 
-            <div class="flex-1 flex flex-col h-screen overflow-hidden min-w-0">
+                @await RenderSectionAsync("Scripts", required: false)
 
-                <header
-                    class="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4 sm:px-6 z-10 shrink-0">
+                <script>
+                    // Inicializar los íconos de Lucide
+                    lucide.createIcons();
 
-                    <div class="flex items-center gap-4">
-                        <button id="open-sidebar-btn"
-                                class="md:hidden p-2 text-gray-500 hover:bg-gray-100 rounded-md transition-colors cursor-pointer">
-                            <i data-lucide="menu" class="w-5 h-5"></i>
-                        </button>
-                        <div class="hidden sm:flex items-center text-sm text-gray-500">
-                            <span class="text-gray-900 font-medium">@ViewData["Title"]</span>
-                        </div>
-                    </div>
+                    // Lógica para el Sidebar en dispositivos móviles
+                    const sidebar = document.getElementById('sidebar');
+                    const backdrop = document.getElementById('sidebar-backdrop');
+                    const openBtn = document.getElementById('open-sidebar-btn');
+                    const closeBtn = document.getElementById('close-sidebar-btn');
 
-                    <div class="flex items-center gap-3 pl-4 border-l border-gray-200">
-                        <div class="hidden sm:flex flex-col items-end">
-                            <span class="text-sm font-semibold text-gray-900 leading-tight">Usuario Administrador</span>
-                            <span class="text-xs text-gray-500 leading-tight">Acceso Total</span>
-                        </div>
-                        <div
-                            class="w-9 h-9 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-sm border border-blue-200">
-                            ADM
-                        </div>
-                        <button class="text-gray-400 hover:text-gray-600 p-1 cursor-pointer">
-                            <i data-lucide="chevron-down" class="w-4 h-4"></i>
-                        </button>
-                    </div>
-                </header>
+                    function toggleSidebar() {
+                    sidebar.classList.toggle('-translate-x-full');
+                    backdrop.classList.toggle('hidden');
+                    }
 
-                <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50">
-                    <div class="p-4 sm:p-6 md:p-8 max-w-7xl mx-auto page-entry">
-                        @RenderBody()
-                    </div>
-                </main>
+                    openBtn.addEventListener('click', toggleSidebar);
+                    closeBtn.addEventListener('click', toggleSidebar);
+                    backdrop.addEventListener('click', toggleSidebar);
+                </script>
+            </body>
 
-            </div>
-        </div>
-
-        <script src="~/lib/jquery/dist/jquery.min.js"></script>
-
-        @await RenderSectionAsync("Scripts", required: false)
-
-        <script>
-            // Inicializar los íconos de Lucide
-            lucide.createIcons();
-
-            // Lógica para el Sidebar en dispositivos móviles
-            const sidebar = document.getElementById('sidebar');
-            const backdrop = document.getElementById('sidebar-backdrop');
-            const openBtn = document.getElementById('open-sidebar-btn');
-            const closeBtn = document.getElementById('close-sidebar-btn');
-
-            function toggleSidebar() {
-            sidebar.classList.toggle('-translate-x-full');
-            backdrop.classList.toggle('hidden');
-            }
-
-            openBtn.addEventListener('click', toggleSidebar);
-            closeBtn.addEventListener('click', toggleSidebar);
-            backdrop.addEventListener('click', toggleSidebar);
-        </script>
-    </body>
-
-</html>
+        </html>
+        l>

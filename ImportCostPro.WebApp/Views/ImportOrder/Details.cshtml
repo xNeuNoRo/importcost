@@ -1,0 +1,179 @@
+@model ImportCostPro.Application.ViewModels.ImportOrderViewModels.UpdateImportOrderViewModel
+@using ImportCostPro.Persistence.Enums
+@{
+    ViewData["Title"] = "Consulta de Orden de Importación";
+    bool isCalculated = Model.Status == OrderStatus.Calculated || Model.Status == OrderStatus.Closed;
+}
+
+<div class="mb-6 animate__animated animate__fadeIn">
+    <a asp-action="Index" class="inline-flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-blue-600 transition-colors cursor-pointer">
+        <i data-lucide="arrow-left" class="w-4 h-4"></i>
+        Volver al listado
+    </a>
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mt-2">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-900">Consulta de Orden #@Model.OrderNumber</h1>
+            <div class="flex items-center gap-2 mt-1">
+                @{
+                    var statusClass = Model.Status switch
+                    {
+                        OrderStatus.Open => "bg-blue-50 text-blue-700 border-blue-100",
+                        OrderStatus.Calculated => "bg-amber-50 text-amber-700 border-amber-100",
+                        OrderStatus.Closed => "bg-emerald-50 text-emerald-700 border-emerald-100",
+                        OrderStatus.Canceled => "bg-gray-100 text-gray-600 border-gray-200",
+                        _ => "bg-gray-50 text-gray-500"
+                    };
+                }
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold border uppercase tracking-wider @statusClass">
+                    @Model.Status.GetDisplayName()
+                </span>
+                <span class="text-xs text-gray-400">•</span>
+                <span class="text-xs text-gray-500 font-medium">Emitida el @Model.OrderDate.ToString("dd/MM/yyyy")</span>
+            </div>
+        </div>
+        
+        <div class="flex items-center gap-3">
+            @if (Model.Status == OrderStatus.Open)
+            {
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="inline-flex items-center justify-center gap-2 px-5 py-2 bg-blue-50 text-blue-700 text-sm font-bold rounded-xl hover:bg-blue-100 transition-all cursor-pointer">
+                    <i data-lucide="edit-3" class="w-4 h-4"></i>
+                    Editar Cabecera
+                </a>
+            }
+        </div>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    @* Información General *@
+    <div class="lg:col-span-2 space-y-6">
+        <div class="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden animate__animated animate__fadeInUp animate__faster">
+            <div class="bg-gray-50/50 px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+                <h3 class="text-sm font-bold text-gray-900 flex items-center gap-2">
+                    <i data-lucide="info" class="w-4 h-4 text-blue-600"></i>
+                    Datos Generales de la Operación
+                </h3>
+            </div>
+            <div class="p-6 sm:p-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-12">
+                    <div>
+                        <span class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Importador Responsable</span>
+                        <span class="text-sm font-semibold text-gray-800">@ViewBag.Importers?.ToString() ?? "Cargando..."</span>
+                        @* Nota: En detalles usualmente queremos el nombre, no el ID. 
+                           Como el VM tiene Ids, necesitamos que el controlador pueble los nombres o usar el response DTO *@
+                    </div>
+                    <div>
+                        <span class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Proveedor de Origen</span>
+                        <span class="text-sm font-semibold text-gray-800">@ViewBag.Suppliers?.ToString()</span>
+                    </div>
+                    <div>
+                        <span class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">País de Exportación</span>
+                        <span class="text-sm font-semibold text-gray-800">@ViewBag.Countries?.ToString()</span>
+                    </div>
+                    <div>
+                        <span class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Moneda de Negociación</span>
+                        <span class="text-sm font-semibold text-gray-800 font-mono">@ViewBag.Currencies?.ToString()</span>
+                    </div>
+                    <div>
+                        <span class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Vía de Transporte</span>
+                        <span class="inline-flex items-center gap-1.5 text-sm font-semibold text-gray-800">
+                            <i data-lucide="ship" class="w-4 h-4 text-gray-400"></i>
+                            @Model.TransportMode.GetDisplayName()
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @* Atajos a Detalle *@
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+             <a asp-controller="OrderProduct" asp-action="Manage" asp-route-orderId="@Model.Id" 
+                class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition-all group">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="p-2.5 bg-blue-50 text-blue-600 rounded-xl group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                        <i data-lucide="package" class="w-5 h-5"></i>
+                    </div>
+                    <i data-lucide="chevron-right" class="w-4 h-4 text-gray-300 group-hover:text-blue-500"></i>
+                </div>
+                <h4 class="text-sm font-bold text-gray-900">Detalle de Productos</h4>
+                <p class="text-[11px] text-gray-500 mt-1">Consulte los artículos, cantidades y precios FOB.</p>
+             </a>
+
+             <a asp-controller="ImportExpense" asp-action="Manage" asp-route-orderId="@Model.Id" 
+                class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition-all group">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="p-2.5 bg-indigo-50 text-indigo-600 rounded-xl group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+                        <i data-lucide="receipt" class="w-5 h-5"></i>
+                    </div>
+                    <i data-lucide="chevron-right" class="w-4 h-4 text-gray-300 group-hover:text-indigo-500"></i>
+                </div>
+                <h4 class="text-sm font-bold text-gray-900">Gastos de Importación</h4>
+                <p class="text-[11px] text-gray-500 mt-1">Fletes, seguros y otros cargos operativos.</p>
+             </a>
+        </div>
+    </div>
+
+    @* Resultado de Liquidación *@
+    <div class="space-y-6">
+        @if (isCalculated)
+        {
+            <div class="bg-linear-to-br from-blue-600 to-indigo-700 rounded-3xl p-8 text-white shadow-xl shadow-blue-100">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="p-2 bg-white/10 rounded-xl">
+                        <i data-lucide="calculator" class="w-5 h-5 text-blue-200"></i>
+                    </div>
+                    <span class="text-xs font-bold uppercase tracking-widest text-blue-100">Resumen de Liquidación</span>
+                </div>
+                
+                <p class="text-[10px] text-blue-200 uppercase font-bold tracking-tighter mb-1">Costo Total Puesto en Almacén</p>
+                <div class="flex items-baseline gap-2 mb-8">
+                    <span class="text-3xl font-black">RD$</span>
+                    <span class="text-4xl font-black">---</span> @* Necesitamos pasar el total real al ViewBag o usar un modelo compuesto *@
+                </div>
+
+                <a asp-controller="LandedCost" asp-action="Details" asp-route-orderId="@Model.Id" class="w-full inline-flex items-center justify-center gap-2 px-6 py-3 bg-white text-blue-700 font-bold rounded-xl hover:bg-blue-50 transition-all hover-scale shadow-lg">
+                    <i data-lucide="file-text" class="w-5 h-5"></i>
+                    Ver Reporte Completo
+                </a>
+            </div>
+        }
+        else
+        {
+            <div class="bg-gray-50 border-2 border-dashed border-gray-200 rounded-3xl p-8 flex flex-col items-center text-center">
+                <div class="p-4 bg-white rounded-full shadow-sm mb-4">
+                    <i data-lucide="alert-circle" class="w-8 h-8 text-gray-300"></i>
+                </div>
+                <h4 class="text-sm font-bold text-gray-400">Sin Liquidación</h4>
+                <p class="text-xs text-gray-400 mt-1">Esta orden aún no ha sido procesada financieramente.</p>
+                @if (Model.Status == OrderStatus.Open)
+                {
+                    <form asp-controller="LandedCost" asp-action="Calculate" asp-route-orderId="@Model.Id" method="post" class="mt-6 w-full">
+                        <button type="submit" class="w-full inline-flex items-center justify-center gap-2 px-6 py-3 bg-amber-500 text-white font-bold rounded-xl hover:bg-amber-600 transition-all shadow-md shadow-amber-100 cursor-pointer">
+                            <i data-lucide="play" class="w-4 h-4"></i>
+                            Calcular Ahora
+                        </button>
+                    </form>
+                }
+            </div>
+        }
+
+        @if (Model.Status == OrderStatus.Open)
+        {
+            <div class="bg-rose-50/50 border border-rose-100 rounded-2xl p-6">
+                <h3 class="text-xs font-bold text-rose-800 uppercase tracking-wider mb-4">Anulación</h3>
+                <form asp-action="ChangeStatus" asp-route-id="@Model.Id" asp-route-newStatus="@OrderStatus.Canceled" method="post">
+                    <button type="submit" class="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-white text-rose-600 text-xs font-bold rounded-xl border border-rose-200 hover:bg-rose-600 hover:text-white transition-all cursor-pointer">
+                        <i data-lucide="ban" class="w-4 h-4"></i>
+                        Anular Orden
+                    </button>
+                </form>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        lucide.createIcons();
+    </script>
+}

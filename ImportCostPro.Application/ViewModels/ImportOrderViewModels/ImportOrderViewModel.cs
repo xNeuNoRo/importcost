@@ -36,7 +36,7 @@ namespace ImportCostPro.Application.ViewModels.ImportOrderViewModels
         [DisplayFormat(DataFormatString = "{0:C2}")]
         public decimal FobTotal { get; set; }
 
-        [Display(Name = "Total Landed Cost")]
+        [Display(Name = "Inversión Liquidada")]
         [DisplayFormat(DataFormatString = "{0:C2}")]
         public decimal TotalLandedCost { get; set; }
     }
