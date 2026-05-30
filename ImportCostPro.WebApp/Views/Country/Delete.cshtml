@@ -3,8 +3,8 @@
     ViewData["Title"] = "Eliminar País";
 }
 
-<div class="mb-6">
-    <a asp-action="Index" class="inline-flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-blue-600 transition-colors">
+<div class="mb-6 animate__animated animate__fadeIn">
+    <a asp-action="Index" class="inline-flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-blue-600 transition-colors cursor-pointer">
         <i data-lucide="arrow-left" class="w-4 h-4"></i>
         Volver al listado
     </a>
@@ -12,10 +12,10 @@
     <p class="text-sm text-gray-500">¿Está seguro que desea eliminar este registro permanentemente?</p>
 </div>
 
-<div class="max-w-2xl">
-    <div class="bg-white border border-red-100 rounded-2xl shadow-xl shadow-red-50/50 overflow-hidden">
+<div class="max-w-2xl animate__animated animate__fadeInUp animate__faster">
+    <div class="bg-white border border-red-100 rounded-2xl shadow-xl shadow-red-50/50 overflow-hidden hover:shadow-2xl transition-shadow duration-300">
         <div class="p-6 sm:p-8">
-            <div class="flex items-start gap-4 mb-8 p-4 bg-red-50 rounded-xl border border-red-100">
+            <div class="flex items-start gap-4 mb-8 p-4 bg-red-50 rounded-xl border border-red-100 animate__animated animate__pulse animate__infinite animate__slow">
                 <div class="p-2 bg-red-100 rounded-lg text-red-600">
                     <i data-lucide="alert-triangle" class="w-6 h-6"></i>
                 </div>
@@ -46,15 +46,15 @@
                     <span class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Estado Actual</span>
                     @if (Model.IsActive)
                     {
-                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700 border border-green-200">
-                            <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700 border border-emerald-200 shadow-sm">
+                            <i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i>
                             Activo
                         </span>
                     }
                     else
                     {
-                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700 border border-red-200">
-                            <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-rose-100 text-rose-700 border border-rose-200 shadow-sm">
+                            <i data-lucide="x-circle" class="w-3.5 h-3.5"></i>
                             Inactivo
                         </span>
                     }
@@ -62,13 +62,13 @@
             </div>
 
             <div class="mt-10 pt-6 border-t border-gray-100 flex items-center justify-end gap-3">
-                <a asp-action="Index" class="px-4 py-2.5 text-sm font-semibold text-gray-600 hover:bg-gray-50 rounded-lg transition-colors cursor-pointer">
+                <a asp-action="Index" class="px-5 py-2.5 text-sm font-semibold text-gray-600 hover:bg-gray-100 rounded-xl transition-all cursor-pointer">
                     Cancelar
                 </a>
                 <form asp-action="Delete" method="post">
                     <input type="hidden" asp-for="Id" />
-                    <button type="submit" class="inline-flex items-center justify-center gap-2 px-6 py-2.5 bg-red-600 text-white text-sm font-bold rounded-lg hover:bg-red-700 transition-colors shadow-sm shadow-red-200 cursor-pointer">
-                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                    <button type="submit" class="inline-flex items-center justify-center gap-2.5 px-8 py-2.5 bg-red-600 text-white text-sm font-bold rounded-xl hover:bg-red-700 transition-all shadow-sm shadow-red-200 cursor-pointer hover-scale active:scale-95">
+                        <i data-lucide="trash-2" class="w-5 h-5"></i>
                         Confirmar Eliminación
                     </button>
                 </form>

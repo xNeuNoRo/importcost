@@ -21,8 +21,5 @@ namespace ImportCostPro.Application.ViewModels.CurrencyViewModels
 
         [Display(Name = "Es moneda local")]
         public bool IsLocalCurrency { get; set; }
-
-        [Display(Name = "Estado")]
-        public bool IsActive { get; set; } = true;
     }
 }

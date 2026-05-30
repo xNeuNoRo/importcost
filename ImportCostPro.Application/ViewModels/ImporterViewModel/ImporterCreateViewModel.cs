@@ -30,8 +30,5 @@ namespace ImportCostPro.Application.ViewModels.Importer
         [MaxLength(250, ErrorMessage = "La dirección debe tener un máximo de 250 caracteres.")]
         [Display(Name = "Dirección")]
         public string? Address { get; set; }
-
-        [Display(Name = "Estado")]
-        public bool IsActive { get; set; } = true;
     }
 }

@@ -153,6 +153,7 @@ namespace ImportCostPro.Application.Services
             request.Adapt(entity);
             entity.Name = normalizedName;
             entity.Email = normalizedEmail;
+            entity.IsActive = request.IsActive;
 
             await _supplierRepository.UpdateAsync(entity);
 

@@ -33,29 +33,15 @@
                     <span asp-validation-for="Name" class="mt-1.5 text-xs text-red-600 font-medium"></span>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                    <div class="group">
-                        <label asp-for="IsoCode" class="block text-sm font-semibold text-gray-700 mb-2 group-focus-within:text-blue-600 transition-colors"></label>
-                        <div class="relative">
-                            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400 group-focus-within:text-blue-500 transition-colors">
-                                <i data-lucide="hash" class="w-4 h-4"></i>
-                            </div>
-                            <input asp-for="IsoCode" class="block w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm placeholder:text-gray-400 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none uppercase" placeholder="Ej: DOM" />
+                <div class="group">
+                    <label asp-for="IsoCode" class="block text-sm font-semibold text-gray-700 mb-2 group-focus-within:text-blue-600 transition-colors"></label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400 group-focus-within:text-blue-500 transition-colors">
+                            <i data-lucide="hash" class="w-4 h-4"></i>
                         </div>
-                        <span asp-validation-for="IsoCode" class="mt-1.5 text-xs text-red-600 font-medium"></span>
+                        <input asp-for="IsoCode" class="block w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm placeholder:text-gray-400 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none uppercase" placeholder="Ej: DOM" />
                     </div>
-
-                    <div class="flex items-end pb-2.5">
-                        <div class="flex flex-col gap-1 w-full">
-                            <label class="flex items-center gap-3 cursor-pointer group w-fit">
-                                <div class="relative">
-                                    <input type="checkbox" asp-for="IsActive" class="peer sr-only" />
-                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600 transition-colors"></div>
-                                </div>
-                                <span id="status-text" class="text-sm font-medium text-gray-600 group-hover:text-gray-900 transition-colors">Habilitar país</span>
-                            </label>
-                        </div>
-                    </div>
+                    <span asp-validation-for="IsoCode" class="mt-1.5 text-xs text-red-600 font-medium"></span>
                 </div>
             </div>
 
@@ -63,8 +49,8 @@
                 <a asp-action="Index" class="px-5 py-2.5 text-sm font-semibold text-gray-600 hover:bg-gray-100 rounded-xl transition-all cursor-pointer">
                     Cancelar
                 </a>
-                <button type="submit" class="inline-flex items-center justify-center gap-2 px-8 py-2.5 bg-blue-600 text-white text-sm font-bold rounded-xl hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-200 transition-all cursor-pointer hover-scale active:scale-95">
-                    <i data-lucide="save" class="w-4 h-4"></i>
+                <button type="submit" class="inline-flex items-center justify-center gap-2.5 px-8 py-2.5 bg-blue-600 text-white text-sm font-bold rounded-xl hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-200 transition-all cursor-pointer hover-scale active:scale-95">
+                    <i data-lucide="save" class="w-5 h-5"></i>
                     Guardar País
                 </button>
             </div>
@@ -74,17 +60,4 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
-    <script>
-        const statusCheckbox = document.querySelector('input[name="IsActive"]');
-        const statusText = document.getElementById('status-text');
-
-        function updateStatusText() {
-            statusText.textContent = statusCheckbox.checked ? "País habilitado" : "País deshabilitado";
-            statusText.classList.toggle('text-green-600', statusCheckbox.checked);
-            statusText.classList.toggle('text-gray-600', !statusCheckbox.checked);
-        }
-
-        statusCheckbox.addEventListener('change', updateStatusText);
-        updateStatusText();
-    </script>
 }

@@ -116,6 +116,7 @@ namespace ImportCostPro.Application.Services
             existingImporter = request.Adapt(existingImporter);
             existingImporter.LegalName = normalizedLegalName;
             existingImporter.TaxId = normalizedTaxID;
+            existingImporter.IsActive = request.IsActive;
 
             await _importerRepository.UpdateAsync(existingImporter);
 

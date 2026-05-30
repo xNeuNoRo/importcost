@@ -8,5 +8,6 @@ namespace ImportCostPro.Application.DTOs.Supplier.Requests
         public int OriginCountryId { get; set; }
         public int DefaultCurrencyId { get; set; }
         public string? PhoneNumber { get; set; }
+        public bool IsActive { get; set; }
     }
 }
