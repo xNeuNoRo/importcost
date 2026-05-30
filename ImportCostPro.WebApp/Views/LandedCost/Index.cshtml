@@ -2,76 +2,152 @@
     ViewData["Title"] = "Liquidación de Costos";
 }
 
-<div class="mb-6 animate__animated animate__fadeIn">
-    <h1 class="text-2xl font-bold text-gray-900">Liquidación de Costos de Importación</h1>
-    <p class="text-sm text-gray-500">Seleccione una orden abierta para determinar el costo real final de los artículos importados.</p>
-</div>
-
-@if (TempData["ErrorMessage"] != null)
-{
-    <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl flex items-center gap-3 text-red-700 shadow-sm animate__animated animate__shakeX">
-        <i data-lucide="alert-circle" class="w-5 h-5 shrink-0"></i>
-        <p class="text-sm font-medium">@TempData["ErrorMessage"]</p>
+<div
+    class="min-h-[80vh] flex flex-col items-center justify-center py-12 px-4 sm:px-6 lg:px-8 animate__animated animate__fadeIn">
+    @* Cabecera Centrada *@
+    <div class="text-center mb-12 max-w-3xl">
+        <h1 class="text-4xl font-black text-gray-900 tracking-tight sm:text-5xl mb-4">
+            Liquidación de Costos de <span class="text-blue-600">Importación</span>
+        </h1>
+        <p class="text-lg text-gray-500 leading-relaxed">
+            Nuestro motor de cálculo procesará automáticamente los gravámenes aduanales, prorrateará los gastos y
+            determinará el costo real de su mercancía puesta en almacén.
+        </p>
     </div>
-}
 
-<div class="max-w-2xl animate__animated animate__fadeInUp animate__faster">
-    <div class="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-300">
-        <div class="bg-blue-600 px-6 py-8 text-white">
-            <div class="flex items-center gap-4">
-                <div class="p-3 bg-white/10 rounded-xl backdrop-blur-sm">
-                    <i data-lucide="calculator" class="w-8 h-8"></i>
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div
+            class="w-full max-w-4xl mb-8 p-4 bg-red-50 border border-red-200 rounded-2xl flex items-center gap-3 text-red-700 shadow-sm animate__animated animate__shakeX">
+            <i data-lucide="alert-circle" class="w-6 h-6 shrink-0"></i>
+            <p class="text-sm font-semibold">@TempData["ErrorMessage"]</p>
+        </div>
+    }
+
+    @* Card Principal Premium *@
+    <div
+        class="w-full max-w-5xl bg-white rounded-[2.5rem] shadow-2xl shadow-blue-100/50 border border-gray-100 overflow-hidden flex flex-col md:flex-row animate__animated animate__zoomIn animate__faster">
+
+        @* Columna Izquierda: Info & Requisitos *@
+        <div
+            class="md:w-5/12 bg-linear-to-br from-blue-700 to-indigo-900 p-8 sm:p-12 text-white relative overflow-hidden">
+            <div class="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
+            <div class="absolute bottom-0 left-0 -ml-16 -mb-16 w-48 h-48 bg-blue-400/10 rounded-full blur-2xl"></div>
+
+            <div class="relative z-10 h-full flex flex-col">
+                <div class="mb-8">
+                    <div class="inline-flex p-3 bg-white/10 rounded-2xl backdrop-blur-md mb-6">
+                        <i data-lucide="shield-check" class="w-8 h-8 text-blue-200"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold mb-4">Garantía de Precisión</h2>
+                    <p class="text-blue-100/80 text-sm leading-relaxed">
+                        El sistema aplica la normativa vigente de la Dirección General de Aduanas (DGA) para el cálculo
+                        de base imponible e impuestos.
+                    </p>
                 </div>
-                <div>
-                    <h2 class="text-xl font-bold">Motor de Liquidación</h2>
-                    <p class="text-blue-100 text-sm">El sistema validará los requisitos fiscales y logísticos antes de proceder.</p>
+
+                <div class="mt-auto">
+                    <h3 class="text-xs font-black uppercase tracking-widest text-blue-200 mb-4">Requisitos del Proceso
+                    </h3>
+                    <ul class="space-y-4">
+                        <li class="flex items-start gap-3">
+                            <div class="mt-1 p-0.5 bg-emerald-400/20 rounded-full">
+                                <i data-lucide="check" class="w-3.5 h-3.5 text-emerald-400"></i>
+                            </div>
+                            <span class="text-xs text-blue-50">Productos con dimensiones y pesos oficiales.</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <div class="mt-1 p-0.5 bg-emerald-400/20 rounded-full">
+                                <i data-lucide="check" class="w-3.5 h-3.5 text-emerald-400"></i>
+                            </div>
+                            <span class="text-xs text-blue-50">Flete y Seguro Internacional registrados.</span>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <div class="mt-1 p-0.5 bg-emerald-400/20 rounded-full">
+                                <i data-lucide="check" class="w-3.5 h-3.5 text-emerald-400"></i>
+                            </div>
+                            <span class="text-xs text-blue-50">Tasas de cambio vigentes para divisas extranjeras.</span>
+                        </li>
+                    </ul>
                 </div>
             </div>
         </div>
 
-        <form asp-action="Calculate" method="post" class="p-6 sm:p-8 space-y-6">
-            <div class="group">
-                <label for="orderId" class="block text-sm font-semibold text-gray-700 mb-2 group-focus-within:text-blue-600 transition-colors">Orden de Importación Pendiente</label>
-                <div class="relative">
-                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400 group-focus-within:text-blue-500 transition-colors">
-                        <i data-lucide="package-search" class="w-4 h-4"></i>
-                    </div>
-                    <select id="orderId" name="orderId" asp-items="ViewBag.Orders" class="block w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none cursor-pointer">
-                        <option value="">Seleccione una orden para liquidar...</option>
-                    </select>
+        @* Columna Derecha: Formulario *@
+        <div class="md:w-7/12 p-8 sm:p-12 flex flex-col justify-center">
+            <form asp-action="Calculate" method="post" class="space-y-8">
+                <div class="group">
+                    <label for="orderId"
+                           class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-3 group-focus-within:text-blue-600 transition-colors">Selección
+                        de Orden Pendiente</label>
+                        <div class="relative">
+                            <div
+                                class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-blue-500 transition-colors">
+                                <i data-lucide="package-search" class="w-5 h-5"></i>
+                            </div>
+                            <select id="orderId" name="orderId" asp-items="ViewBag.Orders"
+                                    class="block w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-200 rounded-2xl text-base font-medium focus:bg-white focus:ring-8 focus:ring-blue-500/5 focus:border-blue-500 transition-all outline-none cursor-pointer appearance-none shadow-sm">
+                                <option value="">Seleccione una orden para liquidar...</option>
+                            </select>
+                            <div
+                                class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none text-gray-400">
+                                <i data-lucide="chevron-down" class="w-5 h-5"></i>
+                            </div>
+                        </div>
+                        <p class="mt-3 text-xs text-gray-400">Solo se muestran órdenes en estado <span
+                            class="font-bold text-blue-600">Abierta</span>.</p>
+                        </div>
+
+                        <div class="pt-4">
+                            <button type="submit"
+                                    class="w-full inline-flex items-center justify-center gap-3 px-8 py-4 bg-blue-600 text-white text-lg font-bold rounded-2xl hover:bg-blue-700 hover:shadow-2xl hover:shadow-blue-200 transition-all cursor-pointer hover-scale active:scale-95 btn-fancy">
+                                <i data-lucide="calculator" class="w-6 h-6"></i>
+                                Calcular landed cost
+                            </button>
+                            <p class="text-center mt-6 text-xs text-gray-400 flex items-center justify-center gap-2">
+                                <i data-lucide="lock" class="w-3.5 h-3.5"></i>
+                                Esta acción generará un registro oficial de costos inmutable.
+                            </p>
+                        </div>
+                    </form>
                 </div>
             </div>
+        </div>
 
-            <div class="bg-amber-50 border border-amber-100 rounded-xl p-4">
-                <h3 class="text-xs font-bold text-amber-800 uppercase tracking-widest mb-2 flex items-center gap-2">
-                    <i data-lucide="info" class="w-3.5 h-3.5"></i>
-                    Requisitos Previos
-                </h3>
-                <ul class="text-xs text-amber-700 space-y-1.5 list-disc list-inside">
-                    <li>La orden debe contener productos con pesos y dimensiones registrados.</li>
-                    <li>Debe existir un gasto de <strong>Flete Internacional</strong> registrado.</li>
-                    <li>Debe existir un gasto de <strong>Seguro Internacional</strong> registrado.</li>
-                    <li>Las divisas extranjeras deben contar con una tasa de cambio vigente a la fecha.</li>
-                </ul>
-            </div>
+        @section Scripts {
+            <script>
+                document.querySelector('form').addEventListener('submit', function (e) {
+                    const select = document.getElementById('orderId');
+                    if (!select.value) {
+                        e.preventDefault();
+                        Swal.fire({
+                            title: 'Atención',
+                            text: 'Debe seleccionar una orden de importación para continuar.',
+                            icon: 'warning',
+                            confirmButtonColor: '#3b82f6',
+                            confirmButtonText: 'Entendido',
+                            customClass: {
+                                confirmButton: 'rounded-xl px-6 py-2.5 text-sm font-bold'
+                            }
+                        });
+                        return;
+                    }
 
-            <div class="pt-4">
-                <button type="submit" class="w-full inline-flex items-center justify-center gap-2.5 px-8 py-3.5 bg-blue-600 text-white text-base font-bold rounded-xl hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-200 transition-all cursor-pointer hover-scale active:scale-95">
-                    <i data-lucide="play" class="w-5 h-5"></i>
-                    Ejecutar Liquidación Oficial
-                </button>
-            </div>
-        </form>
-    </div>
-</div>
+                    const btn = this.querySelector('button[type="submit"]');
+                    btn.disabled = true;
+                    btn.innerHTML = '<i data-lucide="loader-2" class="w-6 h-6 animate-spin"></i> Procesando liquidación...';
+                    lucide.createIcons();
+                });
+            </script>
+        }
 
-@section Scripts {
-    <script>
-        document.querySelector('form').addEventListener('submit', function() {
-            const btn = this.querySelector('button[type="submit"]');
-            btn.disabled = true;
-            btn.innerHTML = '<i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i> Procesando liquidación...';
-            lucide.createIcons();
-        });
-    </script>
-}
+        <style>
+            .btn-fancy {
+                background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+                border: none;
+            }
+
+            .btn-fancy:hover {
+                background: linear-gradient(135deg, #1d4ed8 0%, #1e3a8a 100%);
+            }
+        </style>
