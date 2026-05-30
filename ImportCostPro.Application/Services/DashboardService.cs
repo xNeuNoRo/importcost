@@ -1,7 +1,9 @@
+using ImportCostPro.Application.DTOs.Currency.Responses;
 using ImportCostPro.Application.ViewModels.DashboardViewModels;
 using ImportCostPro.Persistence.Enums;
 using ImportCostPro.Persistence.Interfaces.Providers;
 using ImportCostPro.Persistence.Interfaces.Repositories;
+using Mapster;
 
 namespace ImportCostPro.Application.Services
 {
@@ -38,12 +40,12 @@ namespace ImportCostPro.Application.Services
         {
             var now = _dateTimeProvider.UtcNow;
             
-            // Consultas asíncronas independientes (pueden ser paralelizadas si fuera necesario, 
-            // pero para un dashboard pequeño el impacto es mínimo frente a la claridad)
+            // Consultas asíncronas independientes
             var openOrdersCount = await _importOrderRepository.CountByStatusAsync(OrderStatus.Open);
             var activeSuppliersCount = await _supplierRepository.CountAsync(s => s.IsActive);
             var monthlyTotal = await _calculationResultRepository.GetMonthlyTotalImportCostAsync(now.Month, now.Year);
-            var pendingRates = await _exchangeRateRepository.GetActiveCurrenciesMissingRateCountAsync(now);
+            var pendingRatesCount = await _exchangeRateRepository.GetActiveCurrenciesMissingRateCountAsync(now);
+            var missingCurrencies = await _exchangeRateRepository.GetActiveCurrenciesMissingRateAsync(now);
             
             var localCurrency = await _currencyRepository.GetLocalCurrencyAsync();
 
@@ -51,8 +53,9 @@ namespace ImportCostPro.Application.Services
             {
                 OpenOrdersCount = openOrdersCount,
                 ActiveSuppliersCount = activeSuppliersCount,
-                MonthlyLandedCostTotal = monthlyTotal,
-                PendingExchangeRatesCount = pendingRates,
+                MonthlyLiquidatedTotal = monthlyTotal,
+                PendingExchangeRatesCount = pendingRatesCount,
+                MissingCurrencies = missingCurrencies.Adapt<List<CurrencyResponse>>(),
                 CurrencySymbol = localCurrency?.Symbol ?? "RD$"
             };
         }

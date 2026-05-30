@@ -141,6 +141,12 @@ namespace ImportCostPro.Application.Services
             return existingCurrency.Adapt<CurrencyResponse>();
         }
 
+        public async Task<CurrencyResponse?> GetLocalCurrencyAsync()
+        {
+            var currency = await _currencyRepository.GetLocalCurrencyAsync();
+            return currency?.Adapt<CurrencyResponse>();
+        }
+
         public async Task<bool> ToggleStatusAsync(int id)
         {
             var currency = await _currencyRepository.GetByIdAsync(id);

@@ -28,10 +28,25 @@ namespace ImportCostPro.WebApp.Controllers
             return View(viewModel);
         }
 
-        public async Task<IActionResult> Create()
+        public async Task<IActionResult> Create(int? fromCurrencyId = null)
         {
             await PopulateCurrenciesAsync();
-            return View(new CreateExchangeRateViewModel());
+            var viewModel = new CreateExchangeRateViewModel();
+            
+            // Si viene un ID de moneda origen (desde el Dashboard), lo pre-cargamos
+            if (fromCurrencyId.HasValue)
+            {
+                viewModel.FromCurrencyId = fromCurrencyId.Value;
+            }
+
+            // Buscamos la moneda local para pre-seleccionarla como destino (ToCurrency)
+            var localCurrency = await _currencyService.GetLocalCurrencyAsync();
+            if (localCurrency != null)
+            {
+                viewModel.ToCurrencyId = localCurrency.Id;
+            }
+
+            return View(viewModel);
         }
 
         [HttpPost]

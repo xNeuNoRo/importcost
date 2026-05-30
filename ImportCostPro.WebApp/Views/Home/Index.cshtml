@@ -64,7 +64,7 @@
                         </div>
                         <div class="flex flex-col">
                             <span class="text-2xl font-black text-gray-900">@Model.CurrencySymbol
-                                @Model.MonthlyLandedCostTotal.ToString("N1")M</span>
+                                @Model.MonthlyLiquidatedTotal.ToString("N1")M</span>
                                 <span class="text-sm font-medium text-gray-400 uppercase tracking-widest mt-1">Inversión
                                     Liquidada</span>
                                 </div>
@@ -99,7 +99,7 @@
                                 </div>
                             </div>
 
-                            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-10">
                                 @* Acciones Principales *@
                                 <div class="lg:col-span-2 space-y-6">
                                     <div
@@ -120,84 +120,136 @@
                                             </div>
                                         </div>
 
-                                        <div class="bg-white border border-gray-200 rounded-3xl shadow-sm overflow-hidden">
-                                            <div class="px-6 py-5 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
-                                                <h3 class="text-sm font-bold text-gray-900 uppercase tracking-widest">Configuraciones de Soporte
-                                                </h3>
-                                                <i data-lucide="settings" class="w-4 h-4 text-gray-400"></i>
+                                        @* Detalle de Tasas Pendientes *@
+                                        @if (Model.MissingCurrencies.Any())
+                                        {
+                                            <div
+                                                class="bg-white border border-rose-100 rounded-3xl shadow-sm overflow-hidden animate__animated animate__fadeInUp">
+                                                <div class="px-6 py-4 bg-rose-50 border-b border-rose-100 flex items-center justify-between">
+                                                    <div class="flex items-center gap-3">
+                                                        <div class="p-2 bg-rose-600 text-white rounded-lg shadow-sm shadow-rose-200">
+                                                            <i data-lucide="alert-circle" class="w-4 h-4"></i>
+                                                        </div>
+                                                        <h3 class="text-sm font-bold text-rose-900 uppercase tracking-widest">Tasas de Cambio Faltantes
+                                                            (Hoy)</h3>
+                                                        </div>
+                                                        <span class="text-xs font-bold text-rose-600">Requiere Sincronización</span>
+                                                    </div>
+                                                    <div class="p-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                                        @foreach (var currency in Model.MissingCurrencies)
+                                                        {
+                                                            <div
+                                                                class="flex items-center justify-between p-4 rounded-2xl bg-gray-50 border border-gray-100 group hover:border-rose-200 transition-all">
+                                                                <div class="flex items-center gap-4">
+                                                                    <div
+                                                                        class="p-2.5 bg-white border border-gray-200 text-gray-700 font-black rounded-xl shadow-xs group-hover:bg-rose-600 group-hover:text-white group-hover:border-rose-600 transition-all">
+                                                                        @currency.IsoCode
+                                                                    </div>
+                                                                    <div>
+                                                                        <span class="block text-sm font-bold text-gray-900">@currency.Name</span>
+                                                                        <span class="text-[10px] text-gray-400 uppercase font-bold tracking-tighter">Moneda
+                                                                            Pendiente</span>
+                                                                        </div>
+                                                                    </div>
+                                                                    <a asp-controller="ExchangeRate" asp-action="Create" asp-route-fromCurrencyId="@currency.Id"
+                                                                       class="p-2 text-rose-600 hover:bg-rose-600 hover:text-white rounded-xl transition-all shadow-sm"
+                                                                       title="Registrar Tasa Ahora">
+                                                                        <i data-lucide="plus-circle" class="w-5 h-5"></i>
+                                                                    </a>
+                                                                </div>
+                                                            }
+                                                        </div>
+                                                    </div>
+                                                }
                                             </div>
-                                            <div class="p-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                                <a asp-controller="Currency" asp-action="Index"
-                                                   class="flex items-center gap-4 p-4 rounded-2xl hover:bg-gray-50 border border-transparent hover:border-gray-100 transition-all">
-                                                    <div class="p-2 bg-blue-50 text-blue-600 rounded-xl">
-                                                        <i data-lucide="coins" class="w-5 h-5"></i>
-                                                    </div>
-                                                    <div>
-                                                        <span class="block text-sm font-bold text-gray-900">Divisas</span>
-                                                        <span class="text-xs text-gray-400">Manejo de monedas base</span>
-                                                    </div>
-                                                </a>
-                                                <a asp-controller="TaxConfiguration" asp-action="Index"
-                                                   class="flex items-center gap-4 p-4 rounded-2xl hover:bg-gray-50 border border-transparent hover:border-gray-100 transition-all">
-                                                    <div class="p-2 bg-purple-50 text-purple-600 rounded-xl">
-                                                        <i data-lucide="percent" class="w-5 h-5"></i>
-                                                    </div>
-                                                    <div>
-                                                        <span class="block text-sm font-bold text-gray-900">Impuestos Globales</span>
-                                                        <span class="text-xs text-gray-400">Tasas de ITBIS y Aduanas</span>
-                                                    </div>
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
 
-                                    @* Feedback y Estado Orientado al Usuario *@
-                                    <div class="space-y-6">
-                                        <div class="bg-white border border-gray-200 rounded-3xl shadow-sm p-6">
-                                            <h3 class="text-sm font-bold text-gray-900 mb-6 flex items-center gap-2">
-                                                <i data-lucide="shield-check" class="w-4 h-4 text-blue-600"></i>
-                                                Garantía de Integridad
-                                            </h3>
+                                            @* Feedback y Estado *@
                                             <div class="space-y-6">
-                                                <div class="flex gap-4">
-                                                    <div class="w-1 h-12 bg-emerald-500 rounded-full"></div>
-                                                    <div>
-                                                        <span
-                                                        class="block text-xs font-bold text-gray-400 uppercase tracking-widest">Disponibilidad</span>
-                                                        <span class="text-sm font-semibold text-gray-700">Plataforma Lista</span>
-                                                        <span class="block text-[10px] text-gray-400 mt-1">Sincronización de datos activa.</span>
-                                                    </div>
-                                                </div>
-                                                <div class="flex gap-4">
-                                                    <div class="w-1 h-12 bg-blue-500 rounded-full"></div>
-                                                    <div>
-                                                        <span class="block text-xs font-bold text-gray-400 uppercase tracking-widest">Validación
-                                                            Fiscal</span>
-                                                            <span class="text-sm font-semibold text-gray-700">Reglas Actualizadas</span>
-                                                            <span class="block text-[10px] text-gray-400 mt-1">Cálculos alineados a normativa
-                                                                aduanal.</span>
+                                                <div class="bg-white border border-gray-200 rounded-3xl shadow-sm p-6">
+                                                    <h3 class="text-sm font-bold text-gray-900 mb-6 flex items-center gap-2">
+                                                        <i data-lucide="shield-check" class="w-4 h-4 text-blue-600"></i>
+                                                        Garantía de Integridad
+                                                    </h3>
+                                                    <div class="space-y-6">
+                                                        <div class="flex gap-4">
+                                                            <div class="w-1 h-12 bg-emerald-500 rounded-full"></div>
+                                                            <div>
+                                                                <span
+                                                                class="block text-xs font-bold text-gray-400 uppercase tracking-widest">Disponibilidad</span>
+                                                                <span class="text-sm font-semibold text-gray-700">Plataforma Lista</span>
+                                                                <span class="block text-[10px] text-gray-400 mt-1">Sincronización de datos activa.</span>
+                                                            </div>
+                                                        </div>
+                                                        <div class="flex gap-4">
+                                                            <div class="w-1 h-12 bg-blue-500 rounded-full"></div>
+                                                            <div>
+                                                                <span class="block text-xs font-bold text-gray-400 uppercase tracking-widest">Validación
+                                                                    Fiscal</span>
+                                                                    <span class="text-sm font-semibold text-gray-700">Reglas Actualizadas</span>
+                                                                    <span class="block text-[10px] text-gray-400 mt-1">Cálculos alineados a normativa
+                                                                        aduanal.</span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="bg-indigo-900 rounded-3xl p-6 text-white shadow-xl shadow-indigo-100">
+                                                            <div class="flex items-center gap-3 mb-4">
+                                                                <div class="p-2 bg-white/10 rounded-xl">
+                                                                    <i data-lucide="sparkles" class="w-5 h-5 text-indigo-300"></i>
+                                                                </div>
+                                                                <span class="text-xs font-bold uppercase tracking-widest text-indigo-200">Confianza en sus
+                                                                    Números</span>
+                                                                </div>
+                                                                <p class="text-sm text-indigo-100 leading-relaxed">Nuestro motor asegura que cada centavo sea
+                                                                    prorrateado con exactitud absoluta, facilitando su toma de decisiones financieras.</p>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        @* Accesos Rápidos Inferiores *@
+                                                        <div class="bg-white border border-gray-200 rounded-3xl shadow-sm overflow-hidden">
+                                                            <div class="px-6 py-5 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
+                                                                <h3 class="text-sm font-bold text-gray-900 uppercase tracking-widest">Herramientas de Configuración</h3>
+                                                                <i data-lucide="settings" class="w-4 h-4 text-gray-400"></i>
+                                                            </div>
+                                                            <div class="p-4 grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                                                <a asp-controller="Currency" asp-action="Index"
+                                                                   class="flex items-center gap-4 p-4 rounded-2xl hover:bg-gray-50 border border-transparent hover:border-gray-100 transition-all">
+                                                                    <div class="p-2 bg-blue-50 text-blue-600 rounded-xl">
+                                                                        <i data-lucide="coins" class="w-5 h-5"></i>
+                                                                    </div>
+                                                                    <div>
+                                                                        <span class="block text-sm font-bold text-gray-900">Divisas</span>
+                                                                        <span class="text-xs text-gray-400">Manejo de monedas base</span>
+                                                                    </div>
+                                                                </a>
+                                                                <a asp-controller="TaxConfiguration" asp-action="Index"
+                                                                   class="flex items-center gap-4 p-4 rounded-2xl hover:bg-gray-50 border border-transparent hover:border-gray-100 transition-all">
+                                                                    <div class="p-2 bg-purple-50 text-purple-600 rounded-xl">
+                                                                        <i data-lucide="percent" class="w-5 h-5"></i>
+                                                                    </div>
+                                                                    <div>
+                                                                        <span class="block text-sm font-bold text-gray-900">Impuestos Globales</span>
+                                                                        <span class="text-xs text-gray-400">Tasas de ITBIS y Aduanas</span>
+                                                                    </div>
+                                                                </a>
+                                                                <a asp-controller="Country" asp-action="Index"
+                                                                   class="flex items-center gap-4 p-4 rounded-2xl hover:bg-gray-50 border border-transparent hover:border-gray-100 transition-all">
+                                                                    <div class="p-2 bg-emerald-50 text-emerald-600 rounded-xl">
+                                                                        <i data-lucide="globe" class="w-5 h-5"></i>
+                                                                    </div>
+                                                                    <div>
+                                                                        <span class="block text-sm font-bold text-gray-900">Países</span>
+                                                                        <span class="text-xs text-gray-400">Jurisdicciones de origen</span>
+                                                                    </div>
+                                                                </a>
                                                             </div>
                                                         </div>
                                                     </div>
-                                                </div>
 
-                                                <div class="bg-indigo-900 rounded-3xl p-6 text-white shadow-xl shadow-indigo-100">
-                                                    <div class="flex items-center gap-3 mb-4">
-                                                        <div class="p-2 bg-white/10 rounded-xl">
-                                                            <i data-lucide="sparkles" class="w-5 h-5 text-indigo-300"></i>
-                                                        </div>
-                                                        <span class="text-xs font-bold uppercase tracking-widest text-indigo-200">Confianza en sus
-                                                            Números</span>
-                                                        </div>
-                                                        <p class="text-sm text-indigo-100 leading-relaxed">Nuestro motor asegura que cada centavo sea
-                                                            prorrateado con exactitud absoluta, facilitando su toma de decisiones financieras.</p>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            @section Scripts {
-                                                <script>
-                                                    lucide.createIcons();
-                                                </script>
-                                            }
+                                                    @section Scripts {
+                                                        <script>
+                                                            lucide.createIcons();
+                                                        </script>
+                                                    }

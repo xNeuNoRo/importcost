@@ -110,5 +110,26 @@ namespace ImportCostPro.Persistence.Repositories
                     e.EffectiveDate >= targetDate))
                 .CountAsync();
         }
+
+        public async Task<IEnumerable<Currency>> GetActiveCurrenciesMissingRateAsync(DateTime date)
+        {
+            var targetDate = date.Date;
+
+            var localCurrencyId = await _context.Set<Currency>()
+                .Where(c => c.IsLocalCurrency)
+                .Select(c => c.Id)
+                .FirstOrDefaultAsync();
+
+            if (localCurrencyId == 0) return Enumerable.Empty<Currency>();
+
+            return await _context.Set<Currency>()
+                .Where(c => c.IsActive && !c.IsLocalCurrency)
+                .Where(c => !_context.Set<ExchangeRate>().Any(e => 
+                    e.FromCurrencyId == c.Id && 
+                    e.ToCurrencyId == localCurrencyId && 
+                    e.IsActive && 
+                    e.EffectiveDate >= targetDate))
+                .ToListAsync();
+        }
     }
 }
