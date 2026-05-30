@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 
 <head>
@@ -11,9 +11,76 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
 
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <style>
+        .page-entry {
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        @@keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .hover-scale {
+            transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .hover-scale:hover {
+            transform: scale(1.05);
+        }
+
+        .btn-fancy {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-fancy::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 5px;
+            height: 5px;
+            background: rgba(255, 255, 255, .5);
+            opacity: 0;
+            border-radius: 100%;
+            transform: scale(1, 1) translate(-50%);
+            transform-origin: 50% 50%;
+        }
+
+        .btn-fancy:focus:not(:active)::after {
+            animation: ripple 1s ease-out;
+        }
+
+        @@keyframes ripple {
+            0% { transform: scale(0, 0); opacity: 0.5; }
+            20% { transform: scale(25, 25); opacity: 0.3; }
+            100% { opacity: 0; transform: scale(40, 40); }
+        }
+
+        .cursor-pointer {
+            cursor: pointer !important;
+        }
+    </style>
 </head>
+
+@{
+    string currentController = ViewContext.RouteData.Values["Controller"]?.ToString() ?? "";
+    
+    string GetActiveClasses(string targetController)
+    {
+        bool isActive = string.Equals(currentController, targetController, StringComparison.OrdinalIgnoreCase);
+        
+        return isActive 
+            ? "flex items-center gap-3 px-3 py-2 bg-blue-50 text-blue-700 rounded-lg font-medium border-r-4 border-blue-600 transition-all shadow-sm shadow-blue-100/50" 
+            : "flex items-center gap-3 px-3 py-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg font-medium transition-all";
+    }
+}
 
 <body
     class="bg-gray-50 text-gray-800 font-sans antialiased overflow-hidden selection:bg-blue-100 selection:text-blue-900">
@@ -27,13 +94,13 @@
 
             <div class="h-16 flex items-center justify-between px-6 border-b border-gray-200">
                 <a asp-controller="Home" asp-action="Index" class="flex items-center gap-2.5">
-                    <div class="bg-blue-600 p-1.5 rounded text-white">
+                    <div class="bg-blue-600 p-1.5 rounded text-white shadow-sm shadow-blue-200">
                         <i data-lucide="anchor" class="w-5 h-5"></i>
                     </div>
                     <span class="text-lg font-bold text-gray-900 tracking-tight">ImportCost<span
                         class="text-blue-600">Pro</span></span>
                     </a>
-                    <button id="close-sidebar-btn" class="md:hidden text-gray-500 hover:bg-gray-100 p-1 rounded-md">
+                    <button id="close-sidebar-btn" class="md:hidden text-gray-500 hover:bg-gray-100 p-1 rounded-md cursor-pointer">
                         <i data-lucide="x" class="w-5 h-5"></i>
                     </button>
                 </div>
@@ -43,12 +110,10 @@
                     <div>
                         <p class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">General</p>
                         <div class="space-y-1">
-                            <a asp-controller="Home" asp-action="Index"
-                               class="flex items-center gap-3 px-3 py-2 bg-blue-50 text-blue-700 rounded-lg font-medium border-r-4 border-blue-600 transition-colors">
+                            <a asp-controller="Home" asp-action="Index" class="@GetActiveClasses("Home")">
                                 <i data-lucide="layout-dashboard" class="w-5 h-5"></i> Dashboard
                             </a>
-                            <a asp-controller="ImportOrder" asp-action="Index"
-                               class="flex items-center gap-3 px-3 py-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg font-medium transition-colors">
+                            <a asp-controller="ImportOrder" asp-action="Index" class="@GetActiveClasses("ImportOrder")">
                                 <i data-lucide="package-search" class="w-5 h-5"></i> Órdenes
                             </a>
                         </div>
@@ -57,28 +122,22 @@
                     <div>
                         <p class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Maestros</p>
                         <div class="space-y-1">
-                            <a asp-controller="Product" asp-action="Index"
-                               class="flex items-center gap-3 px-3 py-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg font-medium transition-colors">
+                            <a asp-controller="Product" asp-action="Index" class="@GetActiveClasses("Product")">
                                 <i data-lucide="box" class="w-5 h-5"></i> Productos
                             </a>
-                            <a asp-controller="Importer" asp-action="Index"
-                               class="flex items-center gap-3 px-3 py-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg font-medium transition-colors">
+                            <a asp-controller="Importer" asp-action="Index" class="@GetActiveClasses("Importer")">
                                 <i data-lucide="users" class="w-5 h-5"></i> Importadores
                             </a>
-                            <a asp-controller="Supplier" asp-action="Index"
-                               class="flex items-center gap-3 px-3 py-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg font-medium transition-colors">
+                            <a asp-controller="Supplier" asp-action="Index" class="@GetActiveClasses("Supplier")">
                                 <i data-lucide="truck" class="w-5 h-5"></i> Proveedores
                             </a>
-                            <a asp-controller="Country" asp-action="Index"
-                               class="flex items-center gap-3 px-3 py-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg font-medium transition-colors">
+                            <a asp-controller="Country" asp-action="Index" class="@GetActiveClasses("Country")">
                                 <i data-lucide="globe" class="w-5 h-5"></i> Países
                             </a>
-                            <a asp-controller="Currency" asp-action="Index"
-                               class="flex items-center gap-3 px-3 py-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg font-medium transition-colors">
+                            <a asp-controller="Currency" asp-action="Index" class="@GetActiveClasses("Currency")">
                                 <i data-lucide="coins" class="w-5 h-5"></i> Monedas y Tasas
                             </a>
-                            <a asp-controller="TariffCategory" asp-action="Index"
-                               class="flex items-center gap-3 px-3 py-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg font-medium transition-colors">
+                            <a asp-controller="TariffCategory" asp-action="Index" class="@GetActiveClasses("TariffCategory")">
                                 <i data-lucide="book-open" class="w-5 h-5"></i> Cat. Arancelarias
                             </a>
                         </div>
@@ -87,8 +146,7 @@
                     <div>
                         <p class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Administración</p>
                         <div class="space-y-1">
-                            <a asp-controller="TaxConfiguration" asp-action="Index"
-                               class="flex items-center gap-3 px-3 py-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg font-medium transition-colors">
+                            <a asp-controller="TaxConfiguration" asp-action="Index" class="@GetActiveClasses("TaxConfiguration")">
                                 <i data-lucide="settings-2" class="w-5 h-5"></i> Config. Impuestos
                             </a>
                         </div>
@@ -103,7 +161,7 @@
 
                     <div class="flex items-center gap-4">
                         <button id="open-sidebar-btn"
-                                class="md:hidden p-2 text-gray-500 hover:bg-gray-100 rounded-md transition-colors">
+                                class="md:hidden p-2 text-gray-500 hover:bg-gray-100 rounded-md transition-colors cursor-pointer">
                             <i data-lucide="menu" class="w-5 h-5"></i>
                         </button>
                         <div class="hidden sm:flex items-center text-sm text-gray-500">
@@ -120,14 +178,14 @@
                             class="w-9 h-9 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-sm border border-blue-200">
                             ADM
                         </div>
-                        <button class="text-gray-400 hover:text-gray-600 p-1">
+                        <button class="text-gray-400 hover:text-gray-600 p-1 cursor-pointer">
                             <i data-lucide="chevron-down" class="w-4 h-4"></i>
                         </button>
                     </div>
                 </header>
 
                 <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50">
-                    <div class="p-4 sm:p-6 md:p-8 max-w-7xl mx-auto">
+                    <div class="p-4 sm:p-6 md:p-8 max-w-7xl mx-auto page-entry">
                         @RenderBody()
                     </div>
                 </main>

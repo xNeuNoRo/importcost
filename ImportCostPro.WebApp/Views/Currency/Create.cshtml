@@ -1,0 +1,112 @@
+@model ImportCostPro.Application.ViewModels.CurrencyViewModels.CreateCurrencyViewModel
+@{
+    ViewData["Title"] = "Nueva Moneda";
+}
+
+<div class="mb-6 animate__animated animate__fadeIn">
+    <a asp-action="Index" class="inline-flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-blue-600 transition-colors cursor-pointer">
+        <i data-lucide="arrow-left" class="w-4 h-4"></i>
+        Volver al listado
+    </a>
+    <h1 class="text-2xl font-bold text-gray-900 mt-2">Crear Nueva Moneda</h1>
+    <p class="text-sm text-gray-500">Configure una nueva divisa para ser utilizada en el sistema.</p>
+</div>
+
+<div class="max-w-3xl animate__animated animate__fadeInUp animate__faster">
+    <div class="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-300">
+        <form asp-action="Create" method="post" class="p-6 sm:p-8">
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div asp-validation-summary="All" class="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm animate__animated animate__shakeX">
+                </div>
+            }
+
+            <div class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="group">
+                        <label asp-for="Name" class="block text-sm font-semibold text-gray-700 mb-2 group-focus-within:text-blue-600 transition-colors"></label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400 group-focus-within:text-blue-500 transition-colors">
+                                <i data-lucide="coins" class="w-4 h-4"></i>
+                            </div>
+                            <input asp-for="Name" class="block w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm placeholder:text-gray-400 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none" placeholder="Ej: Dólar Estadounidense" />
+                        </div>
+                        <span asp-validation-for="Name" class="mt-1.5 text-xs text-red-600 font-medium"></span>
+                    </div>
+
+                    <div class="group">
+                        <label asp-for="IsoCode" class="block text-sm font-semibold text-gray-700 mb-2 group-focus-within:text-blue-600 transition-colors"></label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400 group-focus-within:text-blue-500 transition-colors">
+                                <i data-lucide="hash" class="w-4 h-4"></i>
+                            </div>
+                            <input asp-for="IsoCode" class="block w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm placeholder:text-gray-400 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none uppercase" placeholder="Ej: USD" />
+                        </div>
+                        <span asp-validation-for="IsoCode" class="mt-1.5 text-xs text-red-600 font-medium"></span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="group">
+                        <label asp-for="Symbol" class="block text-sm font-semibold text-gray-700 mb-2 group-focus-within:text-blue-600 transition-colors"></label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400 group-focus-within:text-blue-500 transition-colors">
+                                <i data-lucide="type" class="w-4 h-4"></i>
+                            </div>
+                            <input asp-for="Symbol" class="block w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm placeholder:text-gray-400 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none" placeholder="Ej: $" />
+                        </div>
+                        <span asp-validation-for="Symbol" class="mt-1.5 text-xs text-red-600 font-medium"></span>
+                    </div>
+
+                    <div class="space-y-4">
+                        <label class="block text-sm font-semibold text-gray-700">Opciones de configuración</label>
+                        <div class="flex flex-col gap-4">
+                            <label class="flex items-center gap-3 cursor-pointer group w-fit">
+                                <div class="relative">
+                                    <input type="checkbox" asp-for="IsLocalCurrency" class="peer sr-only" />
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600 transition-colors"></div>
+                                </div>
+                                <span class="text-sm font-medium text-gray-600 group-hover:text-gray-900 transition-colors">Marcar como moneda local base</span>
+                            </label>
+
+                            <label class="flex items-center gap-3 cursor-pointer group w-fit">
+                                <div class="relative">
+                                    <input type="checkbox" asp-for="IsActive" class="peer sr-only" />
+                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600 transition-colors"></div>
+                                </div>
+                                <span id="status-text" class="text-sm font-medium text-gray-600 group-hover:text-gray-900 transition-colors">Habilitar para uso</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-10 pt-6 border-t border-gray-100 flex items-center justify-end gap-3">
+                <a asp-action="Index" class="px-5 py-2.5 text-sm font-semibold text-gray-600 hover:bg-gray-100 rounded-xl transition-all cursor-pointer">
+                    Cancelar
+                </a>
+                <button type="submit" class="inline-flex items-center justify-center gap-2 px-8 py-2.5 bg-blue-600 text-white text-sm font-bold rounded-xl hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-200 transition-all cursor-pointer hover-scale active:scale-95">
+                    <i data-lucide="save" class="w-4 h-4"></i>
+                    Guardar Moneda
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        const statusCheckbox = document.querySelector('input[name="IsActive"]');
+        const statusText = document.getElementById('status-text');
+
+        function updateStatusText() {
+            statusText.textContent = statusCheckbox.checked ? "Moneda habilitada" : "Moneda deshabilitada";
+            statusText.classList.toggle('text-green-600', statusCheckbox.checked);
+            statusText.classList.toggle('text-gray-600', !statusCheckbox.checked);
+        }
+
+        statusCheckbox.addEventListener('change', updateStatusText);
+        updateStatusText();
+    </script>
+}
