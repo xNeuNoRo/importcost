@@ -1,50 +1,163 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html lang="es">
+
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - ImportCostPro.WebApp</title>
-    <script type="importmap"></script>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/ImportCostPro.WebApp.styles.css" asp-append-version="true" />
-</head>
-<body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">ImportCostPro.WebApp</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
+    <title>@ViewData["Title"] - ImportCost Pro</title>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - ImportCostPro.WebApp - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body
+    class="bg-gray-50 text-gray-800 font-sans antialiased overflow-hidden selection:bg-blue-100 selection:text-blue-900">
+
+    <div class="flex h-screen w-full relative">
+
+        <div id="sidebar-backdrop" class="fixed inset-0 bg-gray-900/50 z-20 hidden md:hidden transition-opacity"></div>
+
+        <aside id="sidebar"
+               class="fixed inset-y-0 left-0 w-64 bg-white border-r border-gray-200 shrink-0 flex flex-col z-30 transform -translate-x-full md:relative md:translate-x-0 transition-transform duration-300 ease-in-out">
+
+            <div class="h-16 flex items-center justify-between px-6 border-b border-gray-200">
+                <a asp-controller="Home" asp-action="Index" class="flex items-center gap-2.5">
+                    <div class="bg-blue-600 p-1.5 rounded text-white">
+                        <i data-lucide="anchor" class="w-5 h-5"></i>
+                    </div>
+                    <span class="text-lg font-bold text-gray-900 tracking-tight">ImportCost<span
+                        class="text-blue-600">Pro</span></span>
+                    </a>
+                    <button id="close-sidebar-btn" class="md:hidden text-gray-500 hover:bg-gray-100 p-1 rounded-md">
+                        <i data-lucide="x" class="w-5 h-5"></i>
+                    </button>
+                </div>
+
+                <nav class="flex-1 overflow-y-auto py-4 px-3 space-y-6 custom-scrollbar">
+
+                    <div>
+                        <p class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">General</p>
+                        <div class="space-y-1">
+                            <a asp-controller="Home" asp-action="Index"
+                               class="flex items-center gap-3 px-3 py-2 bg-blue-50 text-blue-700 rounded-lg font-medium border-r-4 border-blue-600 transition-colors">
+                                <i data-lucide="layout-dashboard" class="w-5 h-5"></i> Dashboard
+                            </a>
+                            <a asp-controller="ImportOrder" asp-action="Index"
+                               class="flex items-center gap-3 px-3 py-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg font-medium transition-colors">
+                                <i data-lucide="package-search" class="w-5 h-5"></i> Órdenes
+                            </a>
+                        </div>
+                    </div>
+
+                    <div>
+                        <p class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Maestros</p>
+                        <div class="space-y-1">
+                            <a asp-controller="Product" asp-action="Index"
+                               class="flex items-center gap-3 px-3 py-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg font-medium transition-colors">
+                                <i data-lucide="box" class="w-5 h-5"></i> Productos
+                            </a>
+                            <a asp-controller="Importer" asp-action="Index"
+                               class="flex items-center gap-3 px-3 py-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg font-medium transition-colors">
+                                <i data-lucide="users" class="w-5 h-5"></i> Importadores
+                            </a>
+                            <a asp-controller="Supplier" asp-action="Index"
+                               class="flex items-center gap-3 px-3 py-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg font-medium transition-colors">
+                                <i data-lucide="truck" class="w-5 h-5"></i> Proveedores
+                            </a>
+                            <a asp-controller="Country" asp-action="Index"
+                               class="flex items-center gap-3 px-3 py-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg font-medium transition-colors">
+                                <i data-lucide="globe" class="w-5 h-5"></i> Países
+                            </a>
+                            <a asp-controller="Currency" asp-action="Index"
+                               class="flex items-center gap-3 px-3 py-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg font-medium transition-colors">
+                                <i data-lucide="coins" class="w-5 h-5"></i> Monedas y Tasas
+                            </a>
+                            <a asp-controller="TariffCategory" asp-action="Index"
+                               class="flex items-center gap-3 px-3 py-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg font-medium transition-colors">
+                                <i data-lucide="book-open" class="w-5 h-5"></i> Cat. Arancelarias
+                            </a>
+                        </div>
+                    </div>
+
+                    <div>
+                        <p class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Administración</p>
+                        <div class="space-y-1">
+                            <a asp-controller="TaxConfiguration" asp-action="Index"
+                               class="flex items-center gap-3 px-3 py-2 text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-lg font-medium transition-colors">
+                                <i data-lucide="settings-2" class="w-5 h-5"></i> Config. Impuestos
+                            </a>
+                        </div>
+                    </div>
+                </nav>
+            </aside>
+
+            <div class="flex-1 flex flex-col h-screen overflow-hidden min-w-0">
+
+                <header
+                    class="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4 sm:px-6 z-10 shrink-0">
+
+                    <div class="flex items-center gap-4">
+                        <button id="open-sidebar-btn"
+                                class="md:hidden p-2 text-gray-500 hover:bg-gray-100 rounded-md transition-colors">
+                            <i data-lucide="menu" class="w-5 h-5"></i>
+                        </button>
+                        <div class="hidden sm:flex items-center text-sm text-gray-500">
+                            <span class="text-gray-900 font-medium">@ViewData["Title"]</span>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-3 pl-4 border-l border-gray-200">
+                        <div class="hidden sm:flex flex-col items-end">
+                            <span class="text-sm font-semibold text-gray-900 leading-tight">Usuario Administrador</span>
+                            <span class="text-xs text-gray-500 leading-tight">Admin Global</span>
+                        </div>
+                        <div
+                            class="w-9 h-9 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-sm border border-blue-200">
+                            ADM
+                        </div>
+                        <button class="text-gray-400 hover:text-gray-600 p-1">
+                            <i data-lucide="chevron-down" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </header>
+
+                <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50">
+                    <div class="p-4 sm:p-6 md:p-8 max-w-7xl mx-auto">
+                        @RenderBody()
+                    </div>
+                </main>
+
+            </div>
         </div>
-    </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
-    @await RenderSectionAsync("Scripts", required: false)
-</body>
+
+        <script src="~/lib/jquery/dist/jquery.min.js"></script>
+
+        @await RenderSectionAsync("Scripts", required: false)
+
+        <script>
+            // Inicializar los íconos de Lucide
+            lucide.createIcons();
+
+            // Lógica para el Sidebar en dispositivos móviles
+            const sidebar = document.getElementById('sidebar');
+            const backdrop = document.getElementById('sidebar-backdrop');
+            const openBtn = document.getElementById('open-sidebar-btn');
+            const closeBtn = document.getElementById('close-sidebar-btn');
+
+            function toggleSidebar() {
+            sidebar.classList.toggle('-translate-x-full');
+            backdrop.classList.toggle('hidden');
+            }
+
+            openBtn.addEventListener('click', toggleSidebar);
+            closeBtn.addEventListener('click', toggleSidebar);
+            backdrop.addEventListener('click', toggleSidebar);
+        </script>
+    </body>
+
 </html>
