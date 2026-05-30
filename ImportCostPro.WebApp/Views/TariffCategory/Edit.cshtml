@@ -4,7 +4,8 @@
 }
 
 <div class="mb-6 animate__animated animate__fadeIn">
-    <a asp-action="Index" class="inline-flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-blue-600 transition-colors cursor-pointer">
+    <a asp-action="Index"
+       class="inline-flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-blue-600 transition-colors cursor-pointer">
         <i data-lucide="arrow-left" class="w-4 h-4"></i>
         Volver al listado
     </a>
@@ -13,153 +14,195 @@
 </div>
 
 <div class="max-w-4xl animate__animated animate__fadeInUp animate__faster">
-    <div class="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-300">
+    <div
+        class="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-300">
         <form asp-action="Edit" method="post" class="p-6 sm:p-8">
             <input type="hidden" asp-for="Id" />
-            
+
             @if (!ViewData.ModelState.IsValid)
             {
-                <div asp-validation-summary="All" class="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm animate__animated animate__shakeX">
+                <div asp-validation-summary="All"
+                     class="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm animate__animated animate__shakeX">
                 </div>
             }
 
             <div class="space-y-8">
                 @* Sección: Identificación *@
                 <div>
-                    <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2 border-b border-gray-100 pb-2">
+                    <h3
+                        class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2 border-b border-gray-100 pb-2">
                         <i data-lucide="info" class="w-5 h-5 text-blue-600"></i>
                         Identificación de la Categoría
                     </h3>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div class="group">
-                            <label asp-for="Code" class="block text-sm font-semibold text-gray-700 mb-2 group-focus-within:text-blue-600 transition-colors"></label>
+                            <label asp-for="Code"
+                                   class="block text-sm font-semibold text-gray-700 mb-2 group-focus-within:text-blue-600 transition-colors"></label>
                             <div class="relative">
-                                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400 group-focus-within:text-blue-500 transition-colors">
+                                <div
+                                    class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400 group-focus-within:text-blue-500 transition-colors">
                                     <i data-lucide="hash" class="w-4 h-4"></i>
                                 </div>
-                                <input asp-for="Code" class="block w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm placeholder:text-gray-400 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none uppercase" placeholder="Ej: 8471.30.00" />
+                                <input asp-for="Code"
+                                       class="block w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm placeholder:text-gray-400 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none uppercase"
+                                       placeholder="Ej: 8471.30.00" />
                             </div>
                             <span asp-validation-for="Code" class="mt-1.5 text-xs text-red-600 font-medium"></span>
                         </div>
 
                         <div class="group md:col-span-2">
-                            <label asp-for="Description" class="block text-sm font-semibold text-gray-700 mb-2 group-focus-within:text-blue-600 transition-colors">Nombre o Descripción</label>
-                            <div class="relative">
-                                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400 group-focus-within:text-blue-500 transition-colors">
-                                    <i data-lucide="type" class="w-4 h-4"></i>
+                            <label asp-for="Description"
+                                   class="block text-sm font-semibold text-gray-700 mb-2 group-focus-within:text-blue-600 transition-colors">Nombre
+                                o Descripción</label>
+                                <div class="relative">
+                                    <div
+                                        class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400 group-focus-within:text-blue-500 transition-colors">
+                                        <i data-lucide="type" class="w-4 h-4"></i>
+                                    </div>
+                                    <input asp-for="Description"
+                                           class="block w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm placeholder:text-gray-400 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none"
+                                           placeholder="Ej: Máquinas automáticas para tratamiento o procesamiento de datos" />
                                 </div>
-                                <input asp-for="Description" class="block w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm placeholder:text-gray-400 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none" placeholder="Ej: Máquinas automáticas para tratamiento o procesamiento de datos" />
+                                <span asp-validation-for="Description"
+                                      class="mt-1.5 text-xs text-red-600 font-medium"></span>
                             </div>
-                            <span asp-validation-for="Description" class="mt-1.5 text-xs text-red-600 font-medium"></span>
                         </div>
                     </div>
-                </div>
 
-                @* Sección: Configuración Fiscal *@
-                <div>
-                    <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2 border-b border-gray-100 pb-2">
-                        <i data-lucide="calculator" class="w-5 h-5 text-blue-600"></i>
-                        Gravámenes e Impuestos
-                    </h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <div class="space-y-6">
-                            <div class="group">
-                                <label asp-for="CustomsDutyRate" class="block text-sm font-semibold text-gray-700 mb-2 group-focus-within:text-blue-600 transition-colors">Porcentaje de Arancel (Gravamen)</label>
-                                <div class="relative">
-                                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400 group-focus-within:text-blue-500 transition-colors">
-                                        <i data-lucide="percent" class="w-4 h-4"></i>
+                    @* Sección: Configuración Fiscal *@
+                    <div>
+                        <h3
+                            class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2 border-b border-gray-100 pb-2">
+                            <i data-lucide="calculator" class="w-5 h-5 text-blue-600"></i>
+                            Gravámenes e Impuestos
+                        </h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div class="space-y-6">
+                                <div class="group">
+                                    <label asp-for="CustomsDutyRate"
+                                           class="block text-sm font-semibold text-gray-700 mb-2 group-focus-within:text-blue-600 transition-colors">Porcentaje
+                                        de Arancel (Gravamen)</label>
+                                        <div class="relative">
+                                            <div
+                                                class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400 group-focus-within:text-blue-500 transition-colors">
+                                                <i data-lucide="percent" class="w-4 h-4"></i>
+                                            </div>
+                                            <input asp-for="CustomsDutyRate"
+                                                   class="block w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none"
+                                                   placeholder="0.00" />
+                                        </div>
+                                        <span asp-validation-for="CustomsDutyRate"
+                                              class="mt-1.5 text-xs text-red-600 font-medium"></span>
                                     </div>
-                                    <input asp-for="CustomsDutyRate" class="block w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none" placeholder="0.00" />
-                                </div>
-                                <span asp-validation-for="CustomsDutyRate" class="mt-1.5 text-xs text-red-600 font-medium"></span>
-                            </div>
 
-                            <div id="excise-rate-container" class="group transition-opacity duration-300">
-                                <label asp-for="ExciseTaxRate" class="block text-sm font-semibold text-gray-700 mb-2 group-focus-within:text-blue-600 transition-colors">Porcentaje Impuesto Selectivo (ISC)</label>
-                                <div class="relative">
-                                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400 group-focus-within:text-blue-500 transition-colors">
-                                        <i data-lucide="percent" class="w-4 h-4"></i>
+                                    <div id="excise-rate-container" class="group transition-opacity duration-300">
+                                        <label asp-for="ExciseTaxRate"
+                                               class="block text-sm font-semibold text-gray-700 mb-2 group-focus-within:text-blue-600 transition-colors">Porcentaje
+                                            Impuesto Selectivo (ISC)</label>
+                                            <div class="relative">
+                                                <div
+                                                    class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400 group-focus-within:text-blue-500 transition-colors">
+                                                    <i data-lucide="percent" class="w-4 h-4"></i>
+                                                </div>
+                                                <input asp-for="ExciseTaxRate"
+                                                       class="block w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none disabled:bg-gray-100 disabled:text-gray-400"
+                                                       placeholder="0.00" />
+                                            </div>
+                                            <span asp-validation-for="ExciseTaxRate"
+                                                  class="mt-1.5 text-xs text-red-600 font-medium"></span>
+                                        </div>
                                     </div>
-                                    <input asp-for="ExciseTaxRate" class="block w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none disabled:bg-gray-100 disabled:text-gray-400" placeholder="0.00" />
-                                </div>
-                                <span asp-validation-for="ExciseTaxRate" class="mt-1.5 text-xs text-red-600 font-medium"></span>
+
+                                    <div class="space-y-6 bg-gray-50/50 p-6 rounded-2xl border border-gray-100">
+                                        <label class="flex items-center gap-3 cursor-pointer group w-fit">
+                                            <div class="relative">
+                                                <input type="checkbox" asp-for="AppliesItbis" class="peer sr-only" />
+                                                <div
+                                                    class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:inset-s-0.5 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600 transition-colors">
+                                                </div>
+                                            </div>
+                                            <span
+                                                class="text-sm font-medium text-gray-700 group-hover:text-gray-900 transition-colors">Aplica
+                                                pago de ITBIS</span>
+                                            </label>
+
+                                            <label class="flex items-center gap-3 cursor-pointer group w-fit">
+                                                <div class="relative">
+                                                    <input type="checkbox" asp-for="AppliesExciseTax" id="excise-switch"
+                                                           class="peer sr-only" />
+                                                    <div
+                                                        class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:inset-s-0.5 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600 transition-colors">
+                                                    </div>
+                                                </div>
+                                                <span
+                                                    class="text-sm font-medium text-gray-700 group-hover:text-gray-900 transition-colors">Aplica
+                                                    Impuesto Selectivo (ISC)</span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    @* Sección: Configuración Adicional *@
+                                    <div>
+                                        <h3
+                                            class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2 border-b border-gray-100 pb-2">
+                                            <i data-lucide="settings" class="w-5 h-5 text-blue-600"></i>
+                                            Configuración Adicional
+                                        </h3>
+                                        <label class="flex items-center gap-3 cursor-pointer group w-fit">
+                                            <div class="relative">
+                                                <input type="checkbox" asp-for="IsActive" class="peer sr-only" />
+                                                <div
+                                                    class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:inset-s-0.5 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600 transition-colors">
+                                                </div>
+                                            </div>
+                                            <span id="status-text"
+                                                  class="text-sm font-medium text-gray-600 group-hover:text-gray-900 transition-colors">Habilitar
+                                                categoría</span>
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <div class="mt-10 pt-6 border-t border-gray-100 flex items-center justify-end gap-3">
+                                        <a asp-action="Index"
+                                           class="px-5 py-2.5 text-sm font-semibold text-gray-600 hover:bg-gray-100 rounded-xl transition-all cursor-pointer">
+                                            Cancelar
+                                        </a>
+                                        <button type="submit"
+                                                class="inline-flex items-center justify-center gap-2.5 px-8 py-2.5 bg-blue-600 text-white text-sm font-bold rounded-xl hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-200 transition-all cursor-pointer hover-scale active:scale-95">
+                                            <i data-lucide="save" class="w-5 h-5"></i>
+                                            Actualizar Categoría
+                                        </button>
+                                    </div>
+                                </form>
                             </div>
                         </div>
 
-                        <div class="space-y-6 bg-gray-50/50 p-6 rounded-2xl border border-gray-100">
-                            <label class="flex items-center gap-3 cursor-pointer group w-fit">
-                                <div class="relative">
-                                    <input type="checkbox" asp-for="AppliesItbis" class="peer sr-only" />
-                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600 transition-colors"></div>
-                                </div>
-                                <span class="text-sm font-medium text-gray-700 group-hover:text-gray-900 transition-colors">Aplica pago de ITBIS</span>
-                            </label>
+                        @section Scripts {
+                            <partial name="_ValidationScriptsPartial" />
+                            <script>
+                                const exciseSwitch = document.getElementById('excise-switch');
+                                const exciseInput = document.querySelector('input[name="ExciseTaxRate"]');
+                                const exciseContainer = document.getElementById('excise-rate-container');
 
-                            <label class="flex items-center gap-3 cursor-pointer group w-fit">
-                                <div class="relative">
-                                    <input type="checkbox" asp-for="AppliesExciseTax" id="excise-switch" class="peer sr-only" />
-                                    <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600 transition-colors"></div>
-                                </div>
-                                <span class="text-sm font-medium text-gray-700 group-hover:text-gray-900 transition-colors">Aplica Impuesto Selectivo (ISC)</span>
-                            </label>
-                        </div>
-                    </div>
-                </div>
+                                const statusCheckbox = document.querySelector('input[name="IsActive"]');
+                                const statusText = document.getElementById('status-text');
 
-                @* Sección: Configuración Adicional *@
-                <div>
-                    <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2 border-b border-gray-100 pb-2">
-                        <i data-lucide="settings" class="w-5 h-5 text-blue-600"></i>
-                        Configuración Adicional
-                    </h3>
-                    <label class="flex items-center gap-3 cursor-pointer group w-fit">
-                        <div class="relative">
-                            <input type="checkbox" asp-for="IsActive" class="peer sr-only" />
-                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600 transition-colors"></div>
-                        </div>
-                        <span id="status-text" class="text-sm font-medium text-gray-600 group-hover:text-gray-900 transition-colors">Habilitar categoría</span>
-                    </label>
-                </div>
-            </div>
+                                function toggleExcise() {
+                                    exciseInput.disabled = !exciseSwitch.checked;
+                                    exciseContainer.style.opacity = exciseSwitch.checked ? '1' : '0.5';
+                                }
 
-            <div class="mt-10 pt-6 border-t border-gray-100 flex items-center justify-end gap-3">
-                <a asp-action="Index" class="px-5 py-2.5 text-sm font-semibold text-gray-600 hover:bg-gray-100 rounded-xl transition-all cursor-pointer">
-                    Cancelar
-                </a>
-                <button type="submit" class="inline-flex items-center justify-center gap-2.5 px-8 py-2.5 bg-blue-600 text-white text-sm font-bold rounded-xl hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-200 transition-all cursor-pointer hover-scale active:scale-95">
-                    <i data-lucide="save" class="w-5 h-5"></i>
-                    Actualizar Categoría
-                </button>
-            </div>
-        </form>
-    </div>
-</div>
+                                function updateStatusText() {
+                                    statusText.textContent = statusCheckbox.checked ? "Categoría habilitada" : "Categoría deshabilitada";
+                                    statusText.classList.toggle('text-green-600', statusCheckbox.checked);
+                                    statusText.classList.toggle('text-gray-600', !statusCheckbox.checked);
+                                }
 
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-    <script>
-        const exciseSwitch = document.getElementById('excise-switch');
-        const exciseInput = document.querySelector('input[name="ExciseTaxRate"]');
-        const exciseContainer = document.getElementById('excise-rate-container');
+                                exciseSwitch.addEventListener('change', toggleExcise);
+                                statusCheckbox.addEventListener('change', updateStatusText);
 
-        const statusCheckbox = document.querySelector('input[name="IsActive"]');
-        const statusText = document.getElementById('status-text');
-
-        function toggleExcise() {
-            exciseInput.disabled = !exciseSwitch.checked;
-            exciseContainer.style.opacity = exciseSwitch.checked ? '1' : '0.5';
-        }
-
-        function updateStatusText() {
-            statusText.textContent = statusCheckbox.checked ? "Categoría habilitada" : "Categoría deshabilitada";
-            statusText.classList.toggle('text-green-600', statusCheckbox.checked);
-            statusText.classList.toggle('text-gray-600', !statusCheckbox.checked);
-        }
-
-        exciseSwitch.addEventListener('change', toggleExcise);
-        statusCheckbox.addEventListener('change', updateStatusText);
-        
-        toggleExcise();
-        updateStatusText();
-    </script>
-}
+                                toggleExcise();
+                                updateStatusText();
+                            </script>
+                        }
