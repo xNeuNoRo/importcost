@@ -1,0 +1,172 @@
+@model IEnumerable<ImportCostPro.Application.ViewModels.SupplierViewModels.SupplierListViewModel>
+
+<div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div>
+        <h1 class="text-2xl font-bold text-gray-900">Proveedores</h1>
+        <p class="text-sm text-gray-500">Gestiona el catálogo de proveedores internacionales.</p>
+    </div>
+    <div>
+        <a asp-action="Create" class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 transition-all">
+            <i data-lucide="plus" class="w-4 h-4"></i>
+            Nuevo Proveedor
+        </a>
+    </div>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="mb-4 rounded-lg bg-green-50 p-4 border border-green-200">
+        <div class="flex">
+            <div class="shrink-0">
+                <i data-lucide="check-circle" class="h-5 w-5 text-green-400"></i>
+            </div>
+            <div class="ml-3">
+                <p class="text-sm font-medium text-green-800">@TempData["SuccessMessage"]</p>
+            </div>
+        </div>
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="mb-4 rounded-lg bg-red-50 p-4 border border-red-200">
+        <div class="flex">
+            <div class="shrink-0">
+                <i data-lucide="alert-circle" class="h-5 w-5 text-red-400"></i>
+            </div>
+            <div class="ml-3">
+                <p class="text-sm font-medium text-red-800">@TempData["ErrorMessage"]</p>
+            </div>
+        </div>
+    </div>
+}
+
+<div class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+    <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm">
+            <thead class="bg-gray-50 border-b border-gray-200">
+                <tr>
+                    <th class="px-6 py-4 font-semibold text-gray-900">Nombre</th>
+                    <th class="px-6 py-4 font-semibold text-gray-900">País / Moneda</th>
+                    <th class="px-6 py-4 font-semibold text-gray-900">Contacto</th>
+                    <th class="px-6 py-4 font-semibold text-gray-900 text-center">Estado</th>
+                    <th class="px-6 py-4 font-semibold text-gray-900 text-right">Acciones</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+                @foreach (var item in Model)
+                {
+                    <tr class="hover:bg-gray-50/50 transition-colors">
+                        <td class="px-6 py-4">
+                            <span class="font-medium text-gray-900">@item.Name</span>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="flex flex-col gap-1">
+                                <div class="flex items-center gap-1.5 text-gray-700">
+                                    <i data-lucide="globe" class="w-3.5 h-3.5"></i>
+                                    @item.CountryName
+                                </div>
+                                <div class="flex items-center gap-1.5 text-blue-600 font-semibold text-xs">
+                                    <i data-lucide="coins" class="w-3.5 h-3.5"></i>
+                                    @item.CurrencyIsoCode
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="text-gray-600 space-y-1">
+                                <div class="flex items-center gap-1.5">
+                                    <i data-lucide="mail" class="w-3.5 h-3.5"></i>
+                                    @item.Email
+                                </div>
+                                @if (!string.IsNullOrEmpty(item.PhoneNumber))
+                                {
+                                    <div class="flex items-center gap-1.5">
+                                        <i data-lucide="phone" class="w-3.5 h-3.5"></i>
+                                        @item.PhoneNumber
+                                    </div>
+                                }
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                            @if (item.IsActive)
+                            {
+                                <span class="inline-flex items-center gap-1.5 rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-700 border border-green-200">
+                                    <span class="h-1.5 w-1.5 rounded-full bg-green-600"></span>
+                                    Activo
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="inline-flex items-center gap-1.5 rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-700 border border-red-200">
+                                    <span class="h-1.5 w-1.5 rounded-full bg-red-600"></span>
+                                    Inactivo
+                                </span>
+                            }
+                        </td>
+                        <td class="px-6 py-4 text-right">
+                            <div class="flex items-center justify-end gap-2">
+                                <form asp-action="ToggleStatus" asp-route-id="@item.Id" method="post" class="inline">
+                                    <button type="submit" class="p-1 text-gray-400 hover:text-blue-600 transition-colors" title="@(item.IsActive ? "Desactivar" : "Activar")">
+                                        <i data-lucide="@(item.IsActive ? "toggle-right" : "toggle-left")" class="w-5 h-5"></i>
+                                    </button>
+                                </form>
+                                <a asp-action="Edit" asp-route-id="@item.Id" class="p-1 text-gray-400 hover:text-amber-600 transition-colors" title="Editar">
+                                    <i data-lucide="edit-2" class="w-5 h-5"></i>
+                                </a>
+                                <button type="button" 
+                                        onclick="confirmDelete(@item.Id, '@item.Name')"
+                                        class="p-1 text-gray-400 hover:text-red-600 transition-colors" title="Eliminar">
+                                    <i data-lucide="trash-2" class="w-5 h-5"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@* Modal de Confirmación para Delete *@
+<div id="deleteModal" class="fixed inset-0 z-50 hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div class="flex min-h-screen items-end justify-center px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" onclick="closeDeleteModal()"></div>
+        <span class="hidden sm:inline-block sm:h-screen sm:align-middle" aria-hidden="true">&#8203;</span>
+        <div class="inline-block transform overflow-hidden rounded-lg bg-white text-left align-bottom shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:align-middle">
+            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                <div class="sm:flex sm:items-start">
+                    <div class="mx-auto flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                        <i data-lucide="alert-triangle" class="h-6 w-6 text-red-600"></i>
+                    </div>
+                    <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                        <h3 class="text-lg font-medium leading-6 text-gray-900" id="modal-title">Eliminar Proveedor</h3>
+                        <div class="mt-2">
+                            <p class="text-sm text-gray-500">¿Estás seguro de que deseas eliminar al proveedor <span id="deleteItemName" class="font-bold"></span>? Esta acción no se puede deshacer si existen órdenes asociadas.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+                <form id="deleteForm" method="post" asp-action="Delete">
+                    <input type="hidden" name="id" id="deleteItemId" />
+                    <button type="submit" class="inline-flex w-full justify-center rounded-md border border-transparent bg-red-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 sm:ml-3 sm:w-auto sm:text-sm">Eliminar</button>
+                </form>
+                <button type="button" onclick="closeDeleteModal()" class="mt-3 inline-flex w-full justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">Cancelar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function confirmDelete(id, name) {
+            document.getElementById('deleteItemId').value = id;
+            document.getElementById('deleteItemName').innerText = name;
+            document.getElementById('deleteModal').classList.remove('hidden');
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').classList.add('hidden');
+        }
+    </script>
+}

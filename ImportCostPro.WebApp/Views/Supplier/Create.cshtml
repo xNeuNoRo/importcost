@@ -1,0 +1,70 @@
+@model ImportCostPro.Application.ViewModels.SupplierViewModels.CreateSupplierViewModel
+
+<div class="mb-6">
+    <a asp-action="Index" class="inline-flex items-center gap-1.5 text-sm font-medium text-blue-600 hover:text-blue-700 transition-colors">
+        <i data-lucide="arrow-left" class="w-4 h-4"></i>
+        Volver al listado
+    </a>
+    <h1 class="mt-2 text-2xl font-bold text-gray-900">Registrar Nuevo Proveedor</h1>
+    <p class="text-sm text-gray-500">Configura los detalles del proveedor internacional y sus preferencias de facturación.</p>
+</div>
+
+<div class="max-w-3xl overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+    <form asp-action="Create" method="post" class="p-6 sm:p-8">
+        <div asp-validation-summary="ModelOnly" class="mb-4 text-sm text-red-600"></div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="md:col-span-2">
+                <label asp-for="Name" class="block text-sm font-semibold text-gray-700 mb-1.5"></label>
+                <input asp-for="Name" class="block w-full rounded-lg border-gray-300 text-gray-900 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm transition-all" placeholder="Ej. Global Logistics Partners" />
+                <span asp-validation-for="Name" class="text-xs text-red-600 mt-1"></span>
+            </div>
+
+            <div>
+                <label asp-for="Email" class="block text-sm font-semibold text-gray-700 mb-1.5"></label>
+                <input asp-for="Email" class="block w-full rounded-lg border-gray-300 text-gray-900 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm transition-all" placeholder="sales@provider.com" />
+                <span asp-validation-for="Email" class="text-xs text-red-600 mt-1"></span>
+            </div>
+
+            <div>
+                <label asp-for="PhoneNumber" class="block text-sm font-semibold text-gray-700 mb-1.5"></label>
+                <input asp-for="PhoneNumber" class="block w-full rounded-lg border-gray-300 text-gray-900 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm transition-all" placeholder="+1 555-0123" />
+                <span asp-validation-for="PhoneNumber" class="text-xs text-red-600 mt-1"></span>
+            </div>
+
+            <div class="border-t border-gray-100 pt-6 md:col-span-2">
+                <h3 class="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4">Preferencias Comerciales</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label asp-for="OriginCountryId" class="block text-sm font-semibold text-gray-700 mb-1.5"></label>
+                        <select asp-for="OriginCountryId" asp-items="ViewBag.Countries" class="block w-full rounded-lg border-gray-300 text-gray-900 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm transition-all">
+                            <option value="">-- Seleccione País de Origen --</option>
+                        </select>
+                        <span asp-validation-for="OriginCountryId" class="text-xs text-red-600 mt-1"></span>
+                    </div>
+
+                    <div>
+                        <label asp-for="DefaultCurrencyId" class="block text-sm font-semibold text-gray-700 mb-1.5"></label>
+                        <select asp-for="DefaultCurrencyId" asp-items="ViewBag.Currencies" class="block w-full rounded-lg border-gray-300 text-gray-900 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm transition-all">
+                            <option value="">-- Seleccione Moneda --</option>
+                        </select>
+                        <span asp-validation-for="DefaultCurrencyId" class="text-xs text-red-600 mt-1"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-8 flex items-center justify-end gap-3 border-t border-gray-100 pt-6">
+            <a asp-action="Index" class="rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-700 shadow-sm hover:bg-gray-50 transition-all">
+                Cancelar
+            </a>
+            <button type="submit" class="rounded-lg bg-blue-600 px-6 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 transition-all">
+                Guardar Proveedor
+            </button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
