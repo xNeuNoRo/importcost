@@ -4,12 +4,13 @@
 @{
     var order = (ImportOrderViewModel)ViewBag.Order;
     bool isLocked = order.Status != OrderStatus.Open;
+    string source = ViewBag.Source ?? (isLocked ? "Details" : "Edit");
 }
 
 <div class="mb-6 animate__animated animate__fadeIn">
-    <a asp-controller="ImportOrder" asp-action="Edit" asp-route-id="@order.Id" class="inline-flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-blue-600 transition-colors cursor-pointer">
+    <a asp-controller="ImportOrder" asp-action="@source" asp-route-id="@order.Id" class="inline-flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-blue-600 transition-colors cursor-pointer">
         <i data-lucide="arrow-left" class="w-4 h-4"></i>
-        Volver a la orden
+        Volver atrás
     </a>
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mt-2">
         <div>
@@ -95,7 +96,7 @@
                             <div class="flex items-center justify-end gap-2">
                                 @if (!isLocked)
                                 {
-                                    <a asp-action="Edit" asp-route-id="@item.Id" class="p-2.5 text-gray-400 hover:text-amber-600 hover:bg-amber-50 rounded-xl transition-all cursor-pointer hover-scale" title="Editar Línea">
+                                    <a asp-action="Edit" asp-route-id="@item.Id" asp-route-source="@source" class="p-2.5 text-gray-400 hover:text-amber-600 hover:bg-amber-50 rounded-xl transition-all cursor-pointer hover-scale" title="Editar Línea">
                                         <i data-lucide="edit-3" class="w-5 h-5"></i>
                                     </a>
                                     <button type="button" onclick="confirmDelete(@item.Id, '@item.ProductName')" class="p-2.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all cursor-pointer hover-scale" title="Remover de la Orden">
@@ -161,12 +162,18 @@
                     idInput.name = 'id';
                     idInput.value = id;
                     
+                    const sourceInput = document.createElement('input');
+                    sourceInput.type = 'hidden';
+                    sourceInput.name = 'source';
+                    sourceInput.value = '@source';
+                    
                     const antiForgeryToken = document.querySelector('input[name="__RequestVerificationToken"]');
                     if (antiForgeryToken) {
                         form.appendChild(antiForgeryToken.cloneNode());
                     }
                     
                     form.appendChild(idInput);
+                    form.appendChild(sourceInput);
                     document.body.appendChild(form);
                     form.submit();
                 }

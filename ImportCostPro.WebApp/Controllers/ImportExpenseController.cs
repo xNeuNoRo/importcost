@@ -26,7 +26,7 @@ namespace ImportCostPro.WebApp.Controllers
             _currencyService = currencyService;
         }
 
-        public async Task<IActionResult> Manage(int orderId)
+        public async Task<IActionResult> Manage(int orderId, string? source = null)
         {
             var order = await _importOrderService.GetByIdAsync(orderId);
             if (order == null)
@@ -37,34 +37,37 @@ namespace ImportCostPro.WebApp.Controllers
 
             var items = await _importExpenseService.GetExpensesByOrderIdAsync(orderId);
             ViewBag.Order = order.Adapt<ImportOrderViewModel>();
+            ViewBag.Source = source;
             ViewData["Title"] = $"Gastos - Orden {order.OrderNumber}";
             
             return View(items.Adapt<IEnumerable<ImportExpenseViewModel>>());
         }
 
-        public async Task<IActionResult> Add(int orderId)
+        public async Task<IActionResult> Add(int orderId, string? source = null)
         {
             var order = await _importOrderService.GetByIdAsync(orderId);
             if (order == null || order.Status != OrderStatus.Open)
             {
                 TempData["ErrorMessage"] = "La orden no permite registrar gastos.";
-                return RedirectToAction(nameof(Manage), new { orderId });
+                return RedirectToAction(nameof(Manage), new { orderId, source });
             }
 
             await PopulateCurrenciesAsync();
             ViewBag.OrderId = orderId;
             ViewBag.OrderNumber = order.OrderNumber;
+            ViewBag.Source = source;
             return View(new CreateImportExpenseViewModel { ImportOrderId = orderId });
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Add(CreateImportExpenseViewModel viewModel)
+        public async Task<IActionResult> Add(CreateImportExpenseViewModel viewModel, string? source = null)
         {
             if (!ModelState.IsValid)
             {
                 await PopulateCurrenciesAsync();
                 ViewBag.OrderId = viewModel.ImportOrderId;
+                ViewBag.Source = source;
                 return View(viewModel);
             }
 
@@ -73,7 +76,7 @@ namespace ImportCostPro.WebApp.Controllers
                 var request = viewModel.Adapt<CreateImportExpenseRequest>();
                 await _importExpenseService.CreateAsync(request);
                 TempData["SuccessMessage"] = "Gasto registrado correctamente.";
-                return RedirectToAction(nameof(Manage), new { orderId = viewModel.ImportOrderId });
+                return RedirectToAction(nameof(Manage), new { orderId = viewModel.ImportOrderId, source });
             }
             catch (ValidationBusinessException ex)
             {
@@ -90,10 +93,11 @@ namespace ImportCostPro.WebApp.Controllers
 
             await PopulateCurrenciesAsync();
             ViewBag.OrderId = viewModel.ImportOrderId;
+            ViewBag.Source = source;
             return View(viewModel);
         }
 
-        public async Task<IActionResult> Edit(int id)
+        public async Task<IActionResult> Edit(int id, string? source = null)
         {
             var item = await _importExpenseService.GetByIdAsync(id);
             if (item == null)
@@ -106,19 +110,20 @@ namespace ImportCostPro.WebApp.Controllers
             if (order == null || order.Status != OrderStatus.Open)
             {
                 TempData["ErrorMessage"] = "Esta orden está bloqueada para modificaciones.";
-                return RedirectToAction(nameof(Manage), new { orderId = item.ImportOrderId });
+                return RedirectToAction(nameof(Manage), new { orderId = item.ImportOrderId, source });
             }
 
             await PopulateCurrenciesAsync(item.CurrencyId);
             ViewBag.OrderNumber = order.OrderNumber;
             ViewBag.OrderId = item.ImportOrderId;
+            ViewBag.Source = source;
 
             return View(item.Adapt<UpdateImportExpenseViewModel>());
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(UpdateImportExpenseViewModel viewModel)
+        public async Task<IActionResult> Edit(UpdateImportExpenseViewModel viewModel, string? source = null)
         {
             var item = await _importExpenseService.GetByIdAsync(viewModel.Id);
             int orderId = item?.ImportOrderId ?? 0;
@@ -127,6 +132,7 @@ namespace ImportCostPro.WebApp.Controllers
             {
                 await PopulateCurrenciesAsync(item?.CurrencyId ?? 0);
                 ViewBag.OrderId = orderId;
+                ViewBag.Source = source;
                 return View(viewModel);
             }
 
@@ -135,7 +141,7 @@ namespace ImportCostPro.WebApp.Controllers
                 var request = viewModel.Adapt<UpdateImportExpenseRequest>();
                 await _importExpenseService.UpdateAsync(request);
                 TempData["SuccessMessage"] = "Gasto actualizado correctamente.";
-                return RedirectToAction(nameof(Manage), new { orderId });
+                return RedirectToAction(nameof(Manage), new { orderId, source });
             }
             catch (ValidationBusinessException ex)
             {
@@ -152,12 +158,13 @@ namespace ImportCostPro.WebApp.Controllers
 
             await PopulateCurrenciesAsync(item?.CurrencyId ?? 0);
             ViewBag.OrderId = orderId;
+            ViewBag.Source = source;
             return View(viewModel);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> Delete(int id, string? source = null)
         {
             var item = await _importExpenseService.GetByIdAsync(id);
             if (item == null) return RedirectToAction("Index", "ImportOrder");
@@ -177,7 +184,7 @@ namespace ImportCostPro.WebApp.Controllers
                 TempData["ErrorMessage"] = "Error al intentar eliminar el gasto.";
             }
 
-            return RedirectToAction(nameof(Manage), new { orderId });
+            return RedirectToAction(nameof(Manage), new { orderId, source });
         }
 
         private async Task PopulateCurrenciesAsync(int? currentCurrencyId = null)
