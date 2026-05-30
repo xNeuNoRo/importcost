@@ -485,3 +485,6 @@ $RECYCLE.BIN/
 
 *.pdf
 doc.txt
+
+# Configuration files
+appsettings.Development.json
