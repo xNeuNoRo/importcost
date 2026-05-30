@@ -1,6 +1,6 @@
 using System.Diagnostics;
+using ImportCostPro.Application.ViewModels;
 using Microsoft.AspNetCore.Mvc;
-using ImportCostPro.WebApp.Models;
 
 namespace ImportCostPro.WebApp.Controllers;
 
@@ -26,6 +26,6 @@ public class HomeController : Controller
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()
     {
-        return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        return View();
     }
 }
