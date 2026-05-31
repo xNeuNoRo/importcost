@@ -47,11 +47,11 @@ namespace ImportCostPro.WebApp.Controllers
             }
             catch (BusinessException ex)
             {
-                TempData["ErrorMessage"] = ex.Message;
+                ModelState.AddModelError(string.Empty, ex.Message);
             }
             catch (Exception)
             {
-                TempData["ErrorMessage"] = "Ocurrió un error inesperado al guardar la configuración.";
+                ModelState.AddModelError(string.Empty, "Ocurrió un error inesperado al guardar la configuración.");
             }
 
             return View("Index", viewModel);

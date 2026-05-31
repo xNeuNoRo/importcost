@@ -84,11 +84,11 @@ namespace ImportCostPro.WebApp.Controllers
             }
             catch (BusinessException ex)
             {
-                TempData["ErrorMessage"] = ex.Message;
+                ModelState.AddModelError(string.Empty, ex.Message);
             }
             catch (Exception)
             {
-                TempData["ErrorMessage"] = "Error inesperado al registrar el gasto.";
+                ModelState.AddModelError(string.Empty, "Error inesperado al registrar el gasto.");
             }
 
             await PopulateCurrenciesAsync();
@@ -149,11 +149,11 @@ namespace ImportCostPro.WebApp.Controllers
             }
             catch (BusinessException ex)
             {
-                TempData["ErrorMessage"] = ex.Message;
+                ModelState.AddModelError(string.Empty, ex.Message);
             }
             catch (Exception)
             {
-                TempData["ErrorMessage"] = "Error al actualizar el gasto.";
+                ModelState.AddModelError(string.Empty, "Error al actualizar el gasto.");
             }
 
             await PopulateCurrenciesAsync(item?.CurrencyId ?? 0);

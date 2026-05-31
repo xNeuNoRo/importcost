@@ -62,11 +62,11 @@ namespace ImportCostPro.WebApp.Controllers
             }
             catch (BusinessException ex)
             {
-                TempData["ErrorMessage"] = ex.Message;
+                ModelState.AddModelError(string.Empty, ex.Message);
             }
             catch (Exception)
             {
-                TempData["ErrorMessage"] = "Error inesperado al registrar el proveedor.";
+                ModelState.AddModelError(string.Empty, "Error inesperado al registrar el proveedor.");
             }
 
             await PopulateDropDownsAsync();
@@ -112,11 +112,11 @@ namespace ImportCostPro.WebApp.Controllers
             }
             catch (BusinessException ex)
             {
-                TempData["ErrorMessage"] = ex.Message;
+                ModelState.AddModelError(string.Empty, ex.Message);
             }
             catch (Exception)
             {
-                TempData["ErrorMessage"] = "Error crítico al actualizar el proveedor.";
+                ModelState.AddModelError(string.Empty, "Error crítico al actualizar el proveedor.");
             }
 
             await PopulateDropDownsAsync();

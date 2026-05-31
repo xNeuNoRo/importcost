@@ -72,11 +72,12 @@ namespace ImportCostPro.WebApp.Controllers
             }
             catch (BusinessException ex)
             {
-                TempData["ErrorMessage"] = ex.Message;
+                // No usamos TempData aquí porque regresamos la misma vista
+                ModelState.AddModelError(string.Empty, ex.Message);
             }
             catch (Exception)
             {
-                TempData["ErrorMessage"] = "Ocurrió un error inesperado al crear la orden.";
+                ModelState.AddModelError(string.Empty, "Ocurrió un error inesperado al crear la orden.");
             }
 
             await PopulateDropDownsAsync();
@@ -110,7 +111,7 @@ namespace ImportCostPro.WebApp.Controllers
             ViewBag.SupplierName = order.SupplierName;
             ViewBag.CountryName = order.OriginCountryName;
             ViewBag.CurrencyIsoCode = order.CurrencyIsoCode;
-            ViewBag.LocalCurrencySymbol = "RD$"; // Valor por defecto o inyectar CurrencyService
+            ViewBag.LocalCurrencySymbol = "RD$"; 
 
             if (order.Status == OrderStatus.Calculated || order.Status == OrderStatus.Closed)
             {
@@ -157,11 +158,12 @@ namespace ImportCostPro.WebApp.Controllers
             }
             catch (BusinessException ex)
             {
-                TempData["ErrorMessage"] = ex.Message;
+                // No usamos TempData aquí porque regresamos la misma vista
+                ModelState.AddModelError(string.Empty, ex.Message);
             }
             catch (Exception)
             {
-                TempData["ErrorMessage"] = "Ocurrió un error inesperado al actualizar la orden.";
+                ModelState.AddModelError(string.Empty, "Ocurrió un error inesperado al actualizar la orden.");
             }
 
             await PopulateDropDownsAsync();
@@ -179,6 +181,7 @@ namespace ImportCostPro.WebApp.Controllers
             }
             catch (BusinessException ex)
             {
+                // SÍ usamos TempData porque redirigimos
                 TempData["ErrorMessage"] = ex.Message;
             }
             catch (Exception)

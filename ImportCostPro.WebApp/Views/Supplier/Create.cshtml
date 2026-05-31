@@ -15,6 +15,14 @@
 <div class="max-w-4xl animate__animated animate__fadeInUp animate__faster">
     <div class="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-300">
         <form asp-action="Create" method="post" class="p-6 sm:p-8">
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl flex items-center gap-3 text-red-700 shadow-sm animate__animated animate__shakeX">
+                    <i data-lucide="alert-circle" class="w-5 h-5 shrink-0"></i>
+                    <p class="text-sm font-medium">@TempData["ErrorMessage"]</p>
+                </div>
+            }
+
             @if (!ViewData.ModelState.IsValid)
             {
                 <div asp-validation-summary="All" class="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm animate__animated animate__shakeX">

@@ -50,11 +50,11 @@ namespace ImportCostPro.WebApp.Controllers
             }
             catch (BusinessException ex)
             {
-                TempData["ErrorMessage"] = ex.Message;
+                ModelState.AddModelError(string.Empty, ex.Message);
             }
             catch (Exception)
             {
-                TempData["ErrorMessage"] = "Ocurrió un error inesperado al registrar el país.";
+                ModelState.AddModelError(string.Empty, "Ocurrió un error inesperado al registrar el país.");
             }
 
             return View(viewModel);
@@ -95,11 +95,11 @@ namespace ImportCostPro.WebApp.Controllers
             }
             catch (BusinessException ex)
             {
-                TempData["ErrorMessage"] = ex.Message;
+                ModelState.AddModelError(string.Empty, ex.Message);
             }
             catch (Exception)
             {
-                TempData["ErrorMessage"] = "Ocurrió un error inesperado al actualizar el país.";
+                ModelState.AddModelError(string.Empty, "Ocurrió un error inesperado al actualizar el país.");
             }
 
             return View(viewModel);

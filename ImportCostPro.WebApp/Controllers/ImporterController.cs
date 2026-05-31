@@ -57,11 +57,11 @@ namespace ImportCostPro.WebApp.Controllers
             }
             catch (BusinessException ex)
             {
-                TempData["ErrorMessage"] = ex.Message;
+                ModelState.AddModelError(string.Empty, ex.Message);
             }
             catch (Exception)
             {
-                TempData["ErrorMessage"] = "Error inesperado al registrar el importador.";
+                ModelState.AddModelError(string.Empty, "Error inesperado al registrar el importador.");
             }
 
             await PopulateCountriesAsync();
@@ -107,11 +107,11 @@ namespace ImportCostPro.WebApp.Controllers
             }
             catch (BusinessException ex)
             {
-                TempData["ErrorMessage"] = ex.Message;
+                ModelState.AddModelError(string.Empty, ex.Message);
             }
             catch (Exception)
             {
-                TempData["ErrorMessage"] = "Error crítico al actualizar el importador.";
+                ModelState.AddModelError(string.Empty, "Error crítico al actualizar el importador.");
             }
 
             await PopulateCountriesAsync();
@@ -131,6 +131,7 @@ namespace ImportCostPro.WebApp.Controllers
             catch (BusinessException ex)
             {
                 TempData["ErrorMessage"] = ex.Message;
+                ModelState.AddModelError(string.Empty, ex.Message);
             }
             catch (Exception)
             {
@@ -152,6 +153,7 @@ namespace ImportCostPro.WebApp.Controllers
             catch (BusinessException ex)
             {
                 TempData["ErrorMessage"] = ex.Message;
+                ModelState.AddModelError(string.Empty, ex.Message);
             }
 
             return RedirectToAction(nameof(Index));

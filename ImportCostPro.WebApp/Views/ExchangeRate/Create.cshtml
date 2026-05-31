@@ -15,9 +15,21 @@
 <div class="max-w-3xl animate__animated animate__fadeInUp animate__faster">
     <div class="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-300">
         <form asp-action="Create" method="post" class="p-6 sm:p-8">
-            @if (!ViewData.ModelState.IsValid)
+            @* Centro de Alertas Unificado *@
+            @if (TempData["ErrorMessage"] != null || !ViewData.ModelState.IsValid)
             {
-                <div asp-validation-summary="All" class="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm animate__animated animate__shakeX">
+                <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl flex flex-col gap-2 text-red-700 shadow-sm animate__animated animate__shakeX">
+                    <div class="flex items-center gap-3">
+                        <i data-lucide="alert-circle" class="w-5 h-5 shrink-0"></i>
+                        <p class="text-sm font-bold">Han ocurrido los siguientes inconvenientes:</p>
+                    </div>
+                    <div class="ml-8 text-xs space-y-1">
+                        @if (TempData["ErrorMessage"] != null)
+                        {
+                            <p>@TempData["ErrorMessage"]</p>
+                        }
+                        <div asp-validation-summary="All" class="validation-summary-fancy"></div>
+                    </div>
                 </div>
             }
 

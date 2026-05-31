@@ -84,11 +84,11 @@ namespace ImportCostPro.WebApp.Controllers
             }
             catch (BusinessException ex)
             {
-                TempData["ErrorMessage"] = ex.Message;
+                ModelState.AddModelError(string.Empty, ex.Message);
             }
             catch (Exception)
             {
-                TempData["ErrorMessage"] = "Error inesperado al añadir el producto.";
+                ModelState.AddModelError(string.Empty, "Error inesperado al añadir el producto.");
             }
 
             await PopulateProductsAsync();
@@ -149,11 +149,11 @@ namespace ImportCostPro.WebApp.Controllers
             }
             catch (BusinessException ex)
             {
-                TempData["ErrorMessage"] = ex.Message;
+                ModelState.AddModelError(string.Empty, ex.Message);
             }
             catch (Exception)
             {
-                TempData["ErrorMessage"] = "Error al actualizar la línea de producto.";
+                ModelState.AddModelError(string.Empty, "Error al actualizar la línea de producto.");
             }
 
             ViewBag.ProductName = item?.ProductName;

@@ -19,14 +19,11 @@ namespace ImportCostPro.WebApp.Controllers
         public async Task<IActionResult> Index()
         {
             var categories = await _tariffCategoryService.GetAllAsync();
-            var viewModel = categories.Adapt<IEnumerable<TariffCategoryViewModel>>();
-            ViewData["Title"] = "Categorías Arancelarias";
-            return View(viewModel);
+            return View(categories.Adapt<IEnumerable<TariffCategoryViewModel>>());
         }
 
         public IActionResult Create()
         {
-            ViewData["Title"] = "Nueva Categoría Arancelaria";
             return View(new CreateTariffCategoryViewModel());
         }
 
@@ -52,14 +49,14 @@ namespace ImportCostPro.WebApp.Controllers
             }
             catch (BusinessException ex)
             {
-                TempData["ErrorMessage"] = ex.Message;
+                // No usamos TempData aquí porque regresamos la misma vista
+                ModelState.AddModelError(string.Empty, ex.Message);
             }
             catch (Exception)
             {
-                TempData["ErrorMessage"] = "Ocurrió un error inesperado al registrar la categoría arancelaria.";
+                ModelState.AddModelError(string.Empty, "Ocurrió un error inesperado al registrar la categoría arancelaria.");
             }
 
-            ViewData["Title"] = "Nueva Categoría Arancelaria";
             return View(viewModel);
         }
 
@@ -72,9 +69,7 @@ namespace ImportCostPro.WebApp.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            var viewModel = category.Adapt<UpdateTariffCategoryViewModel>();
-            ViewData["Title"] = "Editar Categoría Arancelaria";
-            return View(viewModel);
+            return View(category.Adapt<UpdateTariffCategoryViewModel>());
         }
 
         [HttpPost]
@@ -90,7 +85,7 @@ namespace ImportCostPro.WebApp.Controllers
             {
                 var request = viewModel.Adapt<UpdateTariffCategoryRequest>();
                 await _tariffCategoryService.UpdateAsync(request);
-                TempData["SuccessMessage"] = "Categoría arancelaria actualizada correctamente.";
+                TempData["SuccessMessage"] = "Categoría arancelaria actualizada.";
                 return RedirectToAction(nameof(Index));
             }
             catch (ValidationBusinessException ex)
@@ -99,14 +94,14 @@ namespace ImportCostPro.WebApp.Controllers
             }
             catch (BusinessException ex)
             {
-                TempData["ErrorMessage"] = ex.Message;
+                // No usamos TempData aquí porque regresamos la misma vista
+                ModelState.AddModelError(string.Empty, ex.Message);
             }
             catch (Exception)
             {
-                TempData["ErrorMessage"] = "Ocurrió un error inesperado al actualizar la categoría arancelaria.";
+                ModelState.AddModelError(string.Empty, "Ocurrió un error inesperado al actualizar la categoría arancelaria.");
             }
 
-            ViewData["Title"] = "Editar Categoría Arancelaria";
             return View(viewModel);
         }
 
@@ -121,6 +116,7 @@ namespace ImportCostPro.WebApp.Controllers
             }
             catch (BusinessException ex)
             {
+                // Aquí SÍ usamos TempData porque redirigimos
                 TempData["ErrorMessage"] = ex.Message;
             }
             catch (Exception)
@@ -143,6 +139,10 @@ namespace ImportCostPro.WebApp.Controllers
             catch (BusinessException ex)
             {
                 TempData["ErrorMessage"] = ex.Message;
+            }
+            catch (Exception)
+            {
+                TempData["ErrorMessage"] = "Ocurrió un error inesperado al cambiar el estado.";
             }
 
             return RedirectToAction(nameof(Index));

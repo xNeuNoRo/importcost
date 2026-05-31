@@ -50,11 +50,11 @@ namespace ImportCostPro.WebApp.Controllers
             }
             catch (BusinessException ex)
             {
-                TempData["ErrorMessage"] = ex.Message;
+                ModelState.AddModelError(string.Empty, ex.Message);
             }
             catch (Exception)
             {
-                TempData["ErrorMessage"] = "Ocurrió un error inesperado al registrar la moneda.";
+                ModelState.AddModelError(string.Empty, "Ocurrió un error inesperado al registrar la moneda.");
             }
 
             return View(viewModel);
@@ -95,11 +95,11 @@ namespace ImportCostPro.WebApp.Controllers
             }
             catch (BusinessException ex)
             {
-                TempData["ErrorMessage"] = ex.Message;
+                ModelState.AddModelError(string.Empty, ex.Message);
             }
             catch (Exception)
             {
-                TempData["ErrorMessage"] = "Ocurrió un error inesperado al actualizar la moneda.";
+                ModelState.AddModelError(string.Empty, "Ocurrió un error inesperado al actualizar la moneda.");
             }
 
             return View(viewModel);
@@ -117,6 +117,7 @@ namespace ImportCostPro.WebApp.Controllers
             catch (BusinessException ex)
             {
                 TempData["ErrorMessage"] = ex.Message;
+                ModelState.AddModelError(string.Empty, ex.Message);
             }
             catch (Exception)
             {
@@ -138,6 +139,7 @@ namespace ImportCostPro.WebApp.Controllers
             catch (BusinessException ex)
             {
                 TempData["ErrorMessage"] = ex.Message;
+                ModelState.AddModelError(string.Empty, ex.Message);
             }
             catch (Exception)
             {
