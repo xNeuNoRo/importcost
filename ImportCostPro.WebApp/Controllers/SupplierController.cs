@@ -167,8 +167,22 @@ namespace ImportCostPro.WebApp.Controllers
             var countries = await _countryService.GetAllAsync();
             var currencies = await _currencyService.GetAllAsync();
             
-            ViewBag.Countries = new SelectList(countries.Where(c => c.IsActive || c.Id == currentCountryId), "Id", "Name");
-            ViewBag.Currencies = new SelectList(currencies.Where(c => c.IsActive || c.Id == currentCurrencyId), "Id", "IsoCode");
+            var countryItems = countries
+                .Where(c => c.IsActive || c.Id == currentCountryId)
+                .Select(c => new {
+                    c.Id,
+                    DisplayName = c.IsActive ? c.Name : $"{c.Name} (Inactivo)"
+                });
+
+            var currencyItems = currencies
+                .Where(c => c.IsActive || c.Id == currentCurrencyId)
+                .Select(c => new {
+                    c.Id,
+                    DisplayName = c.IsActive ? c.IsoCode : $"{c.IsoCode} (Inactivo)"
+                });
+
+            ViewBag.Countries = new SelectList(countryItems, "Id", "DisplayName");
+            ViewBag.Currencies = new SelectList(currencyItems, "Id", "DisplayName");
         }
     }
 }

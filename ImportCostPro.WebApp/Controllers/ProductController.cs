@@ -167,8 +167,22 @@ namespace ImportCostPro.WebApp.Controllers
             var countries = await _countryService.GetAllAsync();
             var categories = await _tariffCategoryService.GetAllAsync();
             
-            ViewBag.Countries = new SelectList(countries.Where(c => c.IsActive || c.Id == currentCountryId), "Id", "Name");
-            ViewBag.Categories = new SelectList(categories.Where(c => c.IsActive || c.Id == currentCategoryId), "Id", "Code");
+            var countryItems = countries
+                .Where(c => c.IsActive || c.Id == currentCountryId)
+                .Select(c => new {
+                    c.Id,
+                    DisplayName = c.IsActive ? c.Name : $"{c.Name} (Inactivo)"
+                });
+
+            var categoryItems = categories
+                .Where(c => c.IsActive || c.Id == currentCategoryId)
+                .Select(c => new {
+                    c.Id,
+                    DisplayName = c.IsActive ? c.Code : $"{c.Code} (Inactivo)"
+                });
+
+            ViewBag.Countries = new SelectList(countryItems, "Id", "DisplayName");
+            ViewBag.Categories = new SelectList(categoryItems, "Id", "DisplayName");
         }
     }
 }

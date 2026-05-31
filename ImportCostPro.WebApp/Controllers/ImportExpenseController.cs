@@ -191,10 +191,14 @@ namespace ImportCostPro.WebApp.Controllers
         {
             var currencies = await _currencyService.GetAllAsync();
             
-            // Si estamos editando y el registro tiene una moneda inactiva, debemos mostrarla
-            var availableCurrencies = currencies.Where(c => c.IsActive || c.Id == currentCurrencyId);
-            
-            ViewBag.Currencies = new SelectList(availableCurrencies, "Id", "Name");
+            var items = currencies
+                .Where(c => c.IsActive || c.Id == currentCurrencyId)
+                .Select(c => new {
+                    c.Id,
+                    DisplayName = c.IsActive ? c.Name : $"{c.Name} (Inactivo)"
+                });
+
+            ViewBag.Currencies = new SelectList(items, "Id", "DisplayName");
         }
     }
 }

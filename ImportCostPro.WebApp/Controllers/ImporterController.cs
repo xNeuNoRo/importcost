@@ -162,7 +162,14 @@ namespace ImportCostPro.WebApp.Controllers
         private async Task PopulateCountriesAsync(int? currentCountryId = null)
         {
             var countries = await _countryService.GetAllAsync();
-            ViewBag.Countries = new SelectList(countries.Where(c => c.IsActive || c.Id == currentCountryId), "Id", "Name");
+            var items = countries
+                .Where(c => c.IsActive || c.Id == currentCountryId)
+                .Select(c => new {
+                    c.Id,
+                    DisplayName = c.IsActive ? c.Name : $"{c.Name} (Inactivo)"
+                });
+
+            ViewBag.Countries = new SelectList(items, "Id", "DisplayName");
         }
     }
 }

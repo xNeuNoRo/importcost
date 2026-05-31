@@ -30,7 +30,7 @@ namespace ImportCostPro.WebApp.Controllers
 
         public async Task<IActionResult> Create(int? fromCurrencyId = null)
         {
-            await PopulateCurrenciesAsync();
+            await PopulateCurrenciesAsync(fromCurrencyId);
             var viewModel = new CreateExchangeRateViewModel();
             
             // Si viene un ID de moneda origen (desde el Dashboard), lo pre-cargamos
@@ -55,7 +55,7 @@ namespace ImportCostPro.WebApp.Controllers
         {
             if (!ModelState.IsValid)
             {
-                await PopulateCurrenciesAsync();
+                await PopulateCurrenciesAsync(viewModel.FromCurrencyId, viewModel.ToCurrencyId);
                 return View(viewModel);
             }
 
@@ -79,7 +79,7 @@ namespace ImportCostPro.WebApp.Controllers
                 ModelState.AddModelError(string.Empty, "Ocurrió un error inesperado al registrar la tasa.");
             }
 
-            await PopulateCurrenciesAsync();
+            await PopulateCurrenciesAsync(viewModel.FromCurrencyId, viewModel.ToCurrencyId);
             return View(viewModel);
         }
 
@@ -93,7 +93,7 @@ namespace ImportCostPro.WebApp.Controllers
             }
 
             var viewModel = rate.Adapt<UpdateExchangeRateViewModel>();
-            await PopulateCurrenciesAsync();
+            await PopulateCurrenciesAsync(viewModel.FromCurrencyId, viewModel.ToCurrencyId);
             return View(viewModel);
         }
 
@@ -103,7 +103,7 @@ namespace ImportCostPro.WebApp.Controllers
         {
             if (!ModelState.IsValid)
             {
-                await PopulateCurrenciesAsync();
+                await PopulateCurrenciesAsync(viewModel.FromCurrencyId, viewModel.ToCurrencyId);
                 return View(viewModel);
             }
 
@@ -127,7 +127,7 @@ namespace ImportCostPro.WebApp.Controllers
                 ModelState.AddModelError(string.Empty, "Ocurrió un error inesperado al actualizar la tasa.");
             }
 
-            await PopulateCurrenciesAsync();
+            await PopulateCurrenciesAsync(viewModel.FromCurrencyId, viewModel.ToCurrencyId);
             return View(viewModel);
         }
 
@@ -143,7 +143,6 @@ namespace ImportCostPro.WebApp.Controllers
             catch (BusinessException ex)
             {
                 TempData["ErrorMessage"] = ex.Message;
-                ModelState.AddModelError(string.Empty, ex.Message);
             }
             catch (Exception)
             {
@@ -165,18 +164,23 @@ namespace ImportCostPro.WebApp.Controllers
             catch (BusinessException ex)
             {
                 TempData["ErrorMessage"] = ex.Message;
-                ModelState.AddModelError(string.Empty, ex.Message);
             }
 
             return RedirectToAction(nameof(Index));
         }
 
-        private async Task PopulateCurrenciesAsync()
+        private async Task PopulateCurrenciesAsync(int? currentFromId = null, int? currentToId = null)
         {
             var currencies = await _currencyService.GetAllAsync();
-            var activeCurrencies = currencies.Where(c => c.IsActive);
             
-            ViewBag.Currencies = new SelectList(activeCurrencies, "Id", "Name");
+            var items = currencies
+                .Where(c => c.IsActive || c.Id == currentFromId || c.Id == currentToId)
+                .Select(c => new {
+                    c.Id,
+                    DisplayName = c.IsActive ? c.Name : $"{c.Name} (Inactivo)"
+                });
+
+            ViewBag.Currencies = new SelectList(items, "Id", "DisplayName");
         }
     }
 }

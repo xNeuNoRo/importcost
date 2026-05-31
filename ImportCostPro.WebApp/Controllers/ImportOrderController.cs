@@ -227,10 +227,38 @@ namespace ImportCostPro.WebApp.Controllers
             var countries = await _countryService.GetAllAsync();
             var currencies = await _currencyService.GetAllAsync();
 
-            ViewBag.Importers = new SelectList(importers.Where(x => x.IsActive || x.Id == currentImporterId), "Id", "LegalName");
-            ViewBag.Suppliers = new SelectList(suppliers.Where(x => x.IsActive || x.Id == currentSupplierId), "Id", "Name");
-            ViewBag.Countries = new SelectList(countries.Where(x => x.IsActive || x.Id == currentCountryId), "Id", "Name");
-            ViewBag.Currencies = new SelectList(currencies.Where(x => x.IsActive || x.Id == currentCurrencyId), "Id", "IsoCode");
+            var importerItems = importers
+                .Where(x => x.IsActive || x.Id == currentImporterId)
+                .Select(x => new {
+                    x.Id,
+                    DisplayName = x.IsActive ? x.LegalName : $"{x.LegalName} (Inactivo)"
+                });
+
+            var supplierItems = suppliers
+                .Where(x => x.IsActive || x.Id == currentSupplierId)
+                .Select(x => new {
+                    x.Id,
+                    DisplayName = x.IsActive ? x.Name : $"{x.Name} (Inactivo)"
+                });
+
+            var countryItems = countries
+                .Where(x => x.IsActive || x.Id == currentCountryId)
+                .Select(x => new {
+                    x.Id,
+                    DisplayName = x.IsActive ? x.Name : $"{x.Name} (Inactivo)"
+                });
+
+            var currencyItems = currencies
+                .Where(x => x.IsActive || x.Id == currentCurrencyId)
+                .Select(x => new {
+                    x.Id,
+                    DisplayName = x.IsActive ? x.IsoCode : $"{x.IsoCode} (Inactivo)"
+                });
+
+            ViewBag.Importers = new SelectList(importerItems, "Id", "DisplayName");
+            ViewBag.Suppliers = new SelectList(supplierItems, "Id", "DisplayName");
+            ViewBag.Countries = new SelectList(countryItems, "Id", "DisplayName");
+            ViewBag.Currencies = new SelectList(currencyItems, "Id", "DisplayName");
         }
     }
 }
