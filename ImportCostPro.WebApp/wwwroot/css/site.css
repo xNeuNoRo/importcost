@@ -2672,16 +2672,3 @@
     }
   }
 }
-
-/* Saneamiento de Resumen de Validación */
-.validation-summary-fancy ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-.validation-summary-fancy li {
-    margin-bottom: 0.25rem;
-}
-.validation-summary-fancy li:last-child {
-    margin-bottom: 0;
-}

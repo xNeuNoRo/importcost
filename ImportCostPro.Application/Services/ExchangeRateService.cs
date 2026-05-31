@@ -27,7 +27,42 @@ namespace ImportCostPro.Application.Services
         public async Task<IEnumerable<ExchangeRateResponse>> GetAllAsync()
         {
             var rates = await _exchangeRateRepository.GetAllWithCurrenciesAsync();
-            return rates.Select(r => r.ToResponse());
+            var now = _dateTimeProvider.UtcNow.Date;
+
+            var responses = rates.Select(r => r.ToResponse()).ToList();
+
+            // Lógica para determinar el estado visual dinámico por par de monedas
+            var activeGroups = responses
+                .Where(r => r.IsActive)
+                .GroupBy(r => new { r.FromCurrencyId, r.ToCurrencyId });
+
+            foreach (var group in activeGroups)
+            {
+                // Tasas Programadas (Fecha futura)
+                foreach (var rate in group.Where(r => r.EffectiveDate > now))
+                {
+                    rate.DisplayStatus = "Programada";
+                }
+
+                // La tasa actualmente en vigor (La más reciente <= Hoy)
+                var currentInEffect = group
+                    .Where(r => r.EffectiveDate <= now)
+                    .OrderByDescending(r => r.EffectiveDate)
+                    .FirstOrDefault();
+
+                if (currentInEffect != null)
+                {
+                    currentInEffect.DisplayStatus = "Vigente";
+
+                    // Tasas Expiradas (Tasas pasivas que ya fueron superadas por una más nueva)
+                    foreach (var rate in group.Where(r => r.EffectiveDate <= now && r.Id != currentInEffect.Id))
+                    {
+                        rate.DisplayStatus = "Expirada";
+                    }
+                }
+            }
+
+            return responses;
         }
 
         public async Task<ExchangeRateResponse?> GetByIdAsync(int id)

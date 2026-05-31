@@ -10,5 +10,6 @@
         public decimal RateValue { get; set; }
         public DateTime EffectiveDate { get; set; }
         public bool IsActive { get; set; }
+        public string DisplayStatus { get; set; } = "Inactivo";
     }
-}
+    }

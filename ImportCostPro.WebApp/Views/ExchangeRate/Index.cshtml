@@ -76,20 +76,29 @@
                             </span>
                         </td>
                         <td class="px-6 py-4 text-center">
-                            @if (item.IsActive)
-                            {
-                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700 border border-emerald-200 shadow-sm">
-                                    <i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i>
-                                    Activo
-                                </span>
+                            @{
+                                var badgeClass = item.DisplayStatus switch
+                                {
+                                    "Vigente" => "bg-emerald-100 text-emerald-700 border-emerald-200",
+                                    "Programada" => "bg-blue-100 text-blue-700 border-blue-200",
+                                    "Expirada" => "bg-amber-50 text-amber-600 border-amber-100",
+                                    "Inactivo" => "bg-rose-100 text-rose-700 border-rose-200",
+                                    _ => "bg-gray-100 text-gray-700 border-gray-200"
+                                };
+
+                                var icon = item.DisplayStatus switch
+                                {
+                                    "Vigente" => "check-circle-2",
+                                    "Programada" => "clock",
+                                    "Expirada" => "history",
+                                    "Inactivo" => "x-circle",
+                                    _ => "alert-circle"
+                                };
                             }
-                            else
-                            {
-                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-rose-100 text-rose-700 border border-rose-200 shadow-sm">
-                                    <i data-lucide="x-circle" class="w-3.5 h-3.5"></i>
-                                    Vencida/Inactiva
-                                </span>
-                            }
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] uppercase tracking-wider font-bold border shadow-sm @badgeClass">
+                                <i data-lucide="@icon" class="w-3.5 h-3.5"></i>
+                                @item.DisplayStatus
+                            </span>
                         </td>
                         <td class="px-6 py-4 text-right whitespace-nowrap">
                             <div class="flex items-center justify-end gap-2">
