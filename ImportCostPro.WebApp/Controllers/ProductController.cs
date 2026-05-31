@@ -84,7 +84,7 @@ namespace ImportCostPro.WebApp.Controllers
             }
 
             var viewModel = product.Adapt<ProductUpdateViewModel>();
-            await PopulateDropDownsAsync();
+            await PopulateDropDownsAsync(viewModel.DefaultOriginCountryId, viewModel.TariffCategoryId);
             ViewData["Title"] = "Editar Producto";
             return View(viewModel);
         }
@@ -95,7 +95,7 @@ namespace ImportCostPro.WebApp.Controllers
         {
             if (!ModelState.IsValid)
             {
-                await PopulateDropDownsAsync();
+                await PopulateDropDownsAsync(viewModel.DefaultOriginCountryId, viewModel.TariffCategoryId);
                 return View(viewModel);
             }
 
@@ -119,7 +119,7 @@ namespace ImportCostPro.WebApp.Controllers
                 ModelState.AddModelError(string.Empty, "Ocurrió un error inesperado al actualizar el producto.");
             }
 
-            await PopulateDropDownsAsync();
+            await PopulateDropDownsAsync(viewModel.DefaultOriginCountryId, viewModel.TariffCategoryId);
             ViewData["Title"] = "Editar Producto";
             return View(viewModel);
         }
@@ -162,13 +162,13 @@ namespace ImportCostPro.WebApp.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        private async Task PopulateDropDownsAsync()
+        private async Task PopulateDropDownsAsync(int? currentCountryId = null, int? currentCategoryId = null)
         {
             var countries = await _countryService.GetAllAsync();
             var categories = await _tariffCategoryService.GetAllAsync();
             
-            ViewBag.Countries = new SelectList(countries.Where(c => c.IsActive), "Id", "Name");
-            ViewBag.Categories = new SelectList(categories.Where(c => c.IsActive), "Id", "Code");
+            ViewBag.Countries = new SelectList(countries.Where(c => c.IsActive || c.Id == currentCountryId), "Id", "Name");
+            ViewBag.Categories = new SelectList(categories.Where(c => c.IsActive || c.Id == currentCategoryId), "Id", "Code");
         }
     }
 }

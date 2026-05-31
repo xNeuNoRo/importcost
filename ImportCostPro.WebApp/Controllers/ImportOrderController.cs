@@ -72,7 +72,6 @@ namespace ImportCostPro.WebApp.Controllers
             }
             catch (BusinessException ex)
             {
-                // No usamos TempData aquí porque regresamos la misma vista
                 ModelState.AddModelError(string.Empty, ex.Message);
             }
             catch (Exception)
@@ -94,7 +93,7 @@ namespace ImportCostPro.WebApp.Controllers
             }
 
             var viewModel = order.Adapt<UpdateImportOrderViewModel>();
-            await PopulateDropDownsAsync();
+            await PopulateDropDownsAsync(viewModel.ImporterId, viewModel.SupplierId, viewModel.OriginCountryId, viewModel.CurrencyId);
             return View(viewModel);
         }
 
@@ -141,7 +140,7 @@ namespace ImportCostPro.WebApp.Controllers
         {
             if (!ModelState.IsValid)
             {
-                await PopulateDropDownsAsync();
+                await PopulateDropDownsAsync(viewModel.ImporterId, viewModel.SupplierId, viewModel.OriginCountryId, viewModel.CurrencyId);
                 return View(viewModel);
             }
 
@@ -158,7 +157,6 @@ namespace ImportCostPro.WebApp.Controllers
             }
             catch (BusinessException ex)
             {
-                // No usamos TempData aquí porque regresamos la misma vista
                 ModelState.AddModelError(string.Empty, ex.Message);
             }
             catch (Exception)
@@ -166,7 +164,7 @@ namespace ImportCostPro.WebApp.Controllers
                 ModelState.AddModelError(string.Empty, "Ocurrió un error inesperado al actualizar la orden.");
             }
 
-            await PopulateDropDownsAsync();
+            await PopulateDropDownsAsync(viewModel.ImporterId, viewModel.SupplierId, viewModel.OriginCountryId, viewModel.CurrencyId);
             return View(viewModel);
         }
 
@@ -181,7 +179,6 @@ namespace ImportCostPro.WebApp.Controllers
             }
             catch (BusinessException ex)
             {
-                // SÍ usamos TempData porque redirigimos
                 TempData["ErrorMessage"] = ex.Message;
             }
             catch (Exception)
@@ -219,17 +216,21 @@ namespace ImportCostPro.WebApp.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        private async Task PopulateDropDownsAsync()
+        private async Task PopulateDropDownsAsync(
+            int? currentImporterId = null, 
+            int? currentSupplierId = null, 
+            int? currentCountryId = null, 
+            int? currentCurrencyId = null)
         {
             var importers = await _importerService.GetAllAsync();
             var suppliers = await _supplierService.GetAllAsync();
             var countries = await _countryService.GetAllAsync();
             var currencies = await _currencyService.GetAllAsync();
 
-            ViewBag.Importers = new SelectList(importers.Where(x => x.IsActive), "Id", "LegalName");
-            ViewBag.Suppliers = new SelectList(suppliers.Where(x => x.IsActive), "Id", "Name");
-            ViewBag.Countries = new SelectList(countries.Where(x => x.IsActive), "Id", "Name");
-            ViewBag.Currencies = new SelectList(currencies.Where(x => x.IsActive), "Id", "IsoCode");
+            ViewBag.Importers = new SelectList(importers.Where(x => x.IsActive || x.Id == currentImporterId), "Id", "LegalName");
+            ViewBag.Suppliers = new SelectList(suppliers.Where(x => x.IsActive || x.Id == currentSupplierId), "Id", "Name");
+            ViewBag.Countries = new SelectList(countries.Where(x => x.IsActive || x.Id == currentCountryId), "Id", "Name");
+            ViewBag.Currencies = new SelectList(currencies.Where(x => x.IsActive || x.Id == currentCurrencyId), "Id", "IsoCode");
         }
     }
 }

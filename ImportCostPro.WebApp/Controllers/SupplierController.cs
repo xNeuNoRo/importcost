@@ -84,7 +84,7 @@ namespace ImportCostPro.WebApp.Controllers
             }
 
             var viewModel = supplier.Adapt<UpdateSupplierViewModel>();
-            await PopulateDropDownsAsync();
+            await PopulateDropDownsAsync(viewModel.OriginCountryId, viewModel.DefaultCurrencyId);
             ViewData["Title"] = "Editar Proveedor";
             return View(viewModel);
         }
@@ -95,7 +95,7 @@ namespace ImportCostPro.WebApp.Controllers
         {
             if (!ModelState.IsValid)
             {
-                await PopulateDropDownsAsync();
+                await PopulateDropDownsAsync(viewModel.OriginCountryId, viewModel.DefaultCurrencyId);
                 return View(viewModel);
             }
 
@@ -119,7 +119,7 @@ namespace ImportCostPro.WebApp.Controllers
                 ModelState.AddModelError(string.Empty, "Error crítico al actualizar el proveedor.");
             }
 
-            await PopulateDropDownsAsync();
+            await PopulateDropDownsAsync(viewModel.OriginCountryId, viewModel.DefaultCurrencyId);
             ViewData["Title"] = "Editar Proveedor";
             return View(viewModel);
         }
@@ -162,13 +162,13 @@ namespace ImportCostPro.WebApp.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        private async Task PopulateDropDownsAsync()
+        private async Task PopulateDropDownsAsync(int? currentCountryId = null, int? currentCurrencyId = null)
         {
             var countries = await _countryService.GetAllAsync();
             var currencies = await _currencyService.GetAllAsync();
             
-            ViewBag.Countries = new SelectList(countries.Where(c => c.IsActive), "Id", "Name");
-            ViewBag.Currencies = new SelectList(currencies.Where(c => c.IsActive), "Id", "IsoCode");
+            ViewBag.Countries = new SelectList(countries.Where(c => c.IsActive || c.Id == currentCountryId), "Id", "Name");
+            ViewBag.Currencies = new SelectList(currencies.Where(c => c.IsActive || c.Id == currentCurrencyId), "Id", "IsoCode");
         }
     }
 }

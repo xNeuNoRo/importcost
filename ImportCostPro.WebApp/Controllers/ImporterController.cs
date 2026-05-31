@@ -13,7 +13,9 @@ namespace ImportCostPro.WebApp.Controllers
         private readonly ImporterService _importerService;
         private readonly CountryService _countryService;
 
-        public ImporterController(ImporterService importerService, CountryService countryService)
+        public ImporterController(
+            ImporterService importerService,
+            CountryService countryService)
         {
             _importerService = importerService;
             _countryService = countryService;
@@ -23,7 +25,7 @@ namespace ImportCostPro.WebApp.Controllers
         {
             var importers = await _importerService.GetAllAsync();
             var viewModel = importers.Adapt<IEnumerable<ImporterViewModel>>();
-            ViewData["Title"] = "Gestión de Importadores";
+            ViewData["Title"] = "Importadores";
             return View(viewModel);
         }
 
@@ -79,7 +81,7 @@ namespace ImportCostPro.WebApp.Controllers
             }
 
             var viewModel = importer.Adapt<ImporterUpdateViewModel>();
-            await PopulateCountriesAsync();
+            await PopulateCountriesAsync(viewModel.CountryId);
             ViewData["Title"] = "Editar Importador";
             return View(viewModel);
         }
@@ -90,7 +92,7 @@ namespace ImportCostPro.WebApp.Controllers
         {
             if (!ModelState.IsValid)
             {
-                await PopulateCountriesAsync();
+                await PopulateCountriesAsync(viewModel.CountryId);
                 return View(viewModel);
             }
 
@@ -114,7 +116,7 @@ namespace ImportCostPro.WebApp.Controllers
                 ModelState.AddModelError(string.Empty, "Error crítico al actualizar el importador.");
             }
 
-            await PopulateCountriesAsync();
+            await PopulateCountriesAsync(viewModel.CountryId);
             ViewData["Title"] = "Editar Importador";
             return View(viewModel);
         }
@@ -131,11 +133,10 @@ namespace ImportCostPro.WebApp.Controllers
             catch (BusinessException ex)
             {
                 TempData["ErrorMessage"] = ex.Message;
-                ModelState.AddModelError(string.Empty, ex.Message);
             }
             catch (Exception)
             {
-                TempData["ErrorMessage"] = "Error al intentar eliminar el importador.";
+                TempData["ErrorMessage"] = "Error inesperado al intentar eliminar el importador.";
             }
 
             return RedirectToAction(nameof(Index));
@@ -153,16 +154,15 @@ namespace ImportCostPro.WebApp.Controllers
             catch (BusinessException ex)
             {
                 TempData["ErrorMessage"] = ex.Message;
-                ModelState.AddModelError(string.Empty, ex.Message);
             }
 
             return RedirectToAction(nameof(Index));
         }
 
-        private async Task PopulateCountriesAsync()
+        private async Task PopulateCountriesAsync(int? currentCountryId = null)
         {
             var countries = await _countryService.GetAllAsync();
-            ViewBag.Countries = new SelectList(countries.Where(c => c.IsActive), "Id", "Name");
+            ViewBag.Countries = new SelectList(countries.Where(c => c.IsActive || c.Id == currentCountryId), "Id", "Name");
         }
     }
 }
