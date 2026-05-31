@@ -211,21 +211,61 @@
                             </div>
                         </div>
 
-                        <div class="flex items-center gap-3 pl-4 border-l border-gray-200">
-                            <div class="hidden sm:flex flex-col items-end">
-                                <span class="text-sm font-semibold text-gray-900 leading-tight">Usuario Administrador</span>
-                                <span class="text-xs text-gray-500 leading-tight">Acceso Total</span>
-                            </div>
-                            <div
-                                class="w-9 h-9 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-sm border border-blue-200">
-                                ADM
-                            </div>
-                            <button class="text-gray-400 hover:text-gray-600 p-1 cursor-pointer">
-                                <i data-lucide="chevron-down" class="w-4 h-4"></i>
+                        <div class="relative">
+                            <button id="user-menu-btn" class="flex items-center gap-3 pl-4 border-l border-gray-200 hover:bg-gray-50 py-2 px-2 rounded-xl transition-all cursor-pointer group">
+                                <div class="hidden sm:flex flex-col items-end">
+                                    <span class="text-sm font-semibold text-gray-900 leading-tight">Usuario Administrador</span>
+                                    <span class="text-xs text-gray-500 leading-tight">Acceso Total</span>
+                                </div>
+                                <div class="w-9 h-9 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-sm border border-blue-700 shadow-sm shadow-blue-200 group-hover:scale-105 transition-transform">
+                                    ADM
+                                </div>
+                                <i data-lucide="chevron-down" class="w-4 h-4 text-gray-400 group-hover:text-gray-600 transition-colors"></i>
                             </button>
-                        </div>
-                    </header>
 
+                            @* Dropdown Easter Egg *@
+                            <div id="user-dropdown" class="absolute right-0 mt-2 w-72 bg-white rounded-2xl shadow-2xl border border-gray-100 py-2 z-50 hidden animate__animated animate__fadeIn animate__faster">
+                                <div class="px-4 py-3 border-b border-gray-50">
+                                    <p class="text-[10px] font-black uppercase tracking-widest text-gray-400">Equipo de Desarrollo</p>
+                                </div>
+
+                                <div class="p-2 space-y-1">
+                                    @* Lead *@
+                                    <a href="https://github.com/xNeuNoRo" target="_blank" class="flex items-center gap-3 p-3 rounded-xl hover:bg-blue-50 transition-all group">
+                                        <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white text-xs font-black shadow-sm shadow-blue-100">AM</div>
+                                        <div class="flex-1">
+                                            <span class="block text-xs font-bold text-gray-900">Angel Gonzalez Muñoz</span>
+                                            <span class="block text-[10px] text-blue-600 font-bold uppercase tracking-tighter">Lead Developer</span>
+                                        </div>
+                                        <i data-lucide="github" class="w-4 h-4 text-gray-300 group-hover:text-blue-600 transition-colors"></i>
+                                    </a>
+
+                                    @* Isaias *@
+                                    <a href="https://github.com/IsaiasMorillo" target="_blank" class="flex items-center gap-3 p-3 rounded-xl hover:bg-emerald-50 transition-all group">
+                                        <div class="w-8 h-8 rounded-lg bg-emerald-500 flex items-center justify-center text-white text-xs font-black shadow-sm shadow-emerald-100">IF</div>
+                                        <div class="flex-1">
+                                            <span class="block text-xs font-bold text-gray-900">Isaias Jose Morillo F.</span>
+                                            <span class="block text-[10px] text-emerald-600 font-bold uppercase tracking-tighter">Software Developer</span>
+                                        </div>
+                                        <i data-lucide="github" class="w-4 h-4 text-gray-300 group-hover:text-emerald-600 transition-colors"></i>
+                                    </a>
+
+                                    @* Engel *@
+                                    <a href="https://github.com/notengel" target="_blank" class="flex items-center gap-3 p-3 rounded-xl hover:bg-indigo-50 transition-all group">
+                                        <div class="w-8 h-8 rounded-lg bg-indigo-500 flex items-center justify-center text-white text-xs font-black shadow-sm shadow-indigo-100">AS</div>
+                                        <div class="flex-1">
+                                            <span class="block text-xs font-bold text-gray-900">Engel Orlando Acosta D.</span>
+                                            <span class="block text-[10px] text-indigo-600 font-bold uppercase tracking-tighter">Software Developer</span>
+                                        </div>
+                                        <i data-lucide="github" class="w-4 h-4 text-gray-300 group-hover:text-indigo-600 transition-colors"></i>
+                                    </a>
+                                </div>
+                                <div class="px-4 py-2 mt-2 border-t border-gray-50 text-center">
+                                    <span class="text-[9px] font-bold text-gray-300 uppercase tracking-widest italic">Contributors</span>
+                                </div>
+                            </div>
+                        </div>
+                        </header>
                     <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50">
                         <div class="p-4 sm:p-6 md:p-8 max-w-7xl mx-auto page-entry">
                             @RenderBody()
@@ -250,13 +290,29 @@
                 const closeBtn = document.getElementById('close-sidebar-btn');
 
                 function toggleSidebar() {
-                sidebar.classList.toggle('-translate-x-full');
-                backdrop.classList.toggle('hidden');
+                    sidebar.classList.toggle('-translate-x-full');
+                    backdrop.classList.toggle('hidden');
                 }
 
                 openBtn.addEventListener('click', toggleSidebar);
                 closeBtn.addEventListener('click', toggleSidebar);
                 backdrop.addEventListener('click', toggleSidebar);
+
+                // Lógica para el dropdown del usuario (Easter Egg)
+                const userBtn = document.getElementById('user-menu-btn');
+                const userDropdown = document.getElementById('user-dropdown');
+
+                userBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    userDropdown.classList.toggle('hidden');
+                });
+
+                document.addEventListener('click', function(e) {
+                    if (!userBtn.contains(e.target)) {
+                        userDropdown.classList.add('hidden');
+                    }
+                });
+
             </script>
         </body>
 
