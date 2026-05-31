@@ -232,7 +232,7 @@ namespace ImportCostPro.Application.Services
             if (newStatus == OrderStatus.Open)
             {
                 throw new BusinessException(
-                    "No se puede reabrir una orden que ya fue liquidada o anulada."
+                    "No se puede reabrir una orden que ya fue calculada o anulada."
                 );
             }
 

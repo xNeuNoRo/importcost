@@ -7,7 +7,7 @@ namespace ImportCostPro.Persistence.Enums
         [Display(Name = "Abierta")]
         Open = 1,
 
-        [Display(Name = "Liquidada")]
+        [Display(Name = "Calculada")]
         Calculated = 2,
 
         [Display(Name = "Cerrada")]

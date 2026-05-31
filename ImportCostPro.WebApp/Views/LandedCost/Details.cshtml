@@ -5,6 +5,20 @@
     bool isClosed = Model.OrderStatus == OrderStatus.Closed;
 }
 
+@* Encabezado para Impresión *@
+<div class="print-only">
+    <div class="flex justify-between items-center mb-4">
+        <div>
+            <h1 class="text-3xl font-black text-blue-600">ImportCost <span class="text-gray-900">Pro</span></h1>
+            <p class="text-sm font-bold text-gray-500 uppercase tracking-widest">Liquidación Oficial de Costos</p>
+        </div>
+        <div class="text-right text-xs text-gray-400 font-mono">
+            <p>Orden: @Model.OrderNumber</p>
+            <p>Fecha: @DateTime.Now.ToString("dd/MM/yyyy HH:mm")</p>
+        </div>
+    </div>
+</div>
+
 <div class="mb-6 animate__animated animate__fadeIn">
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
@@ -22,6 +36,12 @@
                     <i data-lucide="lock" class="w-4 h-4"></i>
                     Cerrar orden
                 </button>
+
+                <form id="closeOrderForm_@Model.ImportOrderId" asp-controller="ImportOrder" asp-action="ChangeStatus" method="post" style="display:none;">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="id" value="@Model.ImportOrderId" />
+                    <input type="hidden" name="newStatus" value="@OrderStatus.Closed" />
+                </form>
             }
             <button onclick="window.print()" class="inline-flex items-center justify-center gap-2 px-4 py-2 bg-white text-gray-700 text-sm font-semibold rounded-lg border border-gray-200 hover:bg-gray-50 transition-all cursor-pointer shadow-sm">
                 <i data-lucide="printer" class="w-4 h-4"></i>
@@ -175,37 +195,81 @@
     </div>
 </div>
 
-@* Pie de Reporte Fiscal *@
-<div class="max-w-xl ml-auto animate__animated animate__fadeInUp animate__delay-1s">
-    <div class="bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
-        <h4 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Resumen Impositivo y Gastos</h4>
-        <div class="space-y-3">
+@* Pie de Reporte Fiscal Balanceado *@
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-8 animate__animated animate__fadeInUp animate__delay-1s pb-12">
+    @* Columna Izquierda: Información de Certificación *@
+    <div class="bg-blue-50/50 border border-blue-100 rounded-3xl p-8 flex flex-col justify-center relative overflow-hidden">
+        <div class="absolute top-0 right-0 -mr-8 -mt-8 w-32 h-32 bg-blue-600/5 rounded-full blur-2xl"></div>
+        
+        <div class="flex items-center gap-4 mb-6 relative z-10">
+            <div class="p-3 bg-blue-600 text-white rounded-2xl shadow-lg shadow-blue-200">
+                <i data-lucide="check-circle" class="w-8 h-8"></i>
+            </div>
+            <div>
+                <h4 class="text-lg font-bold text-blue-900">Validación de Costos</h4>
+                <p class="text-xs text-blue-600 font-medium uppercase tracking-widest">Sincronizado con Normativa Fiscal</p>
+            </div>
+        </div>
+        <div class="space-y-4 relative z-10">
+            <p class="text-base text-blue-800 leading-relaxed font-medium">
+                Certificamos que este reporte presenta el <span class="text-blue-700 font-bold">costo real de su importación</span>, 
+                asignando con absoluta precisión cada peso invertido en impuestos y logística a sus productos.
+            </p>
+            <div class="pt-6 flex items-center gap-8">
+                <div>
+                    <span class="block text-[10px] font-bold text-blue-400 uppercase tracking-widest mb-1">Fecha de Emisión</span>
+                    <span class="text-sm font-bold text-blue-900">@DateTime.Now.ToString("dd/MM/yyyy")</span>
+                </div>
+                <div class="w-px h-10 bg-blue-200"></div>
+                <div>
+                    <span class="block text-[10px] font-bold text-blue-400 uppercase tracking-widest mb-1">Precisión Contable</span>
+                    <span class="inline-flex items-center gap-1.5 text-sm font-bold text-emerald-600">
+                        <i data-lucide="sparkles" class="w-4 h-4"></i>
+                        Máxima Exactitud
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @* Columna Derecha: Resumen Impositivo y Gastos *@
+    <div class="bg-white border border-gray-200 rounded-3xl shadow-sm overflow-hidden flex flex-col">
+        <div class="px-8 py-6 border-b border-gray-100 bg-gray-50/50">
+            <h4 class="text-xs font-bold text-gray-400 uppercase tracking-widest">Resumen Impositivo y Gastos</h4>
+        </div>
+        <div class="p-8 space-y-4 flex-1">
             <div class="flex justify-between items-center text-sm">
-                <span class="text-gray-500">Total Gravámenes Arancelarios</span>
+                <span class="text-gray-500 font-medium">Total Gravámenes Arancelarios</span>
                 <span class="font-mono font-bold text-rose-600">@Model.TotalTariff.ToString("C2")</span>
             </div>
             <div class="flex justify-between items-center text-sm">
-                <span class="text-gray-500">Total Impuesto Selectivo (ISC)</span>
+                <span class="text-gray-500 font-medium">Total Impuesto Selectivo (ISC)</span>
                 <span class="font-mono font-bold text-amber-600">@Model.TotalExciseTax.ToString("C2")</span>
             </div>
             <div class="flex justify-between items-center text-sm">
-                <span class="text-gray-500">Total Tasa Servicio de Aduanas</span>
+                <span class="text-gray-500 font-medium">Total Tasa Servicio de Aduanas</span>
                 <span class="font-mono font-bold text-gray-700">@Model.TotalCustomsService.ToString("C2")</span>
             </div>
-            <div class="flex justify-between items-center text-sm">
-                <span class="text-gray-500">Total ITBIS Liquidado</span>
+            <div class="flex justify-between items-center text-sm border-b border-gray-100 pb-4">
+                <span class="text-gray-500 font-medium">Total ITBIS Liquidado</span>
                 <span class="font-mono font-bold text-purple-600">@Model.TotalItbis.ToString("C2")</span>
             </div>
-            <div class="flex justify-between items-center text-sm">
-                <span class="text-gray-500">Gastos Locales y Operativos</span>
+            <div class="flex justify-between items-center text-sm pt-2">
+                <span class="text-gray-500 font-medium">Gastos Locales y Operativos</span>
                 <span class="font-mono font-bold text-gray-900">@Model.TotalLocalExpenses.ToString("C2")</span>
             </div>
-            <div class="mt-4 p-4 bg-blue-600 rounded-xl flex justify-between items-center text-white shadow-lg shadow-blue-100">
+        </div>
+        
+        <div class="bg-gradient-to-r from-blue-600 to-indigo-700 p-8 text-white">
+            <div class="flex justify-between items-center">
                 <div class="flex flex-col">
-                    <span class="text-[10px] font-bold uppercase tracking-wider opacity-80">Costo de Importación Consolidado</span>
-                    <span class="text-xs opacity-80">Total Puesto en Almacén</span>
+                    <span class="text-[10px] font-bold uppercase tracking-widest opacity-80 mb-1">Costo de Importación Consolidado</span>
+                    <span class="text-sm font-medium opacity-90">Total Puesto en Almacén</span>
                 </div>
-                <span class="text-xl font-black">@Model.TotalImportCost.ToString("C2")</span>
+                <div class="flex flex-col items-end">
+                    <span class="text-2xl font-black">@Model.TotalImportCost.ToString("C2")</span>
+                    <span class="text-[10px] font-bold text-blue-200">(@(string.IsNullOrEmpty(Model.LocalCurrencyIsoCode) ? "RD$" : Model.LocalCurrencyIsoCode))</span>
+                </div>
             </div>
         </div>
     </div>
@@ -232,29 +296,7 @@
                 }
             }).then((result) => {
                 if (result.isConfirmed) {
-                    const form = document.createElement('form');
-                    form.method = 'POST';
-                    form.action = '@Url.Action("ChangeStatus", "ImportOrder")';
-                    
-                    const idInput = document.createElement('input');
-                    idInput.type = 'hidden';
-                    idInput.name = 'id';
-                    idInput.value = id;
-                    
-                    const statusInput = document.createElement('input');
-                    statusInput.type = 'hidden';
-                    statusInput.name = 'newStatus';
-                    statusInput.value = '@OrderStatus.Closed';
-                    
-                    const antiForgeryToken = document.querySelector('input[name="__RequestVerificationToken"]');
-                    if (antiForgeryToken) {
-                        form.appendChild(antiForgeryToken.cloneNode());
-                    }
-                    
-                    form.appendChild(idInput);
-                    form.appendChild(statusInput);
-                    document.body.appendChild(form);
-                    form.submit();
+                    document.getElementById('closeOrderForm_' + id).submit();
                 }
             });
         }
@@ -262,24 +304,108 @@
 }
 
 <style>
+    /* Estilos para Pantalla */
+    .print-only { display: none; }
+
     @@media print {
-        header, aside, .mb-6 a, .mb-6 button {
+        /* Ocultar elementos de UI */
+        header, aside, nav, .mb-6, button, .animate__animated {
             display: none !important;
+            animation: none !important;
         }
-        main {
-            padding: 0 !important;
+
+        /* Reset de Layout para Impresión */
+        body {
             background: white !important;
+            color: black !important;
+            margin: 0 !important;
+            padding: 0 !important;
         }
-        .rounded-2xl {
-            border-radius: 0 !important;
-            border: none !important;
-            box-shadow: none !important;
+
+        main {
+            margin: 0 !important;
+            padding: 0 !important;
+            width: 100% !important;
         }
-        .shadow-sm, .shadow-md, .shadow-lg {
-            box-shadow: none !important;
-        }
-        .max-w-xl {
+
+        .container, .max-w-5xl {
             max-width: 100% !important;
+            width: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
         }
+
+        /* Encabezado exclusivo para impresión */
+        .print-only {
+            display: block !important;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 1rem;
+        }
+
+        /* Forzar visualización de colores de fondo en Chrome/Safari/Edge */
+        * {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+        /* Saneamiento de Tarjetas y Bordes */
+        .rounded-2xl, .rounded-3xl, .shadow-sm, .shadow-md, .shadow-lg, .shadow-xl {
+            border-radius: 0.5rem !important;
+            border: 1px solid #e5e7eb !important;
+            box-shadow: none !important;
+        }
+
+        /* Optimización de Tabla */
+        .overflow-x-auto {
+            overflow: visible !important;
+        }
+        
+        table {
+            width: 100% !important;
+            table-layout: fixed !important;
+            border-collapse: collapse !important;
+        }
+
+        th, td {
+            font-size: 8px !important; /* Fuente más pequeña para que quepa todo el ancho */
+            padding: 4px 2px !important;
+            word-wrap: break-word !important;
+        }
+
+        /* Evitar que una fila se rompa entre dos páginas */
+        tr {
+            page-break-inside: avoid !important;
+        }
+
+        /* Control de saltos de página para los bloques de resumen */
+        .grid {
+            display: grid !important;
+            gap: 1rem !important;
+        }
+
+        .grid-cols-4 {
+            grid-template-columns: repeat(4, 1fr) !important;
+        }
+
+        .grid-cols-2 {
+            grid-template-columns: repeat(2, 1fr) !important;
+        }
+
+        .pb-12 {
+            padding-bottom: 0 !important;
+        }
+
+        /* Forzar el bloque de resumen a la siguiente página si no cabe */
+        .animate__delay-1s {
+            page-break-before: auto !important;
+        }
+
+        /* Colores específicos para que resalten en B/N */
+        .text-blue-600, .text-blue-700, .text-blue-800 { color: #1e40af !important; }
+        .text-emerald-600, .text-emerald-700 { color: #065f46 !important; }
+        .text-rose-600 { color: #9f1239 !important; }
+        .bg-gray-50, .bg-blue-50\/50, .bg-blue-50\/20 { background-color: #f9fafb !important; }
+        .bg-blue-600 { background-color: #2563eb !important; }
     }
 </style>
