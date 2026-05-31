@@ -89,10 +89,16 @@
 
 @{
     string currentController = ViewContext.RouteData.Values["Controller"]?.ToString() ?? "";
+    string currentAction = ViewContext.RouteData.Values["Action"]?.ToString() ?? "";
 
-    string GetActiveClasses(string targetController)
+    string GetActiveClasses(string targetController, string? targetAction = null)
     {
         bool isActive = string.Equals(currentController, targetController, StringComparison.OrdinalIgnoreCase);
+        
+        if (targetAction != null)
+        {
+            isActive = isActive && string.Equals(currentAction, targetAction, StringComparison.OrdinalIgnoreCase);
+        }
 
         return isActive
                     ? "flex items-center gap-3 px-3 py-2 bg-blue-50 text-blue-700 rounded-lg font-medium border-r-4 border-blue-600 transition-all shadow-sm shadow-blue-100/50"
@@ -129,7 +135,7 @@
                     <div>
                         <p class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Operaciones</p>
                         <div class="space-y-1">
-                            <a asp-controller="Home" asp-action="Index" class="@GetActiveClasses("Home")">
+                            <a asp-controller="Home" asp-action="Index" class="@GetActiveClasses("Home", "Index")">
                                 <i data-lucide="layout-dashboard" class="w-5 h-5"></i> Panel Principal
                             </a>
                             <a asp-controller="ImportOrder" asp-action="Index" class="@GetActiveClasses("ImportOrder")">
@@ -142,8 +148,7 @@
                     </div>
 
                     <div>
-                        <p class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Gestión de
-                            Catálogos</p>
+                        <p class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Gestión de Catálogos</p>
                             <div class="space-y-1">
                                 <a asp-controller="Product" asp-action="Index" class="@GetActiveClasses("Product")">
                                     <i data-lucide="box" class="w-5 h-5"></i> Catálogo de Productos
@@ -171,8 +176,7 @@
                         </div>
 
                         <div>
-                            <p class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Configuración
-                                Fiscal</p>
+                            <p class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Configuración Fiscal</p>
                                 <div class="space-y-1">
                                     <a asp-controller="TaxConfiguration" asp-action="Index"
                                        class="@GetActiveClasses("TaxConfiguration")">
@@ -180,72 +184,80 @@
                                     </a>
                                 </div>
                             </div>
-                        </nav>
-                    </aside>
 
-                    <div class="flex-1 flex flex-col h-screen overflow-hidden min-w-0">
-
-                        <header
-                            class="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4 sm:px-6 z-10 shrink-0">
-
-                            <div class="flex items-center gap-4">
-                                <button id="open-sidebar-btn"
-                                        class="md:hidden p-2 text-gray-500 hover:bg-gray-100 rounded-md transition-colors cursor-pointer">
-                                    <i data-lucide="menu" class="w-5 h-5"></i>
-                                </button>
-                                <div class="hidden sm:flex items-center text-sm text-gray-500">
-                                    <span class="text-gray-900 font-medium">@ViewData["Title"]</span>
-                                </div>
+                        <div class="pt-4 mt-4 border-t border-gray-100">
+                            <p class="px-3 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Información</p>
+                            <div class="space-y-1">
+                                <a asp-controller="Home" asp-action="Credits" class="@GetActiveClasses("Home", "Credits")">
+                                    <i data-lucide="award" class="w-5 h-5 text-amber-500"></i> Créditos del Proyecto
+                                </a>
                             </div>
+                        </div>
+                    </nav>
+                </aside>
 
-                            <div class="flex items-center gap-3 pl-4 border-l border-gray-200">
-                                <div class="hidden sm:flex flex-col items-end">
-                                    <span class="text-sm font-semibold text-gray-900 leading-tight">Usuario Administrador</span>
-                                    <span class="text-xs text-gray-500 leading-tight">Acceso Total</span>
-                                </div>
-                                <div
-                                    class="w-9 h-9 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-sm border border-blue-200">
-                                    ADM
-                                </div>
-                                <button class="text-gray-400 hover:text-gray-600 p-1 cursor-pointer">
-                                    <i data-lucide="chevron-down" class="w-4 h-4"></i>
-                                </button>
+                <div class="flex-1 flex flex-col h-screen overflow-hidden min-w-0">
+
+                    <header
+                        class="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4 sm:px-6 z-10 shrink-0">
+
+                        <div class="flex items-center gap-4">
+                            <button id="open-sidebar-btn"
+                                    class="md:hidden p-2 text-gray-500 hover:bg-gray-100 rounded-md transition-colors cursor-pointer">
+                                <i data-lucide="menu" class="w-5 h-5"></i>
+                            </button>
+                            <div class="hidden sm:flex items-center text-sm text-gray-500">
+                                <span class="text-gray-900 font-medium">@ViewData["Title"]</span>
                             </div>
-                        </header>
+                        </div>
 
-                        <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50">
-                            <div class="p-4 sm:p-6 md:p-8 max-w-7xl mx-auto page-entry">
-                                @RenderBody()
+                        <div class="flex items-center gap-3 pl-4 border-l border-gray-200">
+                            <div class="hidden sm:flex flex-col items-end">
+                                <span class="text-sm font-semibold text-gray-900 leading-tight">Usuario Administrador</span>
+                                <span class="text-xs text-gray-500 leading-tight">Acceso Total</span>
                             </div>
-                        </main>
+                            <div
+                                class="w-9 h-9 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-sm border border-blue-200">
+                                ADM
+                            </div>
+                            <button class="text-gray-400 hover:text-gray-600 p-1 cursor-pointer">
+                                <i data-lucide="chevron-down" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </header>
 
-                    </div>
+                    <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50">
+                        <div class="p-4 sm:p-6 md:p-8 max-w-7xl mx-auto page-entry">
+                            @RenderBody()
+                        </div>
+                    </main>
+
                 </div>
+            </div>
 
-                <script src="~/lib/jquery/dist/jquery.min.js"></script>
+            <script src="~/lib/jquery/dist/jquery.min.js"></script>
 
-                @await RenderSectionAsync("Scripts", required: false)
+            @await RenderSectionAsync("Scripts", required: false)
 
-                <script>
-                    // Inicializar los íconos de Lucide
-                    lucide.createIcons();
+            <script>
+                // Inicializar los íconos de Lucide
+                lucide.createIcons();
 
-                    // Lógica para el Sidebar en dispositivos móviles
-                    const sidebar = document.getElementById('sidebar');
-                    const backdrop = document.getElementById('sidebar-backdrop');
-                    const openBtn = document.getElementById('open-sidebar-btn');
-                    const closeBtn = document.getElementById('close-sidebar-btn');
+                // Lógica para el Sidebar en dispositivos móviles
+                const sidebar = document.getElementById('sidebar');
+                const backdrop = document.getElementById('sidebar-backdrop');
+                const openBtn = document.getElementById('open-sidebar-btn');
+                const closeBtn = document.getElementById('close-sidebar-btn');
 
-                    function toggleSidebar() {
-                    sidebar.classList.toggle('-translate-x-full');
-                    backdrop.classList.toggle('hidden');
-                    }
+                function toggleSidebar() {
+                sidebar.classList.toggle('-translate-x-full');
+                backdrop.classList.toggle('hidden');
+                }
 
-                    openBtn.addEventListener('click', toggleSidebar);
-                    closeBtn.addEventListener('click', toggleSidebar);
-                    backdrop.addEventListener('click', toggleSidebar);
-                </script>
-            </body>
+                openBtn.addEventListener('click', toggleSidebar);
+                closeBtn.addEventListener('click', toggleSidebar);
+                backdrop.addEventListener('click', toggleSidebar);
+            </script>
+        </body>
 
-        </html>
-        l>
+    </html>
