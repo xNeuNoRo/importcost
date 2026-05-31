@@ -23,10 +23,5 @@ namespace ImportCostPro.WebApp.Controllers
             ViewData["Title"] = "Créditos del Proyecto";
             return View();
         }
-
-        public IActionResult Privacy()
-        {
-            return View();
-        }
     }
 }
