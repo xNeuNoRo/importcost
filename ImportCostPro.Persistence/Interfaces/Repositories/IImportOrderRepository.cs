@@ -64,5 +64,10 @@ namespace ImportCostPro.Persistence.Interfaces.Repositories
         /// Cuenta las órdenes que se encuentran en un estado específico.
         /// </summary>
         Task<int> CountByStatusAsync(OrderStatus status);
+
+        /// <summary>
+        /// Verifica si la orden tiene productos o gastos asociados.
+        /// </summary>
+        Task<bool> HasRelatedRecordsAsync(int id);
     }
 }

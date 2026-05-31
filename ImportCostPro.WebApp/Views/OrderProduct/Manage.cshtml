@@ -134,6 +134,13 @@
     </div>
 </div>
 
+@* Formulario Oculto para Eliminación de Productos de la Orden *@
+<form id="deleteProductForm" asp-action="Delete" method="post" style="display:none;">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="id" id="deleteProductId" />
+    <input type="hidden" name="source" value="@source" />
+</form>
+
 @section Scripts {
     <script>
         function confirmDelete(id, name) {
@@ -153,29 +160,8 @@
                 }
             }).then((result) => {
                 if (result.isConfirmed) {
-                    const form = document.createElement('form');
-                    form.method = 'POST';
-                    form.action = '@Url.Action("Delete")';
-                    
-                    const idInput = document.createElement('input');
-                    idInput.type = 'hidden';
-                    idInput.name = 'id';
-                    idInput.value = id;
-                    
-                    const sourceInput = document.createElement('input');
-                    sourceInput.type = 'hidden';
-                    sourceInput.name = 'source';
-                    sourceInput.value = '@source';
-                    
-                    const antiForgeryToken = document.querySelector('input[name="__RequestVerificationToken"]');
-                    if (antiForgeryToken) {
-                        form.appendChild(antiForgeryToken.cloneNode());
-                    }
-                    
-                    form.appendChild(idInput);
-                    form.appendChild(sourceInput);
-                    document.body.appendChild(form);
-                    form.submit();
+                    document.getElementById('deleteProductId').value = id;
+                    document.getElementById('deleteProductForm').submit();
                 }
             });
         }

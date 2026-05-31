@@ -264,6 +264,13 @@ namespace ImportCostPro.Application.Services
                 );
             }
 
+            if (await _importOrderRepository.HasRelatedRecordsAsync(id))
+            {
+                throw new BusinessException(
+                    "No se puede eliminar esta orden porque contiene productos o gastos registrados. Por favor, elimine el detalle primero."
+                );
+            }
+
             return await _importOrderRepository.DeleteAsync(id);
         }
 

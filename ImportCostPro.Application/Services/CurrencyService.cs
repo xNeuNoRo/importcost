@@ -124,7 +124,19 @@ namespace ImportCostPro.Application.Services
                 {
                     throw new ValidationBusinessException(
                         nameof(request.IsLocalCurrency),
-                        "Operación rechazada. Ya existe otra divisa establecida como moneda local base."
+                        "Ya existe una moneda configurada como moneda local. Solo puede existir una moneda local en el sistema."
+                    );
+                }
+            }
+
+            // No permitimos inactivar la moneda local si tiene dependencias
+            if (existingCurrency.IsLocalCurrency && !request.IsActive)
+            {
+                if (await _currencyRepository.IsCurrencyReferencedAsync(request.Id))
+                {
+                    throw new ValidationBusinessException(
+                        nameof(request.IsActive),
+                        "No se puede inactivar la moneda local mientras existan registros que dependan de ella."
                     );
                 }
             }
@@ -147,6 +159,11 @@ namespace ImportCostPro.Application.Services
             return currency?.Adapt<CurrencyResponse>();
         }
 
+        public async Task<bool> IsCurrencyReferencedAsync(int id)
+        {
+            return await _currencyRepository.IsCurrencyReferencedAsync(id);
+        }
+
         public async Task<bool> ToggleStatusAsync(int id)
         {
             var currency = await _currencyRepository.GetByIdAsync(id);
@@ -155,11 +172,15 @@ namespace ImportCostPro.Application.Services
                 throw new BusinessException("La moneda específica no existe en el catálogo.");
             }
 
-            if (currency.IsLocalCurrency)
+            // Si se intenta INACTIVAR y es moneda local, validar dependencias
+            if (currency.IsLocalCurrency && currency.IsActive)
             {
-                throw new BusinessException(
-                    "La moneda local base del sistema no puede ser desactivada."
-                );
+                if (await _currencyRepository.IsCurrencyReferencedAsync(id))
+                {
+                    throw new BusinessException(
+                        "No se puede inactivar la moneda local mientras existan registros que dependan de ella."
+                    );
+                }
             }
 
             currency.IsActive = !currency.IsActive;

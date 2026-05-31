@@ -69,8 +69,8 @@ namespace ImportCostPro.WebApp.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            var viewModel = currency.Adapt<UpdateCurrencyViewModel>();
-            return View(viewModel);
+            ViewBag.HasDependencies = await _currencyService.IsCurrencyReferencedAsync(id);
+            return View(currency.Adapt<UpdateCurrencyViewModel>());
         }
 
         [HttpPost]
@@ -79,6 +79,7 @@ namespace ImportCostPro.WebApp.Controllers
         {
             if (!ModelState.IsValid)
             {
+                ViewBag.HasDependencies = await _currencyService.IsCurrencyReferencedAsync(viewModel.Id);
                 return View(viewModel);
             }
 
@@ -102,6 +103,7 @@ namespace ImportCostPro.WebApp.Controllers
                 ModelState.AddModelError(string.Empty, "Ocurrió un error inesperado al actualizar la moneda.");
             }
 
+            ViewBag.HasDependencies = await _currencyService.IsCurrencyReferencedAsync(viewModel.Id);
             return View(viewModel);
         }
 
@@ -117,7 +119,6 @@ namespace ImportCostPro.WebApp.Controllers
             catch (BusinessException ex)
             {
                 TempData["ErrorMessage"] = ex.Message;
-                ModelState.AddModelError(string.Empty, ex.Message);
             }
             catch (Exception)
             {
@@ -139,7 +140,6 @@ namespace ImportCostPro.WebApp.Controllers
             catch (BusinessException ex)
             {
                 TempData["ErrorMessage"] = ex.Message;
-                ModelState.AddModelError(string.Empty, ex.Message);
             }
             catch (Exception)
             {

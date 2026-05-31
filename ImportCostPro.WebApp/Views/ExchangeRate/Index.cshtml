@@ -123,6 +123,7 @@
 </div>
 
 @section Scripts {
+    @Html.AntiForgeryToken()
     <script>
         function confirmDelete(id, conversion) {
             Swal.fire({
@@ -150,12 +151,14 @@
                     idInput.name = 'id';
                     idInput.value = id;
                     
-                    const antiForgeryToken = document.querySelector('input[name="__RequestVerificationToken"]');
-                    if (antiForgeryToken) {
-                        form.appendChild(antiForgeryToken.cloneNode());
-                    }
+                    const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+                    const tokenInput = document.createElement('input');
+                    tokenInput.type = 'hidden';
+                    tokenInput.name = '__RequestVerificationToken';
+                    tokenInput.value = token;
                     
                     form.appendChild(idInput);
+                    form.appendChild(tokenInput);
                     document.body.appendChild(form);
                     form.submit();
                 }

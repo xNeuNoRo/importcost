@@ -112,5 +112,13 @@ namespace ImportCostPro.Persistence.Repositories
         {
             return await _dbSet.CountAsync(o => o.Status == status);
         }
+
+        public async Task<bool> HasRelatedRecordsAsync(int id)
+        {
+            var hasProducts = await _context.Set<OrderProduct>().AnyAsync(op => op.ImportOrderId == id);
+            var hasExpenses = await _context.Set<ImportExpense>().AnyAsync(e => e.ImportOrderId == id);
+            
+            return hasProducts || hasExpenses;
+        }
     }
 }

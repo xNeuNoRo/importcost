@@ -115,14 +115,27 @@
 
                             <label class="flex items-center gap-3 cursor-pointer group w-fit">
                                 <div class="relative">
-                                    <input type="checkbox" asp-for="IsActive" class="peer sr-only" />
+                                    @{
+                                        bool canDisableStatus = !(Model.IsLocalCurrency && (ViewBag.HasDependencies ?? false));
+                                    }
+                                    <input type="checkbox" asp-for="IsActive" class="peer sr-only" disabled="@(!canDisableStatus)" />
                                     <div
-                                        class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:inset-s-0.5 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600 transition-colors">
+                                        class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:inset-s-0.5 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600 transition-colors @(!canDisableStatus ? "opacity-50 cursor-not-allowed" : "")">
                                     </div>
+                                    @if (!canDisableStatus)
+                                    {
+                                        <input type="hidden" asp-for="IsActive" />
+                                    }
                                 </div>
-                                <span id="status-text"
-                                      class="text-sm font-medium text-gray-600 group-hover:text-gray-900 transition-colors">Habilitar
-                                    para uso</span>
+                                <div class="flex flex-col">
+                                    <span id="status-text"
+                                          class="text-sm font-medium text-gray-600 group-hover:text-gray-900 transition-colors">Habilitar
+                                        para uso</span>
+                                    @if (!canDisableStatus)
+                                    {
+                                        <span class="text-[10px] text-amber-600 font-bold uppercase tracking-tighter">Protegida por historial</span>
+                                    }
+                                </div>
                                 </label>
                             </div>
                         </div>
