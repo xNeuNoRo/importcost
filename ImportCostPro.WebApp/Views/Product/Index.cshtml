@@ -103,7 +103,12 @@
                                 <a asp-action="Edit" asp-route-id="@item.Id" class="p-2.5 text-gray-400 hover:text-amber-600 hover:bg-amber-50 rounded-xl transition-all cursor-pointer hover-scale" title="Editar">
                                     <i data-lucide="edit-3" class="w-5 h-5"></i>
                                 </a>
-                                <button type="button" onclick="confirmDelete(@item.Id, '@item.Name')" class="p-2.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all cursor-pointer hover-scale" title="Eliminar">
+                                <button type="button" 
+                                        data-id="@item.Id"
+                                        data-name="@item.Name"
+                                        onclick="confirmDelete(this)"
+                                        class="p-2.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all cursor-pointer hover-scale" 
+                                        title="Eliminar">
                                     <i data-lucide="trash-2" class="w-5 h-5"></i>
                                 </button>
                             </div>
@@ -115,13 +120,24 @@
     </div>
 </div>
 
-@section Scripts {
+    </div>
+</div>
+
+@* Formulario Oculto para Eliminación de Productos *@
+<form id="deleteProductForm" asp-action="Delete" method="post" style="display:none;">
     @Html.AntiForgeryToken()
+    <input type="hidden" name="id" id="deleteProductId" />
+</form>
+
+@section Scripts {
     <script>
-        function confirmDelete(id, name) {
+        function confirmDelete(btn) {
+            const id = btn.getAttribute('data-id');
+            const name = btn.getAttribute('data-name');
+
             Swal.fire({
                 title: 'Eliminar Producto',
-                text: '¿Está seguro que desea eliminar este producto?',
+                text: `¿Está seguro que desea eliminar el producto "${name}"?`,
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#ef4444',
@@ -135,25 +151,8 @@
                 }
             }).then((result) => {
                 if (result.isConfirmed) {
-                    const form = document.createElement('form');
-                    form.method = 'POST';
-                    form.action = '@Url.Action("Delete")';
-                    
-                    const idInput = document.createElement('input');
-                    idInput.type = 'hidden';
-                    idInput.name = 'id';
-                    idInput.value = id;
-                    
-                    const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
-                    const tokenInput = document.createElement('input');
-                    tokenInput.type = 'hidden';
-                    tokenInput.name = '__RequestVerificationToken';
-                    tokenInput.value = token;
-                    
-                    form.appendChild(idInput);
-                    form.appendChild(tokenInput);
-                    document.body.appendChild(form);
-                    form.submit();
+                    document.getElementById('deleteProductId').value = id;
+                    document.getElementById('deleteProductForm').submit();
                 }
             });
         }

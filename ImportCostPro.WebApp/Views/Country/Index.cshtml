@@ -106,7 +106,10 @@
                                                title="Editar">
                                                 <i data-lucide="edit-3" class="w-5 h-5"></i>
                                             </a>
-                                            <button type="button" onclick="confirmDelete(@item.Id, '@item.Name')"
+                                            <button type="button" 
+                                                    data-id="@item.Id"
+                                                    data-name="@item.Name"
+                                                    onclick="confirmDelete(this)"
                                                     class="p-2.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all cursor-pointer hover-scale"
                                                     title="Eliminar">
                                                 <i data-lucide="trash-2" class="w-5 h-5"></i>
@@ -120,47 +123,41 @@
                 </div>
             </div>
 
-            @section Scripts {
-                @Html.AntiForgeryToken()
-                <script>
-                    function confirmDelete(id, name) {
-                        Swal.fire({
-                            title: 'Eliminar País',
-                            text: '¿Está seguro que desea eliminar este país?',
-                            icon: 'warning',
-                            showCancelButton: true,
-                            confirmButtonColor: '#ef4444',
-                            cancelButtonColor: '#6b7280',
-                            confirmButtonText: 'Aceptar',
-                            cancelButtonText: 'Cancelar',
-                            reverseButtons: true,
-                            customClass: {
-                                confirmButton: 'rounded-xl px-6 py-2.5 text-sm font-bold ml-2',
-                                cancelButton: 'rounded-xl px-6 py-2.5 text-sm font-bold'
-                            }
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                const form = document.createElement('form');
-                                form.method = 'POST';
-                                form.action = '@Url.Action("Delete")';
+    </div>
+</div>
 
-                                const idInput = document.createElement('input');
-                                idInput.type = 'hidden';
-                                idInput.name = 'id';
-                                idInput.value = id;
+@* Formulario Oculto para Eliminación de Países *@
+<form id="deleteCountryForm" asp-action="Delete" method="post" style="display:none;">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="id" id="deleteCountryId" />
+</form>
 
-                                const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
-                                const tokenInput = document.createElement('input');
-                                tokenInput.type = 'hidden';
-                                tokenInput.name = '__RequestVerificationToken';
-                                tokenInput.value = token;
+@section Scripts {
+    <script>
+        function confirmDelete(btn) {
+            const id = btn.getAttribute('data-id');
+            const name = btn.getAttribute('data-name');
 
-                                form.appendChild(idInput);
-                                form.appendChild(tokenInput);
-                                document.body.appendChild(form);
-                                form.submit();
-                            }
-                        });
-                    }
-                </script>
-            }
+            Swal.fire({
+                title: 'Eliminar País',
+                text: `¿Está seguro que desea eliminar el país "${name}"?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'Aceptar',
+                cancelButtonText: 'Cancelar',
+                reverseButtons: true,
+                customClass: {
+                    confirmButton: 'rounded-xl px-6 py-2.5 text-sm font-bold ml-2',
+                    cancelButton: 'rounded-xl px-6 py-2.5 text-sm font-bold'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('deleteCountryId').value = id;
+                    document.getElementById('deleteCountryForm').submit();
+                }
+            });
+        }
+    </script>
+}
