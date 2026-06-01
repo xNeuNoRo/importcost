@@ -1,14 +1,31 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace ImportCostPro.Persistence.Enums
 {
     public enum ExpenseType
     {
-        InternationalFreight = 1, // Flete internacional
-        InternationalInsurance = 2, // Seguro internacional
-        PortCharges = 3, // Gastos portuarios
-        LocalTransport = 4, // Transporte local
-        CustomsFees = 5, // Honorarios aduanales
-        Storage = 6, // Almacenaje
-        CargoHandling = 7, // Manejo de carga
-        OtherExpenses = 8, // Otros gastos
+        [Display(Name = "Flete Internacional")]
+        InternationalFreight = 1,
+
+        [Display(Name = "Seguro Internacional")]
+        InternationalInsurance = 2,
+
+        [Display(Name = "Gastos Portuarios")]
+        PortCharges = 3,
+
+        [Display(Name = "Transporte Local")]
+        LocalTransport = 4,
+
+        [Display(Name = "Honorarios Aduanales")]
+        CustomsFees = 5,
+
+        [Display(Name = "Almacenaje y Estadía")]
+        Storage = 6,
+
+        [Display(Name = "Manejo de Carga")]
+        CargoHandling = 7,
+
+        [Display(Name = "Otros Gastos Logísticos")]
+        OtherExpenses = 8,
     }
 }

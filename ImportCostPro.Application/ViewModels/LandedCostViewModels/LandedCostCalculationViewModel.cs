@@ -1,3 +1,4 @@
+using ImportCostPro.Persistence.Enums;
 using System.ComponentModel.DataAnnotations;
 
 namespace ImportCostPro.Application.ViewModels.LandedCostViewModels
@@ -10,30 +11,33 @@ namespace ImportCostPro.Application.ViewModels.LandedCostViewModels
         [Display(Name = "Número de Orden")]
         public string OrderNumber { get; set; } = null!;
 
-        [Display(Name = "Moneda Local")]
-        public string LocalCurrencyIsoCode { get; set; } = null!;
+        [Display(Name = "Fecha de Liquidación")]
+        [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}")]
+        public DateTime CalculationDate { get; set; }
 
-        [Display(Name = "Tasa de Cambio")]
+        [Display(Name = "Tasa de Cambio (Local)")]
         [DisplayFormat(DataFormatString = "{0:N4}")]
         public decimal ExchangeRateUsed { get; set; }
 
-        [Display(Name = "Total FOB (Original)")]
-        [DisplayFormat(DataFormatString = "{0:N2}")]
-        public decimal TotalOriginalFob { get; set; }
+        [Display(Name = "Divisa Local")]
+        public string LocalCurrencyIsoCode { get; set; } = null!;
 
-        [Display(Name = "Total FOB (Local)")]
+        [Display(Name = "Divisa Origen")]
+        public string OriginCurrencyIsoCode { get; set; } = null!;
+
+        [Display(Name = "Valor FOB Total (Local)")]
         [DisplayFormat(DataFormatString = "{0:C2}")]
         public decimal TotalLocalFob { get; set; }
 
-        [Display(Name = "Total Flete")]
+        [Display(Name = "Gastos de Flete Total")]
         [DisplayFormat(DataFormatString = "{0:C2}")]
         public decimal TotalFreight { get; set; }
 
-        [Display(Name = "Total Seguro")]
+        [Display(Name = "Gastos de Seguro Total")]
         [DisplayFormat(DataFormatString = "{0:C2}")]
         public decimal TotalInsurance { get; set; }
 
-        [Display(Name = "Total CIF")]
+        [Display(Name = "Valor CIF Total Liquidado")]
         [DisplayFormat(DataFormatString = "{0:C2}")]
         public decimal TotalCif { get; set; }
 
@@ -41,35 +45,31 @@ namespace ImportCostPro.Application.ViewModels.LandedCostViewModels
         [DisplayFormat(DataFormatString = "{0:C2}")]
         public decimal TotalTariff { get; set; }
 
-        [Display(Name = "Total Selectivo")]
+        [Display(Name = "Total Impuesto Selectivo (ISC)")]
         [DisplayFormat(DataFormatString = "{0:C2}")]
         public decimal TotalExciseTax { get; set; }
 
-        [Display(Name = "Total Tasa Servicio")]
+        [Display(Name = "Total Tasa Servicio Aduanal")]
         [DisplayFormat(DataFormatString = "{0:C2}")]
         public decimal TotalCustomsService { get; set; }
 
-        [Display(Name = "Total ITBIS")]
+        [Display(Name = "Total ITBIS Liquidado")]
         [DisplayFormat(DataFormatString = "{0:C2}")]
         public decimal TotalItbis { get; set; }
 
-        [Display(Name = "Gastos Locales")]
+        [Display(Name = "Total Otros Gastos Locales")]
         [DisplayFormat(DataFormatString = "{0:C2}")]
         public decimal TotalLocalExpenses { get; set; }
 
-        [Display(Name = "Costo Total Importación")]
+        [Display(Name = "Costo de Importación Consolidado")]
         [DisplayFormat(DataFormatString = "{0:C2}")]
         public decimal TotalImportCost { get; set; }
 
-        [Display(Name = "Cantidad Total")]
-        [DisplayFormat(DataFormatString = "{0:N2}")]
+        [Display(Name = "Cantidad Total Importada")]
         public decimal TotalImportedQuantity { get; set; }
 
-        [Display(Name = "Fecha de Cálculo")]
-        [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy HH:mm}")]
-        public DateTime CalculationDate { get; set; }
+        public OrderStatus OrderStatus { get; set; }
 
-        public ICollection<CalculationResultDetailViewModel> Details { get; set; } =
-            new List<CalculationResultDetailViewModel>();
+        public List<CalculationResultDetailViewModel> Details { get; set; } = new();
     }
 }

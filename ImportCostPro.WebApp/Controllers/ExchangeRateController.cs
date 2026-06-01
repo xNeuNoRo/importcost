@@ -1,0 +1,186 @@
+using ImportCostPro.Application.DTOs.ExchangeRate.Requests;
+using ImportCostPro.Application.Exceptions;
+using ImportCostPro.Application.Services;
+using ImportCostPro.Application.ViewModels.ExchageRateViewModels;
+using Mapster;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+
+namespace ImportCostPro.WebApp.Controllers
+{
+    public class ExchangeRateController : Controller
+    {
+        private readonly ExchangeRateService _exchangeRateService;
+        private readonly CurrencyService _currencyService;
+
+        public ExchangeRateController(
+            ExchangeRateService exchangeRateService, 
+            CurrencyService currencyService)
+        {
+            _exchangeRateService = exchangeRateService;
+            _currencyService = currencyService;
+        }
+
+        public async Task<IActionResult> Index()
+        {
+            var rates = await _exchangeRateService.GetAllAsync();
+            var viewModel = rates.Adapt<IEnumerable<ExchangeRateViewModel>>();
+            return View(viewModel);
+        }
+
+        public async Task<IActionResult> Create(int? fromCurrencyId = null)
+        {
+            await PopulateCurrenciesAsync(fromCurrencyId);
+            var viewModel = new CreateExchangeRateViewModel();
+            
+            // Si viene un ID de moneda origen (desde el Dashboard), lo pre-cargamos
+            if (fromCurrencyId.HasValue)
+            {
+                viewModel.FromCurrencyId = fromCurrencyId.Value;
+            }
+
+            // Buscamos la moneda local para pre-seleccionarla como destino (ToCurrency)
+            var localCurrency = await _currencyService.GetLocalCurrencyAsync();
+            if (localCurrency != null)
+            {
+                viewModel.ToCurrencyId = localCurrency.Id;
+            }
+
+            return View(viewModel);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(CreateExchangeRateViewModel viewModel)
+        {
+            if (!ModelState.IsValid)
+            {
+                await PopulateCurrenciesAsync(viewModel.FromCurrencyId, viewModel.ToCurrencyId);
+                return View(viewModel);
+            }
+
+            try
+            {
+                var request = viewModel.Adapt<CreateExchangeRateRequest>();
+                await _exchangeRateService.CreateAsync(request);
+                TempData["SuccessMessage"] = "Tasa de cambio registrada correctamente.";
+                return RedirectToAction(nameof(Index));
+            }
+            catch (ValidationBusinessException ex)
+            {
+                ModelState.AddModelError(ex.PropertyName, ex.Message);
+            }
+            catch (BusinessException ex)
+            {
+                ModelState.AddModelError(string.Empty, ex.Message);
+            }
+            catch (Exception)
+            {
+                ModelState.AddModelError(string.Empty, "Ocurrió un error inesperado al registrar la tasa.");
+            }
+
+            await PopulateCurrenciesAsync(viewModel.FromCurrencyId, viewModel.ToCurrencyId);
+            return View(viewModel);
+        }
+
+        public async Task<IActionResult> Edit(int id)
+        {
+            var rate = await _exchangeRateService.GetByIdAsync(id);
+            if (rate == null)
+            {
+                TempData["ErrorMessage"] = "La tasa solicitada no existe.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            var viewModel = rate.Adapt<UpdateExchangeRateViewModel>();
+            await PopulateCurrenciesAsync(viewModel.FromCurrencyId, viewModel.ToCurrencyId);
+            return View(viewModel);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(UpdateExchangeRateViewModel viewModel)
+        {
+            if (!ModelState.IsValid)
+            {
+                await PopulateCurrenciesAsync(viewModel.FromCurrencyId, viewModel.ToCurrencyId);
+                return View(viewModel);
+            }
+
+            try
+            {
+                var request = viewModel.Adapt<UpdateExchangeRateRequest>();
+                await _exchangeRateService.UpdateAsync(request);
+                TempData["SuccessMessage"] = "Tasa de cambio actualizada correctamente.";
+                return RedirectToAction(nameof(Index));
+            }
+            catch (ValidationBusinessException ex)
+            {
+                ModelState.AddModelError(ex.PropertyName, ex.Message);
+            }
+            catch (BusinessException ex)
+            {
+                ModelState.AddModelError(string.Empty, ex.Message);
+            }
+            catch (Exception)
+            {
+                ModelState.AddModelError(string.Empty, "Ocurrió un error inesperado al actualizar la tasa.");
+            }
+
+            await PopulateCurrenciesAsync(viewModel.FromCurrencyId, viewModel.ToCurrencyId);
+            return View(viewModel);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Delete(int id)
+        {
+            try
+            {
+                await _exchangeRateService.DeleteAsync(id);
+                TempData["SuccessMessage"] = "Tasa de cambio eliminada con éxito.";
+            }
+            catch (BusinessException ex)
+            {
+                TempData["ErrorMessage"] = ex.Message;
+            }
+            catch (Exception)
+            {
+                TempData["ErrorMessage"] = "Ocurrió un error inesperado al intentar eliminar la tasa.";
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ToggleStatus(int id)
+        {
+            try
+            {
+                await _exchangeRateService.ToggleStatusAsync(id);
+                TempData["SuccessMessage"] = "Estado de la tasa de cambio actualizado correctamente.";
+            }
+            catch (BusinessException ex)
+            {
+                TempData["ErrorMessage"] = ex.Message;
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        private async Task PopulateCurrenciesAsync(int? currentFromId = null, int? currentToId = null)
+        {
+            var currencies = await _currencyService.GetAllAsync();
+            
+            var items = currencies
+                .Where(c => c.IsActive || c.Id == currentFromId || c.Id == currentToId)
+                .Select(c => new {
+                    c.Id,
+                    DisplayName = c.IsActive ? c.Name : $"{c.Name} (Inactivo)"
+                });
+
+            ViewBag.Currencies = new SelectList(items, "Id", "DisplayName");
+        }
+    }
+}

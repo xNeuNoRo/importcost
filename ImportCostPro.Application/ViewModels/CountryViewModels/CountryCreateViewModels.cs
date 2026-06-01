@@ -11,14 +11,7 @@ namespace ImportCostPro.Application.ViewModels.CountryViewModels
 
         [Required(ErrorMessage = "El código ISO del país es requerido.")]
         [Display(Name = "Código ISO")]
-        [StringLength(
-            3,
-            MinimumLength = 2,
-            ErrorMessage = "El código ISO del país debe tener entre 2 y 3 caracteres."
-        )]
-        public string IsoCode { get; set; } = null!;
-
-        [Display(Name = "Estado")]
-        public bool IsActive { get; set; } = true;
-    }
-}
+        [StringLength(3, MinimumLength = 2, ErrorMessage = "El código ISO del país debe tener entre 2 y 3 caracteres.")]
+        public string IsoCode {get;  set;} = null!;
+        }
+        }

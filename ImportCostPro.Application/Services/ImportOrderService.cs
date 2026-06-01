@@ -25,8 +25,7 @@ namespace ImportCostPro.Application.Services
             ICountryRepository countryRepository,
             ICurrencyRepository currencyRepository,
             ICalculationResultRepository calculationResultRepository,
-            IOrderProductRepository orderProductRepository
-        )
+            IOrderProductRepository orderProductRepository)
         {
             _importOrderRepository = importOrderRepository;
             _importerRepository = importerRepository;
@@ -69,7 +68,7 @@ namespace ImportCostPro.Application.Services
             {
                 throw new ValidationBusinessException(
                     nameof(request.OrderNumber),
-                    "El número de orden ya se encuentra registrado."
+                    "Ya existe una orden de importación registrada con este número."
                 );
             }
 
@@ -120,7 +119,7 @@ namespace ImportCostPro.Application.Services
                 )
                 {
                     throw new BusinessException(
-                        "No se pueden modificar estos datos porque la orden ya tiene un cálculo oficial de landed cost."
+                        "No se pueden modificar estos datos porque la orden ya tiene una Liquidación de Costos oficial."
                     );
                 }
             }
@@ -142,7 +141,7 @@ namespace ImportCostPro.Application.Services
             {
                 throw new ValidationBusinessException(
                     nameof(request.OrderNumber),
-                    "Ya existe otra orden registrada con este número."
+                    "Ya existe una orden de importación registrada con este número."
                 );
             }
 
@@ -187,33 +186,27 @@ namespace ImportCostPro.Application.Services
                 );
             }
 
-            // Si la orden ya fue calculada, solo se le permite cambiar a estado Cerrada o Cancelada
             if (newStatus == OrderStatus.Closed)
             {
-                // Si la orden ya fue calculada, tiramos una excepcion
                 if (currentStatus != OrderStatus.Calculated)
                 {
                     throw new BusinessException(
-                        "Solo se puede cerrar una orden que se encuentra en estado Calculada."
+                        "Solo se puede cerrar una orden que se encuentra en estado Liquidada."
                     );
                 }
 
-                // Obtenemos el cálculo oficial de landed cost para hacer validaciones antes de permitir cerrar la orden
                 var calculation =
                     await _calculationResultRepository.GetLatestCalculatedResultWithDetailsAsync(
                         id
                     );
 
-                // Validamos que exista un cálculo oficial registrado para esta orden
                 if (calculation == null)
                 {
                     throw new BusinessException(
-                        "No se puede cerrar esta orden porque no tiene un cálculo oficial de landed cost guardado."
+                        "No se puede cerrar esta orden porque no tiene una Liquidación de Costos oficial guardada."
                     );
                 }
 
-                // Validamos que la orden tenga productos registrados y que el costo total de
-                // importación del cálculo oficial sea mayor a 0
                 var products = await _orderProductRepository.GetProductsByOrderIdAsync(id);
                 if (products == null || !products.Any())
                 {
@@ -224,30 +217,27 @@ namespace ImportCostPro.Application.Services
                 if (calculation.TotalImportCost <= 0)
                 {
                     throw new BusinessException(
-                        "No se puede cerrar esta orden porque el costo total de importación del cálculo oficial es 0."
+                        "No se puede cerrar esta orden porque el costo total de importación de la Liquidación de Costos oficial es 0."
                     );
                 }
             }
 
-            // Solo se permite calcular una orden que se encuentra en estado Abierta
             if (newStatus == OrderStatus.Calculated && currentStatus != OrderStatus.Open)
             {
                 throw new BusinessException(
-                    "Solo se puede calcular una orden que se encuentra en estado Abierta."
+                    "Solo se puede liquidar una orden que se encuentra en estado Abierta."
                 );
             }
 
-            // No se puede reabrir una orden que ya fue calculada o cancelada
             if (newStatus == OrderStatus.Open)
             {
                 throw new BusinessException(
-                    "No se puede reabrir una orden que ya fue calculada o cancelada."
+                    "No se puede reabrir una orden que ya fue calculada o anulada."
                 );
             }
 
-            // Actualizamos el estado de la orden
-            var updated = await _importOrderRepository.UpdateStatusAsync(id, newStatus);
-            if (!updated)
+            var success = await _importOrderRepository.UpdateStatusAsync(id, newStatus);
+            if (!success)
             {
                 throw new BusinessException(
                     $"No se pudo actualizar el estado de la orden de importación con ID {id}."
@@ -265,13 +255,19 @@ namespace ImportCostPro.Application.Services
                 throw new BusinessException($"La orden de importación con ID {id} no existe.");
             }
 
-            // Solo se pueden eliminar órdenes que no estén en estado Calculada, Cerrada o Cancelada
             var hasCalculation =
                 await _calculationResultRepository.GetLatestCalculatedResultWithDetailsAsync(id);
             if (hasCalculation != null)
             {
                 throw new BusinessException(
-                    "No se puede eliminar una orden que ya tiene un cálculo oficial de landed cost guardado."
+                    "No se puede eliminar esta orden porque ya tiene una Liquidación de Costos oficial."
+                );
+            }
+
+            if (await _importOrderRepository.HasRelatedRecordsAsync(id))
+            {
+                throw new BusinessException(
+                    "No se puede eliminar esta orden porque contiene productos o gastos registrados. Por favor, elimine el detalle primero."
                 );
             }
 

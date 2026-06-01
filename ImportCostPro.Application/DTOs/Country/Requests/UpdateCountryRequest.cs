@@ -8,5 +8,6 @@ namespace ImportCostPro.Application.DTOs.Country.Requests
         public int Id { get; set; }
         public string Name { get; set; } = null!;
         public string IsoCode { get; set; } = null!;
+        public bool IsActive { get; set; }
     }
 }

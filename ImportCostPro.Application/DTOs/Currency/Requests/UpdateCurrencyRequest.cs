@@ -10,5 +10,6 @@ namespace ImportCostPro.Application.DTOs.Currency.Requests
         public string IsoCode { get; set; } = null!;
         public string Symbol { get; set; } = null!;
         public bool IsLocalCurrency { get; set; }
+        public bool IsActive { get; set; }
     }
 }

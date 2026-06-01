@@ -7,6 +7,7 @@ namespace ImportCostPro.Application.DTOs.LandedCost.Responses
         public string OrderNumber { get; set; } = null!;
         public int LocalCurrencyUsedId { get; set; }
         public string LocalCurrencyIsoCode { get; set; } = null!;
+        public string OriginCurrencyIsoCode { get; set; } = null!;
         public decimal ExchangeRateUsed { get; set; }
         public decimal TotalOriginalFob { get; set; }
         public decimal TotalLocalFob { get; set; }

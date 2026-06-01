@@ -5,7 +5,7 @@ namespace ImportCostPro.Application.ViewModels.CurrencyViewModels
     public class CreateCurrencyViewModel
     {
         [Required(ErrorMessage = "El nombre de la moneda es requerido.")]
-        [MaxLength(100, ErrorMessage = "El nombre de la moneda no debe exceder los 100 caracteres.")]
+        [MaxLength(150, ErrorMessage = "El nombre de la moneda no debe exceder los 150 caracteres.")]
         [Display(Name = "Nombre de la moneda")]
         public string Name { get; set; } = null!;
 
@@ -21,8 +21,5 @@ namespace ImportCostPro.Application.ViewModels.CurrencyViewModels
 
         [Display(Name = "Es moneda local")]
         public bool IsLocalCurrency { get; set; }
-
-        [Display(Name = "Estado")]
-        public bool IsActive { get; set; } = true;
     }
 }

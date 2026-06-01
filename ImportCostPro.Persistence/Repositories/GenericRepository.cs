@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using ImportCostPro.Persistence.Common;
 using ImportCostPro.Persistence.Contexts;
 using ImportCostPro.Persistence.Interfaces.Repositories;
@@ -95,6 +96,19 @@ namespace ImportCostPro.Persistence.Repositories
         public async Task<bool> ExistsByIdAsync(int id)
         {
             return await _dbSet.AnyAsync(e => e.Id == id);
+        }
+
+        /// <summary>
+        /// Obtiene la cantidad de registros que cumplen con una condición opcional.
+        /// </summary>
+        public async Task<int> CountAsync(Expression<Func<T, bool>>? predicate = null)
+        {
+            if (predicate == null)
+            {
+                return await _dbSet.CountAsync();
+            }
+
+            return await _dbSet.CountAsync(predicate);
         }
     }
 }

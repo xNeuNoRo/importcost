@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ImportCostPro.Application.ViewModels.ExchageRateViewModels
 {
-    public class UpdateExchangeRateViewModel
+    public class UpdateExchangeRateViewModel : IValidatableObject
     {
         [Required(ErrorMessage = "El ID de la tasa de cambio no es válido.")]
         public int Id { get; set; }
@@ -29,5 +29,16 @@ namespace ImportCostPro.Application.ViewModels.ExchageRateViewModels
 
         [Display(Name = "Estado")]
         public bool IsActive { get; set; }
+
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            if (FromCurrencyId == ToCurrencyId && FromCurrencyId > 0)
+            {
+                yield return new ValidationResult(
+                    "La moneda origen no puede ser igual a la moneda destino.",
+                    new[] { nameof(FromCurrencyId), nameof(ToCurrencyId) }
+                );
+            }
+        }
     }
 }

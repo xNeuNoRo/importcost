@@ -35,7 +35,10 @@ namespace ImportCostPro.Application.ViewModels.ProductViewModels
         public string DefaultOriginCountryName { get; set; } = null!;
 
         [Display(Name = "Categoría Arancelaria")]
-        public string TariffCategoryName { get; set; } = null!;
+        public string TariffCategoryCode { get; set; } = null!;
+
+        [Display(Name = "Descripción Categoría")]
+        public string TariffCategoryDescription { get; set; } = null!;
 
         [Display(Name = "Estado")]
         public bool IsActive { get; set; }

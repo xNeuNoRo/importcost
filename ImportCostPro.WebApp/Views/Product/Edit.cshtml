@@ -1,0 +1,255 @@
+@model ImportCostPro.Application.ViewModels.ProductViewModels.ProductUpdateViewModel
+@{
+    ViewData["Title"] = "Editar";
+    ViewData["Breadcrumbs"] = new List<(string Text, string? Action, string? Controller)>
+    {
+        ("Catálogos", "Catalogues", "Home"),
+        ("Productos", "Index", "Product"),
+        ("Editar", null, null)
+    };
+}
+
+<div class="mb-6 animate__animated animate__fadeIn">
+    <a asp-action="Index"
+       class="inline-flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-blue-600 transition-colors cursor-pointer">
+        <i data-lucide="arrow-left" class="w-4 h-4"></i>
+        Volver al catálogo
+    </a>
+    <h1 class="text-2xl font-bold text-gray-900 mt-2">Editar Producto</h1>
+    <p class="text-sm text-gray-500">Actualice las especificaciones y clasificación del producto seleccionado.</p>
+</div>
+
+<div class="max-w-4xl animate__animated animate__fadeInUp animate__faster">
+    <div
+        class="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-300">
+        <form asp-action="Edit" method="post" class="p-6 sm:p-8">
+            <input type="hidden" asp-for="Id" />
+
+            @* Centro de Alertas Unificado *@
+            @if (TempData["ErrorMessage"] != null || !ViewData.ModelState.IsValid)
+            {
+                <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl flex flex-col gap-2 text-red-700 shadow-sm animate__animated animate__shakeX">
+                    <div class="flex items-center gap-3">
+                        <i data-lucide="alert-circle" class="w-5 h-5 shrink-0"></i>
+                        <p class="text-sm font-bold">Han ocurrido los siguientes inconvenientes:</p>
+                    </div>
+                    <div class="ml-8 text-xs space-y-1">
+                        @if (TempData["ErrorMessage"] != null)
+                        {
+                            <p>@TempData["ErrorMessage"]</p>
+                        }
+                        <div asp-validation-summary="All" class="validation-summary-fancy"></div>
+                    </div>
+                </div>
+            }
+
+            <div class="space-y-8">
+                @* Sección: Información Básica *@
+                <div>
+                    <h3
+                        class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2 border-b border-gray-100 pb-2">
+                        <i data-lucide="tag" class="w-5 h-5 text-blue-600"></i>
+                        Información General
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="group md:col-span-2">
+                            <label asp-for="Name"
+                                   class="block text-sm font-semibold text-gray-700 mb-2 group-focus-within:text-blue-600 transition-colors"></label>
+                            <div class="relative">
+                                <div
+                                    class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400 group-focus-within:text-blue-500 transition-colors">
+                                    <i data-lucide="package" class="w-4 h-4"></i>
+                                </div>
+                                <input asp-for="Name"
+                                       class="block w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm placeholder:text-gray-400 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none"
+                                       placeholder="Ej: Laptop Dell XPS 13" />
+                            </div>
+                            <span asp-validation-for="Name" class="mt-1.5 text-xs text-red-600 font-medium"></span>
+                        </div>
+
+                        <div class="group">
+                            <label asp-for="ReferenceCode"
+                                   class="block text-sm font-semibold text-gray-700 mb-2 group-focus-within:text-blue-600 transition-colors"></label>
+                            <div class="relative">
+                                <div
+                                    class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400 group-focus-within:text-blue-500 transition-colors">
+                                    <i data-lucide="hash" class="w-4 h-4"></i>
+                                </div>
+                                <input asp-for="ReferenceCode"
+                                       class="block w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm placeholder:text-gray-400 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none uppercase"
+                                       placeholder="Ej: DELL-7390-01" />
+                            </div>
+                            <span asp-validation-for="ReferenceCode"
+                                  class="mt-1.5 text-xs text-red-600 font-medium"></span>
+                        </div>
+
+                        <div class="group">
+                            <label asp-for="UnitOfMeasure"
+                                   class="block text-sm font-semibold text-gray-700 mb-2 group-focus-within:text-blue-600 transition-colors"></label>
+                            <div class="relative">
+                                <div
+                                    class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400 group-focus-within:text-blue-500 transition-colors">
+                                    <i data-lucide="layers" class="w-4 h-4"></i>
+                                </div>
+                                <select asp-for="UnitOfMeasure"
+                                        asp-items="Html.GetEnumSelectList<ImportCostPro.Persistence.Enums.UnitOfMeasure>()"
+                                        class="block w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none cursor-pointer">
+                                    <option value="">Seleccione UDM...</option>
+                                </select>
+                            </div>
+                            <span asp-validation-for="UnitOfMeasure"
+                                  class="mt-1.5 text-xs text-red-600 font-medium"></span>
+                        </div>
+                    </div>
+                </div>
+
+                @* Sección: Parámetros Físicos *@
+                <div>
+                    <h3
+                        class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2 border-b border-gray-100 pb-2">
+                        <i data-lucide="scale" class="w-5 h-5 text-blue-600"></i>
+                        Dimensiones y Peso
+                    </h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+                        <div class="group">
+                            <label asp-for="UnitWeight"
+                                   class="block text-sm font-semibold text-gray-700 mb-2 group-focus-within:text-blue-600 transition-colors"></label>
+                            <input asp-for="UnitWeight"
+                                   class="block w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none"
+                                   placeholder="0.00" />
+                            <span asp-validation-for="UnitWeight"
+                                  class="mt-1.5 text-xs text-red-600 font-medium"></span>
+                        </div>
+                        <div class="group">
+                            <label asp-for="Length"
+                                   class="block text-sm font-semibold text-gray-700 mb-2 group-focus-within:text-blue-600 transition-colors"></label>
+                            <input asp-for="Length"
+                                   class="block w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none"
+                                   placeholder="Opcional" />
+                            <span asp-validation-for="Length" class="mt-1.5 text-xs text-red-600 font-medium"></span>
+                        </div>
+                        <div class="group">
+                            <label asp-for="Width"
+                                   class="block text-sm font-semibold text-gray-700 mb-2 group-focus-within:text-blue-600 transition-colors"></label>
+                            <input asp-for="Width"
+                                   class="block w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none"
+                                   placeholder="Opcional" />
+                            <span asp-validation-for="Width" class="mt-1.5 text-xs text-red-600 font-medium"></span>
+                        </div>
+                        <div class="group">
+                            <label asp-for="Height"
+                                   class="block text-sm font-semibold text-gray-700 mb-2 group-focus-within:text-blue-600 transition-colors"></label>
+                            <input asp-for="Height"
+                                   class="block w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none"
+                                   placeholder="Opcional" />
+                            <span asp-validation-for="Height" class="mt-1.5 text-xs text-red-600 font-medium"></span>
+                        </div>
+                    </div>
+                </div>
+
+                @* Sección: Configuración Logística *@
+                <div>
+                    <h3
+                        class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2 border-b border-gray-100 pb-2">
+                        <i data-lucide="clipboard-check" class="w-5 h-5 text-blue-600"></i>
+                        Clasificación Logística
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="group">
+                            <label asp-for="DefaultOriginCountryId"
+                                   class="block text-sm font-semibold text-gray-700 mb-2 group-focus-within:text-blue-600 transition-colors"></label>
+                            <div class="relative">
+                                <div
+                                    class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400 group-focus-within:text-blue-500 transition-colors">
+                                    <i data-lucide="globe" class="w-4 h-4"></i>
+                                </div>
+                                <select asp-for="DefaultOriginCountryId" asp-items="ViewBag.Countries"
+                                        class="block w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none cursor-pointer">
+                                    <option value="">Seleccione país...</option>
+                                </select>
+                            </div>
+                            <span asp-validation-for="DefaultOriginCountryId"
+                                  class="mt-1.5 text-xs text-red-600 font-medium"></span>
+                        </div>
+
+                        <div class="group">
+                            <label asp-for="TariffCategoryId"
+                                   class="block text-sm font-semibold text-gray-700 mb-2 group-focus-within:text-blue-600 transition-colors"></label>
+                            <div class="relative">
+                                <div
+                                    class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400 group-focus-within:text-blue-500 transition-colors">
+                                    <i data-lucide="book-open" class="w-4 h-4"></i>
+                                </div>
+                                <select asp-for="TariffCategoryId" asp-items="ViewBag.Categories"
+                                        class="block w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none cursor-pointer">
+                                    <option value="">Seleccione categoría...</option>
+                                </select>
+                            </div>
+                            <span asp-validation-for="TariffCategoryId"
+                                  class="mt-1.5 text-xs text-red-600 font-medium"></span>
+                        </div>
+
+                        <div class="group md:col-span-2">
+                            <label asp-for="Description"
+                                   class="block text-sm font-semibold text-gray-700 mb-2 group-focus-within:text-blue-600 transition-colors"></label>
+                            <textarea asp-for="Description" rows="2"
+                                      class="block w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm placeholder:text-gray-400 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none resize-none"
+                                      placeholder="Breve descripción adicional del producto..."></textarea>
+                            <span asp-validation-for="Description"
+                                  class="mt-1.5 text-xs text-red-600 font-medium"></span>
+                        </div>
+                    </div>
+                </div>
+
+                @* Sección: Configuración Adicional *@
+                <div>
+                    <h3
+                        class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2 border-b border-gray-100 pb-2">
+                        <i data-lucide="settings" class="w-5 h-5 text-blue-600"></i>
+                        Configuración Adicional
+                    </h3>
+                    <label class="flex items-center gap-3 cursor-pointer group w-fit">
+                        <div class="relative">
+                            <input type="checkbox" asp-for="IsActive" class="peer sr-only" />
+                            <div
+                                class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:inset-s-0.5 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600 transition-colors">
+                            </div>
+                        </div>
+                        <span id="status-text"
+                              class="text-sm font-medium text-gray-600 group-hover:text-gray-900 transition-colors">Habilitar
+                            producto</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="mt-10 pt-6 border-t border-gray-100 flex items-center justify-end gap-3">
+                    <a asp-action="Index"
+                       class="px-5 py-2.5 text-sm font-semibold text-gray-600 hover:bg-gray-100 rounded-xl transition-all cursor-pointer">
+                        Volver atrás
+                    </a>
+                    <button type="submit"
+                            class="inline-flex items-center justify-center gap-2.5 px-8 py-2.5 bg-blue-600 text-white text-sm font-bold rounded-xl hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-200 transition-all cursor-pointer hover-scale active:scale-95">
+                        <i data-lucide="save" class="w-5 h-5"></i>
+                        Guardar cambios
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    @section Scripts {
+        <partial name="_ValidationScriptsPartial" />
+        <script>
+            const statusCheckbox = document.querySelector('input[name="IsActive"]');
+            const statusText = document.getElementById('status-text');
+
+            function updateStatusText() {
+                statusText.textContent = statusCheckbox.checked ? "Producto habilitado" : "Producto deshabilitado";
+                statusText.classList.toggle('text-green-600', statusCheckbox.checked);
+                statusText.classList.toggle('text-gray-600', !statusCheckbox.checked);
+            }
+
+            statusCheckbox.addEventListener('change', updateStatusText);
+            updateStatusText();
+        </script>
+    }

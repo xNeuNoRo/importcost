@@ -1,31 +1,37 @@
-using System.Diagnostics;
+using ImportCostPro.Application.Services;
 using Microsoft.AspNetCore.Mvc;
-using ImportCostPro.WebApp.Models;
 
-namespace ImportCostPro.WebApp.Controllers;
-
-public class HomeController : Controller
+namespace ImportCostPro.WebApp.Controllers
 {
-    private readonly ILogger<HomeController> _logger;
-
-    public HomeController(ILogger<HomeController> logger)
+    public class HomeController : Controller
     {
-        _logger = logger;
-    }
+        private readonly DashboardService _dashboardService;
 
-    public IActionResult Index()
-    {
-        return View();
-    }
+        public HomeController(DashboardService dashboardService)
+        {
+            _dashboardService = dashboardService;
+        }
 
-    public IActionResult Privacy()
-    {
-        return View();
-    }
+        public async Task<IActionResult> Index()
+        {
+            var viewModel = await _dashboardService.GetStatisticsAsync();
+            return View(viewModel);
+        }
 
-    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-    public IActionResult Error()
-    {
-        return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        public IActionResult Credits()
+        {
+            ViewData["Title"] = "Créditos del Proyecto";
+            return View();
+        }
+
+        public IActionResult Catalogues()
+        {
+            ViewData["Title"] = "Gestión de Catálogos";
+            ViewData["Breadcrumbs"] = new List<(string Text, string? Action, string? Controller)>
+            {
+                ("Catálogos", null, null)
+            };
+            return View();
+        }
     }
 }

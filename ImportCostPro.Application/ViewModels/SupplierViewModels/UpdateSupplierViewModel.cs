@@ -12,11 +12,10 @@ namespace ImportCostPro.Application.ViewModels.SupplierViewModels
         [Display(Name = "Nombre del Proveedor")]
         public string Name { get; set; } = null!;
 
-        [Required(ErrorMessage = "El correo electrónico del proveedor es requerido.")]
         [EmailAddress(ErrorMessage = "El correo electrónico debe tener un formato válido.")]
         [MaxLength(100, ErrorMessage = "El correo electrónico debe tener un máximo de 100 caracteres.")]
         [Display(Name = "Correo Electrónico")]
-        public string Email { get; set; } = null!;
+        public string? Email { get; set; }
 
         [Required(ErrorMessage = "El país de origen seleccionado no es válido.")]
         [Display(Name = "País de Origen")]

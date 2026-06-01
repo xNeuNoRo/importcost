@@ -18,5 +18,6 @@ namespace ImportCostPro.Application.DTOs.Product.Requests
         public UnitOfMeasure UnitOfMeasure { get; set; }
         public int DefaultOriginCountryId { get; set; }
         public int TariffCategoryId { get; set; }
+        public bool IsActive { get; set; }
     }
 }

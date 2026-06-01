@@ -27,5 +27,7 @@ namespace ImportCostPro.Application.ViewModels.ExchageRateViewModels
 
         [Display(Name = "Estado")]
         public bool IsActive { get; set; }
+
+        public string DisplayStatus { get; set; } = "Inactivo";
     }
 }

@@ -47,6 +47,14 @@ namespace ImportCostPro.Application.Services
                 );
             }
 
+            if (await _currencyRepository.ExistsByNameAsync(normalizedName))
+            {
+                throw new ValidationBusinessException(
+                    nameof(request.Name),
+                    $"El nombre de moneda '{normalizedName}' ya se encuentra registrado."
+                );
+            }
+
             if (request.IsLocalCurrency && await _currencyRepository.AnyLocalCurrencyAsync())
             {
                 throw new ValidationBusinessException(
@@ -83,6 +91,14 @@ namespace ImportCostPro.Application.Services
                 );
             }
 
+            if (await _currencyRepository.ExistsByNameAsync(normalizedName, request.Id))
+            {
+                throw new ValidationBusinessException(
+                    nameof(request.Name),
+                    $"El nombre de moneda '{normalizedName}' ya está siendo utilizado por otra divisa."
+                );
+            }
+
             if (existingCurrency.IsoCode != normalizedIsoCode)
             {
                 if (await _currencyRepository.ExistsByIsoCodeAsync(normalizedIsoCode, request.Id))
@@ -108,7 +124,19 @@ namespace ImportCostPro.Application.Services
                 {
                     throw new ValidationBusinessException(
                         nameof(request.IsLocalCurrency),
-                        "Operación rechazada. Ya existe otra divisa establecida como moneda local base."
+                        "Ya existe una moneda configurada como moneda local. Solo puede existir una moneda local en el sistema."
+                    );
+                }
+            }
+
+            // No permitimos inactivar la moneda local si tiene dependencias
+            if (existingCurrency.IsLocalCurrency && !request.IsActive)
+            {
+                if (await _currencyRepository.IsCurrencyReferencedAsync(request.Id))
+                {
+                    throw new ValidationBusinessException(
+                        nameof(request.IsActive),
+                        "No se puede inactivar la moneda local mientras existan registros que dependan de ella."
                     );
                 }
             }
@@ -125,6 +153,17 @@ namespace ImportCostPro.Application.Services
             return existingCurrency.Adapt<CurrencyResponse>();
         }
 
+        public async Task<CurrencyResponse?> GetLocalCurrencyAsync()
+        {
+            var currency = await _currencyRepository.GetLocalCurrencyAsync();
+            return currency?.Adapt<CurrencyResponse>();
+        }
+
+        public async Task<bool> IsCurrencyReferencedAsync(int id)
+        {
+            return await _currencyRepository.IsCurrencyReferencedAsync(id);
+        }
+
         public async Task<bool> ToggleStatusAsync(int id)
         {
             var currency = await _currencyRepository.GetByIdAsync(id);
@@ -133,11 +172,15 @@ namespace ImportCostPro.Application.Services
                 throw new BusinessException("La moneda específica no existe en el catálogo.");
             }
 
-            if (currency.IsLocalCurrency)
+            // Si se intenta INACTIVAR y es moneda local, validar dependencias
+            if (currency.IsLocalCurrency && currency.IsActive)
             {
-                throw new BusinessException(
-                    "La moneda local base del sistema no puede ser desactivada."
-                );
+                if (await _currencyRepository.IsCurrencyReferencedAsync(id))
+                {
+                    throw new BusinessException(
+                        "No se puede inactivar la moneda local mientras existan registros que dependan de ella."
+                    );
+                }
             }
 
             currency.IsActive = !currency.IsActive;
@@ -159,14 +202,14 @@ namespace ImportCostPro.Application.Services
             if (currency.IsLocalCurrency)
             {
                 throw new BusinessException(
-                    "Está prohibido eliminar físicamente la moneda local del sistema."
+                    "No se puede eliminar la moneda local del sistema."
                 );
             }
 
             if (await _currencyRepository.IsCurrencyReferencedAsync(id))
             {
                 throw new BusinessException(
-                    $"No es posible eliminar la divisa '{currency.Name}' debido a que cuenta con tasas de cambio u órdenes de importación asociadas."
+                    "No se puede eliminar esta moneda porque está asociada a otros registros del sistema."
                 );
             }
 

@@ -1,0 +1,519 @@
+@model ImportCostPro.Application.ViewModels.LandedCostViewModels.LandedCostCalculationViewModel
+@using ImportCostPro.Persistence.Enums
+@{
+    ViewData["Title"] = $"Resultado Liquidación - {Model.OrderNumber}";
+    ViewData["Breadcrumbs"] = new List<(string Text, string? Action, string? Controller)>
+    {
+        ("Operaciones", null, null),
+        ("Liquidación de Costos", "Index", "LandedCost"),
+        ($"Resultado #{Model.OrderNumber}", null, null)
+    };
+    bool isClosed = Model.OrderStatus == OrderStatus.Closed;
+}
+
+
+@* Encabezado Exclusivo para Impresión (Membrete Corporativo) *@
+<div class="print-only header-print">
+    <div class="flex justify-between items-end border-b-2 border-blue-600 pb-4 mb-6"
+         style="display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #2563eb; padding-bottom: 1rem; margin-bottom: 1.5rem;">
+        <div>
+            <h1 style="font-size: 2rem; font-weight: 900; color: #2563eb; margin: 0;">ImportCost <span
+                style="color: #111827;">Pro</span></h1>
+                <p
+                    style="font-size: 0.75rem; font-weight: 700; color: #6b7280; text-transform: uppercase; letter-spacing: 0.1em; margin: 0;">
+                    Sistema de Gestión Logística e Impositiva</p>
+                </div>
+                <div style="text-align: right;">
+                    <h2 style="font-size: 1.125rem; font-weight: 700; color: #1f2937; text-transform: uppercase; margin: 0;">
+                        Liquidación Oficial de Costos</h2>
+                        <p style="font-size: 0.75rem; color: #6b7280; font-family: monospace; margin: 0;">Documento No:
+                            @Model.OrderNumber</p>
+                            <p style="font-size: 0.75rem; color: #6b7280; font-family: monospace; margin: 0;">Emisión:
+                                @DateTime.Now.ToString("dd/MM/yyyy HH:mm")</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    @* Contenido Principal *@
+                    <div class="mb-6 animate__animated animate__fadeIn no-print">
+                        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                            <div>
+                                <a asp-controller="ImportOrder" asp-action="Index"
+                                   class="inline-flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-blue-600 transition-colors cursor-pointer">
+                                    <i data-lucide="arrow-left" class="w-4 h-4"></i>
+                                    Volver atrás
+                                </a>
+                                <h1 class="text-2xl font-bold text-gray-900 mt-2">Liquidación Oficial: Orden @Model.OrderNumber</h1>
+                                <p class="text-sm text-gray-500">Determinación del costo unitario puesto en almacén y desglose de
+                                    gravámenes.</p>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    @if (Model.OrderStatus == OrderStatus.Calculated)
+                                    {
+                                        <button type="button" onclick="confirmClose(@Model.ImportOrderId)"
+                                                class="inline-flex items-center justify-center gap-2 px-5 py-2 bg-emerald-600 text-white text-sm font-bold rounded-xl hover:bg-emerald-700 transition-all cursor-pointer shadow-sm shadow-emerald-200 hover-scale active:scale-95">
+                                            <i data-lucide="lock" class="w-4 h-4"></i>
+                                            Cerrar orden
+                                        </button>
+
+                                        <form id="closeOrderForm_@Model.ImportOrderId" asp-controller="ImportOrder" asp-action="ChangeStatus"
+                                              method="post" style="display:none;">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="id" value="@Model.ImportOrderId" />
+                                            <input type="hidden" name="newStatus" value="@OrderStatus.Closed" />
+                                        </form>
+                                    }
+                                    <button onclick="window.print()"
+                                            class="inline-flex items-center justify-center gap-2 px-4 py-2 bg-white text-gray-700 text-sm font-semibold rounded-lg border border-gray-200 hover:bg-gray-50 transition-all cursor-pointer shadow-sm">
+                                        <i data-lucide="printer" class="w-4 h-4"></i>
+                                        Imprimir Reporte
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        @if (TempData["SuccessMessage"] != null)
+                        {
+                            <div
+                                class="mb-6 p-4 bg-green-50 border border-green-200 rounded-xl flex items-center gap-3 text-green-700 shadow-sm animate__animated animate__fadeInDown no-print">
+                                <i data-lucide="check-circle" class="w-5 h-5 shrink-0"></i>
+                                <p class="text-sm font-medium">@TempData["SuccessMessage"]</p>
+                            </div>
+                        }
+
+                        @* Panel de Resumen Superior *@
+                        <div
+                            class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8 animate__animated animate__fadeInUp animate__faster print-resumen">
+                            <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm print-card">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Valor FOB Total (Local)</span>
+                                    <div class="p-1.5 bg-blue-50 text-blue-600 rounded-lg no-print">
+                                        <i data-lucide="banknote" class="w-4 h-4"></i>
+                                    </div>
+                                </div>
+                                <div class="flex flex-col">
+                                    <span class="text-xl font-black text-gray-900">@Model.TotalLocalFob.ToString("C2")</span>
+                                    <span class="text-[10px] text-gray-400 mt-1 font-medium">Tasa aplicada: 
+                                        <span class="font-bold">@Model.OriginCurrencyIsoCode</span> <i data-lucide="arrow-right" class="inline w-3 h-3 mx-0.5 opacity-75"></i> <span class="font-bold">@Model.LocalCurrencyIsoCode</span> (@Model.ExchangeRateUsed.ToString("N4"))
+                                    </span>
+                                </div>
+                                </div>
+
+                                <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm print-card">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Valor CIF Total</span>
+                                        <div class="p-1.5 bg-indigo-50 text-indigo-600 rounded-lg no-print">
+                                            <i data-lucide="ship" class="w-4 h-4"></i>
+                                        </div>
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <span class="text-xl font-black text-gray-900">@Model.TotalCif.ToString("C2")</span>
+                                        <span class="text-[10px] text-gray-400 mt-1 font-medium">Incluye Flete y Seguro</span>
+                                    </div>
+                                </div>
+
+                                <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm print-card">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <span class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Total Impuestos</span>
+                                        <div class="p-1.5 bg-purple-50 text-purple-600 rounded-lg no-print">
+                                            <i data-lucide="calculator" class="w-4 h-4"></i>
+                                        </div>
+                                    </div>
+                                    <div class="flex flex-col">
+                                        @{
+                                            var totalTaxes = Model.TotalTariff + Model.TotalExciseTax + Model.TotalCustomsService + Model.TotalItbis;
+                                        }
+                                        <span class="text-xl font-black text-gray-900">@totalTaxes.ToString("C2")</span>
+                                        <span class="text-[10px] text-gray-400 mt-1 font-medium">Arancel+ISC+Tasa+ITBIS</span>
+                                    </div>
+                                </div>
+
+                                <div class="bg-white p-5 rounded-2xl border border-blue-100 shadow-md shadow-blue-50 print-card print-primary">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <span class="text-[10px] font-bold text-blue-600 uppercase tracking-widest">Costo en Almacén</span>
+                                        <div class="p-1.5 bg-blue-600 text-white rounded-lg no-print">
+                                            <i data-lucide="check-circle" class="w-4 h-4"></i>
+                                        </div>
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <span class="text-xl font-black text-blue-700">@Model.TotalImportCost.ToString("C2")</span>
+                                        <span class="text-[10px] text-blue-400 mt-1 font-bold">@Model.TotalImportedQuantity.ToString("N0")
+                                            Unidades</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                @* Tabla Detallada *@
+                                <div
+                                    class="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden mb-8 animate__animated animate__fadeInUp animate__delay-1s print-section">
+                                    <div class="bg-gray-50/50 px-6 py-4 border-b border-gray-200 no-print">
+                                        <h3 class="text-sm font-bold text-gray-900 uppercase tracking-widest">Desglose Analítico por Artículo</h3>
+                                    </div>
+
+                                    <div class="overflow-x-auto print-overflow-visible">
+                                        <table class="w-full text-left border-collapse table-print">
+                                            <thead>
+                                                <tr class="bg-gray-100/50 text-[10px] font-bold text-gray-500 uppercase tracking-wider">
+                                                    <th class="px-3 py-3 border-b border-gray-200">Producto</th>
+                                                    <th class="px-2 py-3 border-b border-gray-200 text-center">Cant.</th>
+                                                    <th class="px-2 py-3 border-b border-gray-200 text-right">FOB U.</th>
+                                                    <th class="px-2 py-3 border-b border-gray-200 text-right">Flete</th>
+                                                    <th class="px-2 py-3 border-b border-gray-200 text-right">Seguro</th>
+                                                    <th class="px-2 py-3 border-b border-gray-200 text-right">CIF</th>
+                                                    <th class="px-2 py-3 border-b border-gray-200 text-right">Aranc.</th>
+                                                    <th class="px-2 py-3 border-b border-gray-200 text-right">ISC</th>
+                                                    <th class="px-2 py-3 border-b border-gray-200 text-right">Serv.</th>
+                                                    <th class="px-2 py-3 border-b border-gray-200 text-right">ITBIS</th>
+                                                    <th class="px-2 py-3 border-b border-gray-200 text-right">Otros</th>
+                                                    <th class="px-2 py-3 border-b border-gray-200 text-right bg-blue-50/30">Costo U.</th>
+                                                    <th class="px-2 py-3 border-b border-gray-200 text-right bg-emerald-50/30">P.Venta</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="divide-y divide-gray-100">
+                                                @foreach (var item in Model.Details)
+                                                {
+                                                    <tr class="hover:bg-gray-50/50 transition-colors">
+                                                        <td class="px-3 py-3">
+                                                            <div class="flex flex-col">
+                                                                <span class="text-[11px] font-bold text-gray-900">@item.ProductName</span>
+                                                                <span class="text-[9px] text-gray-400 font-mono">@item.ProductReferenceCode</span>
+                                                            </div>
+                                                        </td>
+                                                        <td class="px-2 py-3 text-center">
+                                                            <span class="text-[11px] text-gray-600">@item.Quantity.ToString("N0")</span>
+                                                        </td>
+                                                        <td class="px-2 py-3 text-right">
+                                                            <span
+                                                            class="text-[10px] font-mono text-gray-500">@item.OriginalUnitPriceFob.ToString("N2")</span>
+                                                        </td>
+                                                        <td class="px-2 py-3 text-right">
+                                                            <span class="text-[10px] font-mono text-gray-600">@item.AllocatedFreight.ToString("N2")</span>
+                                                        </td>
+                                                        <td class="px-2 py-3 text-right">
+                                                            <span class="text-[10px] font-mono text-gray-600">@item.AllocatedInsurance.ToString("N2")</span>
+                                                        </td>
+                                                        <td class="px-2 py-3 text-right">
+                                                            <span
+                                                            class="text-[10px] font-mono font-bold text-gray-700">@item.LocalTotalCif.ToString("N2")</span>
+                                                        </td>
+                                                        <td class="px-2 py-3 text-right">
+                                                            <span class="text-[10px] font-mono text-rose-600">@item.CustomsDutyAmount.ToString("N2")</span>
+                                                        </td>
+                                                        <td class="px-2 py-3 text-right">
+                                                            <span class="text-[10px] font-mono text-amber-600">@item.ExciseTaxAmount.ToString("N2")</span>
+                                                        </td>
+                                                        <td class="px-2 py-3 text-right">
+                                                            <span
+                                                            class="text-[10px] font-mono text-gray-600">@item.CustomsServiceAmount.ToString("N2")</span>
+                                                        </td>
+                                                        <td class="px-2 py-3 text-right">
+                                                            <span class="text-[10px] font-mono text-purple-600">@item.ItbisAmount.ToString("N2")</span>
+                                                        </td>
+                                                        <td class="px-2 py-3 text-right">
+                                                            <span
+                                                            class="text-[10px] font-mono text-gray-500">@item.AllocatedLocalExpenses.ToString("N2")</span>
+                                                        </td>
+                                                        <td class="px-2 py-3 text-right bg-blue-50/10 font-bold border-l border-blue-50">
+                                                            <span
+                                                            class="text-[11px] font-mono font-black text-blue-700">@item.UnitLandedCost.ToString("N2")</span>
+                                                        </td>
+                                                        <td class="px-2 py-3 text-right bg-emerald-50/10 font-bold border-l border-emerald-50">
+                                                            <span
+                                                            class="text-[11px] font-mono text-emerald-700">@item.SuggestedRetailPrice.ToString("N2")</span>
+                                                        </td>
+                                                    </tr>
+                                                }
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                @* Pie de Reporte Fiscal Balanceado *@
+                                <div
+                                    class="grid grid-cols-1 lg:grid-cols-2 gap-8 animate__animated animate__fadeInUp animate__delay-1s pb-12 print-footer-grid">
+                                    @* Columna Izquierda: Información de Certificación *@
+                                    <div
+                                        class="bg-blue-50/50 border border-blue-100 rounded-3xl p-8 flex flex-col justify-center relative overflow-hidden print-cert">
+                                        <div class="absolute top-0 right-0 -mr-8 -mt-8 w-32 h-32 bg-blue-600/5 rounded-full blur-2xl no-print"></div>
+
+                                        <div class="flex items-center gap-4 mb-6 relative z-10">
+                                            <div class="p-3 bg-blue-600 text-white rounded-2xl shadow-lg shadow-blue-200 no-print">
+                                                <i data-lucide="check-circle" class="w-8 h-8"></i>
+                                            </div>
+                                            <div>
+                                                <h4 class="text-lg font-bold text-blue-900">Validación de Costos</h4>
+                                                <p class="text-xs text-blue-600 font-medium uppercase tracking-widest">Garantía Contable de Importación
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div class="space-y-4 relative z-10">
+                                            <p class="text-base text-blue-800 leading-relaxed font-medium">
+                                                Este reporte certifica el <span class="text-blue-700 font-bold text-print-bold">costo real de su
+                                                importación</span> para la orden @Model.OrderNumber,
+                                                distribuyendo todos los gastos e impuestos de forma exacta.
+                                            </p>
+                                            <div class="pt-6 flex items-center gap-8 print-meta-row">
+                                                <div>
+                                                    <span class="block text-[10px] font-bold text-blue-400 uppercase tracking-widest mb-1">Fecha de
+                                                        Registro</span>
+                                                        <span class="text-sm font-bold text-blue-900">@DateTime.Now.ToString("dd/MM/yyyy")</span>
+                                                    </div>
+                                                    <div class="w-px h-10 bg-blue-200 no-print"></div>
+                                                    <div>
+                                                        <span class="block text-[10px] font-bold text-blue-400 uppercase tracking-widest mb-1">Estado
+                                                            Fiscal</span>
+                                                            <span class="inline-flex items-center gap-1.5 text-sm font-bold text-emerald-600">
+                                                                PROCESO VALIDADO
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            @* Columna Derecha: Resumen Impositivo y Gastos *@
+                                            <div class="bg-white border border-gray-200 rounded-3xl shadow-sm overflow-hidden flex flex-col print-resumen-card">
+                                                <div class="px-8 py-6 border-b border-gray-100 bg-gray-50/50">
+                                                    <h4 class="text-xs font-bold text-gray-400 uppercase tracking-widest">Resumen de Liquidación</h4>
+                                                </div>
+                                                <div class="p-8 space-y-4 flex-1">
+                                                    <div class="flex justify-between items-center text-sm">
+                                                        <span class="text-gray-500 font-medium">Total Gravámenes Arancelarios</span>
+                                                        <span class="font-mono font-bold text-rose-600">@Model.TotalTariff.ToString("C2")</span>
+                                                    </div>
+                                                    <div class="flex justify-between items-center text-sm">
+                                                        <span class="text-gray-500 font-medium">Total Impuesto Selectivo (ISC)</span>
+                                                        <span class="font-mono font-bold text-amber-600">@Model.TotalExciseTax.ToString("C2")</span>
+                                                    </div>
+                                                    <div class="flex justify-between items-center text-sm">
+                                                        <span class="text-gray-500 font-medium">Total Tasa Servicio de Aduanas</span>
+                                                        <span class="font-mono font-bold text-gray-700">@Model.TotalCustomsService.ToString("C2")</span>
+                                                    </div>
+                                                    <div class="flex justify-between items-center text-sm border-b border-gray-100 pb-4">
+                                                        <span class="text-gray-500 font-medium">Total ITBIS Liquidado</span>
+                                                        <span class="font-mono font-bold text-purple-600">@Model.TotalItbis.ToString("C2")</span>
+                                                    </div>
+                                                    <div class="flex justify-between items-center text-sm pt-2">
+                                                        <span class="text-gray-500 font-medium">Gastos Locales y Operativos</span>
+                                                        <span class="font-mono font-bold text-gray-900">@Model.TotalLocalExpenses.ToString("C2")</span>
+                                                    </div>
+                                                </div>
+
+                                                <div class="bg-linear-to-r from-blue-600 to-indigo-700 p-8 text-white print-total-box"
+                                                     style="background: linear-gradient(to right, #2563eb, #4338ca) !important; color: white !important;">
+                                                    <div class="flex justify-between items-center">
+                                                        <div class="flex flex-col">
+                                                            <span class="text-[10px] font-bold uppercase tracking-widest opacity-80 mb-1">Costo
+                                                                Consolidado</span>
+                                                                <span class="text-sm font-medium opacity-90">Total Puesto en Almacén</span>
+                                                            </div>
+                                                            <div class="flex flex-col items-end">
+                                                                <span class="text-2xl font-black">@Model.TotalImportCost.ToString("C2")</span>
+                                                                <span
+                                                                    class="text-[10px] font-bold text-blue-200">(@(string.IsNullOrEmpty(Model.LocalCurrencyIsoCode)
+                                                                                                                                                                ? "RD$" : Model.LocalCurrencyIsoCode))</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                @section Scripts {
+                                                    <script>
+                                                        lucide.createIcons();
+
+                                                        function confirmClose(id) {
+                                                            Swal.fire({
+                                                                title: 'Cerrar orden de importación',
+                                                                text: '¿Está seguro que desea cerrar esta orden de importación? Una vez cerrada, no podrá modificar sus datos, productos, gastos ni resultado de cálculo.',
+                                                                icon: 'question',
+                                                                showCancelButton: true,
+                                                                confirmButtonColor: '#10b981',
+                                                                cancelButtonColor: '#6b7280',
+                                                                confirmButtonText: 'Aceptar',
+                                                                cancelButtonText: 'Cancelar',
+                                                                reverseButtons: true,
+                                                                customClass: {
+                                                                    confirmButton: 'rounded-xl px-6 py-2.5 text-sm font-bold ml-2',
+                                                                    cancelButton: 'rounded-xl px-6 py-2.5 text-sm font-bold'
+                                                                }
+                                                            }).then((result) => {
+                                                                if (result.isConfirmed) {
+                                                                    document.getElementById('closeOrderForm_' + id).submit();
+                                                                }
+                                                            });
+                                                        }
+                                                    </script>
+                                                }
+
+                                                <style>
+                                                    /* Estilos para Pantalla */
+                                                    .print-only {
+                                                        display: none;
+                                                    }
+
+                                                    @@media print {
+                                                        @@page {
+                                                            size: landscape;
+                                                            margin: 0.5cm;
+                                                        }
+
+                                                        /* Ocultar elementos de UI */
+                                                        header,
+                                                        aside,
+                                                        nav,
+                                                        .mb-6,
+                                                        button,
+                                                        .no-print,
+                                                        .animate__animated {
+                                                            display: none !important;
+                                                            animation: none !important;
+                                                        }
+
+                                                        /* Reset de Layout para Impresión */
+                                                        body {
+                                                            background: white !important;
+                                                            color: black !important;
+                                                            margin: 0 !important;
+                                                            padding: 0 !important;
+                                                            font-family: 'Inter', sans-serif !important;
+                                                            -webkit-print-color-adjust: exact !important;
+                                                            print-color-adjust: exact !important;
+                                                        }
+
+                                                        main {
+                                                            margin: 0 !important;
+                                                            padding: 0 !important;
+                                                            width: 100% !important;
+                                                        }
+
+                                                        .container,
+                                                        .max-w-5xl {
+                                                            max-width: 100% !important;
+                                                            width: 100% !important;
+                                                            margin: 0 !important;
+                                                            padding: 0 !important;
+                                                        }
+
+                                                        /* Encabezado exclusivo para impresión */
+                                                        .print-only {
+                                                            display: block !important;
+                                                        }
+
+                                                        .header-print {
+                                                            margin-bottom: 1.5rem !important;
+                                                        }
+
+                                                        /* Saneamiento de Tarjetas y Bordes */
+                                                        .rounded-2xl,
+                                                        .rounded-3xl,
+                                                        .print-card,
+                                                        .print-cert,
+                                                        .print-resumen-card {
+                                                            border-radius: 8px !important;
+                                                            border: 1px solid #d1d5db !important;
+                                                            box-shadow: none !important;
+                                                            margin-bottom: 0.75rem !important;
+                                                            overflow: hidden !important;
+                                                        }
+
+                                                        /* Optimización de Tabla */
+                                                        .overflow-x-auto {
+                                                            overflow: visible !important;
+                                                        }
+
+                                                        .table-print {
+                                                            width: 100% !important;
+                                                            table-layout: auto !important;
+                                                            border-collapse: collapse !important;
+                                                        }
+
+                                                        .table-print th {
+                                                            background-color: #f3f4f6 !important;
+                                                            color: #111827 !important;
+                                                            font-size: 8px !important;
+                                                            padding: 6px 3px !important;
+                                                            border: 1px solid #d1d5db !important;
+                                                            text-transform: uppercase !important;
+                                                        }
+
+                                                        .table-print td {
+                                                            font-size: 8.5px !important;
+                                                            padding: 5px 3px !important;
+                                                            border: 1px solid #e5e7eb !important;
+                                                        }
+
+                                                        /* Evitar que una fila se rompa entre dos páginas */
+                                                        tr {
+                                                            page-break-inside: avoid !important;
+                                                        }
+
+                                                        /* Control de bloques inferiores */
+                                                        .print-footer-grid {
+                                                            display: flex !important;
+                                                            flex-direction: row !important;
+                                                            gap: 15px !important;
+                                                            margin-top: 15px !important;
+                                                            page-break-inside: avoid !important;
+                                                            align-items: stretch !important;
+                                                        }
+
+                                                        .print-cert,
+                                                        .print-resumen-card {
+                                                            flex: 1 !important;
+                                                            width: 50% !important;
+                                                        }
+
+                                                        .print-resumen {
+                                                            display: flex !important;
+                                                            flex-direction: row !important;
+                                                            gap: 10px !important;
+                                                            margin-bottom: 1.5rem !important;
+                                                        }
+
+                                                        .print-card {
+                                                            flex: 1 !important;
+                                                            padding: 10px !important;
+                                                        }
+
+                                                        /* Colores específicos para impresión */
+                                                        .text-blue-600,
+                                                        .text-blue-700,
+                                                        .text-blue-800,
+                                                        .text-blue-900 {
+                                                            color: #1e40af !important;
+                                                        }
+
+                                                        .text-rose-600 {
+                                                            color: #b91c1c !important;
+                                                        }
+
+                                                        .text-amber-600 {
+                                                            color: #b45309 !important;
+                                                        }
+
+                                                        .text-emerald-600 {
+                                                            color: #047857 !important;
+                                                        }
+
+                                                        .text-print-bold {
+                                                            font-weight: 800 !important;
+                                                        }
+
+                                                        .bg-blue-600,
+                                                        .print-total-box {
+                                                            background-color: #1e40af !important;
+                                                            color: white !important;
+                                                            -webkit-print-color-adjust: exact;
+                                                        }
+
+                                                        .bg-blue-50\/50,
+                                                        .bg-blue-50 {
+                                                            background-color: #f0f9ff !important;
+                                                        }
+
+                                                        .bg-gray-100\/50,
+                                                        .bg-gray-50 {
+                                                            background-color: #f9fafb !important;
+                                                        }
+                                                    }
+                                                </style>

@@ -44,6 +44,19 @@ namespace ImportCostPro.Persistence.Repositories
             return await query.AnyAsync();
         }
 
+        public async Task<bool> ExistsLegalNameAsync(string legalName, int? excludeId = null)
+        {
+            string cleanName = legalName.Trim();
+            var query = _dbSet.Where(i => i.LegalName == cleanName);
+
+            if (excludeId.HasValue)
+            {
+                query = query.Where(i => i.Id != excludeId.Value);
+            }
+
+            return await query.AnyAsync();
+        }
+
         public async Task<bool> IsImporterReferencedAsync(int importerId)
         {
             return await _context.Set<ImportOrder>().AnyAsync(o => o.ImporterId == importerId);

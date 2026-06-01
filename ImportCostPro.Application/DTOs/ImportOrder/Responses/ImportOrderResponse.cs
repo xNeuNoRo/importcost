@@ -24,5 +24,6 @@ namespace ImportCostPro.Application.DTOs.ImportOrder.Responses
         public DateTime OrderDate { get; set; }
         public decimal FobTotal { get; set; }
         public decimal TotalLandedCost { get; set; }
+        public decimal ExchangeRateUsed { get; set; }
     }
 }

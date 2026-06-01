@@ -29,6 +29,19 @@ namespace ImportCostPro.Persistence.Repositories
             return await query.AnyAsync();
         }
 
+        public async Task<bool> ExistsByNameAsync(string name, int? excludeId = null)
+        {
+            string cleanName = name.Trim();
+            var query = _dbSet.Where(c => c.Name == cleanName);
+
+            if (excludeId.HasValue)
+            {
+                query = query.Where(c => c.Id != excludeId.Value);
+            }
+
+            return await query.AnyAsync();
+        }
+
         public async Task<bool> AnyLocalCurrencyAsync(int? excludingId = null)
         {
             var query = _dbSet.Where(c => c.IsLocalCurrency);

@@ -27,6 +27,10 @@ namespace ImportCostPro.Application.Extensions
                     .CalculationResults.OrderByDescending(c => c.CreatedAt)
                     .Select(c => c.TotalImportCost)
                     .FirstOrDefault(),
+                ExchangeRateUsed = entity
+                    .CalculationResults.OrderByDescending(c => c.CreatedAt)
+                    .Select(c => c.ExchangeRateUsed)
+                    .FirstOrDefault()
             };
         }
     }

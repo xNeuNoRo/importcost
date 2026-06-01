@@ -44,7 +44,7 @@ namespace ImportCostPro.Application.Services
         public async Task<SupplierResponse> CreateAsync(CreateSupplierRequest request)
         {
             string normalizedName = request.Name.Trim();
-            string normalizedEmail = request.Email.Trim();
+            string? normalizedEmail = request.Email?.Trim();
 
             var country = await _countryRepository.GetByIdAsync(request.OriginCountryId);
             if (country == null || !country.IsActive)
@@ -86,7 +86,7 @@ namespace ImportCostPro.Application.Services
         public async Task<SupplierResponse> UpdateAsync(UpdateSupplierRequest request)
         {
             string normalizedName = request.Name.Trim();
-            string normalizedEmail = request.Email.Trim();
+            string? normalizedEmail = request.Email?.Trim();
 
             var entity = await _supplierRepository.GetByIdAsync(request.Id);
             if (entity == null)
@@ -153,6 +153,7 @@ namespace ImportCostPro.Application.Services
             request.Adapt(entity);
             entity.Name = normalizedName;
             entity.Email = normalizedEmail;
+            entity.IsActive = request.IsActive;
 
             await _supplierRepository.UpdateAsync(entity);
 
@@ -173,7 +174,7 @@ namespace ImportCostPro.Application.Services
             if (isReferenced)
             {
                 throw new BusinessException(
-                    $"No se puede eliminar el proveedor '{entity.Name}' porque cuenta con órdenes de importación asociadas."
+                    "No se puede eliminar este proveedor porque tiene órdenes de importación registradas."
                 );
             }
 

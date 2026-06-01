@@ -58,6 +58,14 @@ namespace ImportCostPro.Application.Services
                 );
             }
 
+            if (await _importerRepository.ExistsLegalNameAsync(normalizedLegalName))
+            {
+                throw new ValidationBusinessException(
+                    nameof(request.LegalName),
+                    "Ya existe un importador registrado con esta razón social."
+                );
+            }
+
             var importer = request.Adapt<Importer>();
             importer.LegalName = normalizedLegalName;
             importer.TaxId = normalizedTaxID;
@@ -109,13 +117,22 @@ namespace ImportCostPro.Application.Services
             {
                 throw new ValidationBusinessException(
                     nameof(request.TaxId),
-                    "El RNC ingresado ya está siendo utilizado por otro importador."
+                    "Ya existe un importador registrado con este RNC o identificación fiscal."
+                );
+            }
+
+            if (await _importerRepository.ExistsLegalNameAsync(normalizedLegalName, excludeId: request.Id))
+            {
+                throw new ValidationBusinessException(
+                    nameof(request.LegalName),
+                    "La razón social ingresada ya está siendo utilizada por otro importador."
                 );
             }
 
             existingImporter = request.Adapt(existingImporter);
             existingImporter.LegalName = normalizedLegalName;
             existingImporter.TaxId = normalizedTaxID;
+            existingImporter.IsActive = request.IsActive;
 
             await _importerRepository.UpdateAsync(existingImporter);
 
@@ -137,7 +154,7 @@ namespace ImportCostPro.Application.Services
             if (await _importerRepository.IsImporterReferencedAsync(id))
             {
                 throw new BusinessException(
-                    $"No se puede eliminar: el importador '{existingImporter.LegalName}' posee órdenes de importación históricas."
+                    "No se puede eliminar este importador porque tiene órdenes de importación registradas."
                 );
             }
 

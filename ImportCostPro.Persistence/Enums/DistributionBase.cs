@@ -1,10 +1,19 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace ImportCostPro.Persistence.Enums
 {
     public enum DistributionBase
     {
-        FobValue = 1, // Promediar por Valor FOB
-        Weight = 2, // Promediar por Peso Bruto
-        Volume = 3, // Promediar por Volumen
-        Quantity = 4, // Promediar por Cantidad de Unidades
+        [Display(Name = "Valor FOB")]
+        FobValue = 1,
+
+        [Display(Name = "Peso Bruto")]
+        Weight = 2,
+
+        [Display(Name = "Volumen")]
+        Volume = 3,
+
+        [Display(Name = "Cantidad")]
+        Quantity = 4,
     }
 }
