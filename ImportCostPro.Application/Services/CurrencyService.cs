@@ -202,7 +202,7 @@ namespace ImportCostPro.Application.Services
             if (currency.IsLocalCurrency)
             {
                 throw new BusinessException(
-                    "Está prohibido eliminar físicamente la moneda local del sistema."
+                    "No se puede eliminar la moneda local del sistema."
                 );
             }
 
