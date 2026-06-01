@@ -1,6 +1,7 @@
 @model ImportCostPro.Application.ViewModels.TariffCategoryViewModels.UpdateTariffCategoryViewModel
 @{
     ViewData["Title"] = "Editar Categoría Arancelaria";
+    bool isReferenced = ViewBag.IsReferenced ?? false;
 }
 
 <div class="mb-6 animate__animated animate__fadeIn">
@@ -12,6 +13,14 @@
     <h1 class="text-2xl font-bold text-gray-900 mt-2">Editar Categoría</h1>
     <p class="text-sm text-gray-500">Actualice las tasas impositivas y la descripción de la categoría.</p>
 </div>
+
+@if (isReferenced)
+{
+    <div class="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-xl flex items-center gap-3 text-amber-700 shadow-sm animate__animated animate__fadeInDown">
+        <i data-lucide="info" class="w-5 h-5 shrink-0"></i>
+        <p class="text-sm font-medium">Esta categoría está asociada a productos en el catálogo. Los campos críticos de cálculo han sido bloqueados para preservar la integridad histórica.</p>
+    </div>
+}
 
 <div class="max-w-4xl animate__animated animate__fadeInUp animate__faster">
     <div
@@ -55,8 +64,9 @@
                                     <i data-lucide="hash" class="w-4 h-4"></i>
                                 </div>
                                 <input asp-for="Code"
-                                       class="block w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm placeholder:text-gray-400 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none uppercase"
-                                       placeholder="Ej: 8471.30.00" />
+                                       class="block w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm placeholder:text-gray-400 focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none uppercase @(isReferenced ? "bg-gray-100 cursor-not-allowed" : "")"
+                                       placeholder="Ej: 8471.30.00" 
+                                       readonly="@isReferenced" />
                             </div>
                             <span asp-validation-for="Code" class="mt-1.5 text-xs text-red-600 font-medium"></span>
                         </div>
@@ -99,8 +109,9 @@
                                                 <i data-lucide="percent" class="w-4 h-4"></i>
                                             </div>
                                             <input asp-for="CustomsDutyRate"
-                                                   class="block w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none"
-                                                   placeholder="0.00" />
+                                                   class="block w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none @(isReferenced ? "bg-gray-100 cursor-not-allowed" : "")"
+                                                   placeholder="0.00"
+                                                   readonly="@isReferenced" />
                                         </div>
                                         <span asp-validation-for="CustomsDutyRate"
                                               class="mt-1.5 text-xs text-red-600 font-medium"></span>
@@ -116,8 +127,9 @@
                                                     <i data-lucide="percent" class="w-4 h-4"></i>
                                                 </div>
                                                 <input asp-for="ExciseTaxRate"
-                                                       class="block w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none disabled:bg-gray-100 disabled:text-gray-400"
-                                                       placeholder="0.00" />
+                                                       class="block w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none disabled:bg-gray-100 disabled:text-gray-400 @(isReferenced ? "bg-gray-100 cursor-not-allowed" : "")"
+                                                       placeholder="0.00"
+                                                       readonly="@isReferenced" />
                                             </div>
                                             <span asp-validation-for="ExciseTaxRate"
                                                   class="mt-1.5 text-xs text-red-600 font-medium"></span>
@@ -125,28 +137,30 @@
                                     </div>
 
                                     <div class="space-y-6 bg-gray-50/50 p-6 rounded-2xl border border-gray-100">
-                                        <label class="flex items-center gap-3 cursor-pointer group w-fit">
+                                        <label class="flex items-center gap-3 w-fit @(isReferenced ? "cursor-not-allowed" : "cursor-pointer group")">
                                             <div class="relative">
-                                                <input type="checkbox" asp-for="AppliesItbis" class="peer sr-only" />
+                                                <input type="checkbox" asp-for="AppliesItbis" class="peer sr-only" disabled="@isReferenced" />
                                                 <div
-                                                    class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:inset-s-0.5 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600 transition-colors">
+                                                    class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:inset-s-0.5 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600 transition-colors @(isReferenced ? "opacity-50" : "")">
                                                 </div>
+                                                @if (isReferenced) { <input type="hidden" asp-for="AppliesItbis" /> }
                                             </div>
                                             <span
-                                                class="text-sm font-medium text-gray-700 group-hover:text-gray-900 transition-colors">Aplica
+                                                class="text-sm font-medium text-gray-700 @(isReferenced ? "" : "group-hover:text-gray-900") transition-colors">Aplica
                                                 pago de ITBIS</span>
                                             </label>
 
-                                            <label class="flex items-center gap-3 cursor-pointer group w-fit">
+                                            <label class="flex items-center gap-3 w-fit @(isReferenced ? "cursor-not-allowed" : "cursor-pointer group")">
                                                 <div class="relative">
                                                     <input type="checkbox" asp-for="AppliesExciseTax" id="excise-switch"
-                                                           class="peer sr-only" />
+                                                           class="peer sr-only" disabled="@isReferenced" />
                                                     <div
-                                                        class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:inset-s-0.5 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600 transition-colors">
+                                                        class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:inset-s-0.5 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600 transition-colors @(isReferenced ? "opacity-50" : "")">
                                                     </div>
+                                                    @if (isReferenced) { <input type="hidden" asp-for="AppliesExciseTax" /> }
                                                 </div>
                                                 <span
-                                                    class="text-sm font-medium text-gray-700 group-hover:text-gray-900 transition-colors">Aplica
+                                                    class="text-sm font-medium text-gray-700 @(isReferenced ? "" : "group-hover:text-gray-900") transition-colors">Aplica
                                                     Impuesto Selectivo (ISC)</span>
                                                 </label>
                                             </div>
@@ -200,8 +214,14 @@
                                 const statusText = document.getElementById('status-text');
 
                                 function toggleExcise() {
+                                    if (@(isReferenced ? "true" : "false")) return; // Don't run toggle logic if locked
+                                    
                                     exciseInput.disabled = !exciseSwitch.checked;
                                     exciseContainer.style.opacity = exciseSwitch.checked ? '1' : '0.5';
+                                    
+                                    if (!exciseSwitch.checked) {
+                                        exciseInput.value = "0";
+                                    }
                                 }
 
                                 function updateStatusText() {

@@ -69,6 +69,7 @@ namespace ImportCostPro.WebApp.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
+            ViewBag.IsReferenced = await _tariffCategoryService.IsReferencedAsync(id);
             return View(category.Adapt<UpdateTariffCategoryViewModel>());
         }
 

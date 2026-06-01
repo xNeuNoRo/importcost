@@ -32,10 +32,32 @@ namespace ImportCostPro.Application.Services
             return category.ToResponse();
         }
 
+        public async Task<bool> IsReferencedAsync(int id)
+        {
+            return await _tariffCategoryRepository.IsTariffCategoryReferencedAsync(id);
+        }
+
         public async Task<TariffCategoryResponse> CreateAsync(CreateTariffCategoryRequest request)
         {
             string normalizedCode = request.Code.Trim().ToUpperInvariant();
             string normalizedDescription = request.Description.Trim();
+
+            // Validaciones de Reglas de Negocio
+            if (request.AppliesExciseTax && request.ExciseTaxRate <= 0)
+            {
+                throw new ValidationBusinessException(
+                    nameof(request.ExciseTaxRate),
+                    "Si aplica impuesto selectivo, el porcentaje debe ser mayor que 0."
+                );
+            }
+
+            if (!request.AppliesExciseTax && request.ExciseTaxRate != 0)
+            {
+                throw new ValidationBusinessException(
+                    nameof(request.ExciseTaxRate),
+                    "Si no aplica impuesto selectivo, el porcentaje debe ser 0."
+                );
+            }
 
             bool duplicate = await _tariffCategoryRepository.ExistsByCodeAsync(normalizedCode);
             if (duplicate)
@@ -70,6 +92,23 @@ namespace ImportCostPro.Application.Services
             {
                 throw new BusinessException(
                     $"La categoría arancelaria con ID {request.Id} no fue encontrada en el sistema."
+                );
+            }
+
+            // Validaciones de Reglas de Negocio
+            if (request.AppliesExciseTax && request.ExciseTaxRate <= 0)
+            {
+                throw new ValidationBusinessException(
+                    nameof(request.ExciseTaxRate),
+                    "Si aplica impuesto selectivo, el porcentaje debe ser mayor que 0."
+                );
+            }
+
+            if (!request.AppliesExciseTax && request.ExciseTaxRate != 0)
+            {
+                throw new ValidationBusinessException(
+                    nameof(request.ExciseTaxRate),
+                    "Si no aplica impuesto selectivo, el porcentaje debe ser 0."
                 );
             }
 
@@ -122,9 +161,7 @@ namespace ImportCostPro.Application.Services
             var entity = await _tariffCategoryRepository.GetByIdAsync(id);
             if (entity == null)
             {
-                throw new BusinessException(
-                    $"La categoría arancelaria con ID {id} no fue encontrada."
-                );
+                throw new BusinessException($"La categoría arancelaria con ID {id} no existe.");
             }
 
             entity.IsActive = !entity.IsActive;
