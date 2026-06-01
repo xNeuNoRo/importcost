@@ -1,4 +1,5 @@
 @model IEnumerable<ImportCostPro.Application.ViewModels.ProductViewModels.ProductViewModel>
+@using ImportCostPro.Application.Extensions
 @{
     ViewData["Title"] = "Catálogo de Productos";
 }
@@ -36,8 +37,9 @@
             <thead>
                 <tr class="bg-gray-50/50 border-b border-gray-200">
                     <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Producto</th>
-                    <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-center">Peso</th>
-                    <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Dimensiones (L x A x A)</th>
+                    <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Origen / Arancel</th>
+                    <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-center">Físicos (kg / cm)</th>
+                    <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-center">U.M.</th>
                     <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-center">Estado</th>
                     <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">Acciones</th>
                 </tr>
@@ -46,7 +48,7 @@
                 @if (!Model.Any())
                 {
                     <tr>
-                        <td colspan="5" class="px-6 py-12 text-center text-gray-500 italic">
+                        <td colspan="6" class="px-6 py-12 text-center text-gray-500 italic">
                             No se encontraron productos registrados en el catálogo.
                         </td>
                     </tr>
@@ -57,37 +59,50 @@
                         <td class="px-6 py-4">
                             <div class="flex flex-col">
                                 <span class="text-sm font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">@item.Name</span>
-                                <span class="text-xs text-gray-500 font-mono mt-0.5">Ref: @item.ReferenceCode</span>
+                                <span class="text-[10px] text-gray-500 font-mono mt-0.5 bg-gray-100 px-1.5 py-0.5 rounded w-fit">REF: @item.ReferenceCode</span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="flex flex-col gap-1">
+                                <div class="flex items-center gap-1.5 text-xs text-gray-600">
+                                    <i data-lucide="globe" class="w-3.5 h-3.5 text-gray-400"></i>
+                                    @item.DefaultOriginCountryName
+                                </div>
+                                <div class="flex items-center gap-1.5 text-[10px] font-bold text-blue-600">
+                                    <i data-lucide="book-open" class="w-3.5 h-3.5"></i>
+                                    @item.TariffCategoryCode
+                                </div>
                             </div>
                         </td>
                         <td class="px-6 py-4 text-center">
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-bold bg-blue-50 text-blue-700 border border-blue-100">
-                                @item.UnitWeight.ToString("N2") kg
-                            </span>
-                        </td>
-                        <td class="px-6 py-4">
-                            @if (item.Length.HasValue && item.Width.HasValue && item.Height.HasValue)
-                            {
-                                <span class="text-xs text-gray-600 font-medium">
-                                    @item.Length.Value.ToString("N1") x @item.Width.Value.ToString("N1") x @item.Height.Value.ToString("N1") cm
+                            <div class="flex flex-col items-center gap-1">
+                                <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-black bg-blue-50 text-blue-700 border border-blue-100">
+                                    @item.UnitWeight.ToString("N2") kg
                                 </span>
-                            }
-                            else
-                            {
-                                <span class="text-xs text-gray-400 italic">N/A</span>
-                            }
+                                @if (item.Length.HasValue && item.Width.HasValue && item.Height.HasValue)
+                                {
+                                    <span class="text-[10px] text-gray-500 font-medium">
+                                        @(item.Length.Value.ToString("N0"))x@(item.Width.Value.ToString("N0"))x@(item.Height.Value.ToString("N0")) cm
+                                    </span>
+                                }
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                            <span class="text-xs font-bold text-gray-600 uppercase">
+                                @item.UnitOfMeasure.GetDisplayName()
+                            </span>
                         </td>
                         <td class="px-6 py-4 text-center">
                             @if (item.IsActive)
                             {
-                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700 border border-emerald-200 shadow-sm">
+                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase bg-emerald-100 text-emerald-700 border border-emerald-200 shadow-sm">
                                     <i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i>
                                     Activo
                                 </span>
                             }
                             else
                             {
-                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-rose-100 text-rose-700 border border-rose-200 shadow-sm">
+                                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase bg-rose-100 text-rose-700 border border-rose-200 shadow-sm">
                                     <i data-lucide="x-circle" class="w-3.5 h-3.5"></i>
                                     Inactivo
                                 </span>
@@ -96,18 +111,18 @@
                         <td class="px-6 py-4 text-right whitespace-nowrap">
                             <div class="flex items-center justify-end gap-2">
                                 <form asp-action="ToggleStatus" asp-route-id="@item.Id" method="post" class="inline">
-                                    <button type="submit" class="p-2.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all cursor-pointer hover-scale" title="@(item.IsActive ? "Desactivar" : "Activar")">
+                                    <button type="submit" class="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all cursor-pointer hover-scale" title="@(item.IsActive ? "Desactivar" : "Activar")">
                                         <i data-lucide="@(item.IsActive ? "toggle-right" : "toggle-left")" class="w-5 h-5"></i>
                                     </button>
                                 </form>
-                                <a asp-action="Edit" asp-route-id="@item.Id" class="p-2.5 text-gray-400 hover:text-amber-600 hover:bg-amber-50 rounded-xl transition-all cursor-pointer hover-scale" title="Editar">
+                                <a asp-action="Edit" asp-route-id="@item.Id" class="p-2 text-gray-400 hover:text-amber-600 hover:bg-amber-50 rounded-xl transition-all cursor-pointer hover-scale" title="Editar">
                                     <i data-lucide="edit-3" class="w-5 h-5"></i>
                                 </a>
                                 <button type="button" 
                                         data-id="@item.Id"
                                         data-name="@item.Name"
                                         onclick="confirmDelete(this)"
-                                        class="p-2.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all cursor-pointer hover-scale" 
+                                        class="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all cursor-pointer hover-scale" 
                                         title="Eliminar">
                                     <i data-lucide="trash-2" class="w-5 h-5"></i>
                                 </button>
@@ -117,9 +132,6 @@
                 }
             </tbody>
         </table>
-    </div>
-</div>
-
     </div>
 </div>
 
