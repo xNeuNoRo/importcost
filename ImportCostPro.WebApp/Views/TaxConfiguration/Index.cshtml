@@ -1,95 +1,134 @@
 @model ImportCostPro.Application.ViewModels.TaxConfigurationViewModels.SaveTaxConfigurationViewModel
 @{
     ViewData["Title"] = "Configuración de Impuestos";
+    ViewData["Breadcrumbs"] = new List<(string Text, string? Action, string? Controller)>
+    {
+        ("Configuración Fiscal", null, null),
+        ("Tasas de Impuestos", null, null)
+    };
 }
 
-<div class="mb-6 animate__animated animate__fadeIn">
-    <h1 class="text-2xl font-bold text-gray-900">Configuración Global de Impuestos</h1>
-    <p class="text-sm text-gray-500">Defina los porcentajes base para el cálculo del Costo de Importación Liquidado en todo el sistema.</p>
-</div>
-
-@if (TempData["SuccessMessage"] != null)
-{
-    <div class="mb-6 p-4 bg-green-50 border border-green-200 rounded-xl flex items-center gap-3 text-green-700 shadow-sm animate__animated animate__fadeInDown">
-        <i data-lucide="check-circle" class="w-5 h-5 shrink-0"></i>
-        <p class="text-sm font-medium">@TempData["SuccessMessage"]</p>
-    </div>
-}
-
-@if (TempData["ErrorMessage"] != null)
-{
-    <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl flex items-center gap-3 text-red-700 shadow-sm animate__animated animate__shakeX">
-        <i data-lucide="alert-circle" class="w-5 h-5 shrink-0"></i>
-        <p class="text-sm font-medium">@TempData["ErrorMessage"]</p>
-    </div>
-}
-
-<div class="max-w-3xl animate__animated animate__fadeInUp animate__faster">
-    <div class="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-300">
-        <div class="bg-gray-50/50 px-6 py-4 border-b border-gray-200 flex items-center gap-3">
-            <div class="p-2 bg-blue-600 rounded-lg text-white">
-                <i data-lucide="settings-2" class="w-5 h-5"></i>
-            </div>
-            <div>
-                <h3 class="text-sm font-bold text-gray-900">Panel de Configuración</h3>
-                <p class="text-[11px] text-gray-500 italic">Los cambios aplicados se utilizarán solo para nuevos cálculos oficiales.</p>
-            </div>
+<div class="animate__animated animate__fadeIn max-w-5xl mx-auto">
+    @* Encabezado Centralizado y de Lujo *@
+    <div class="text-center mb-10">
+        <div class="inline-flex p-3 bg-blue-50 text-blue-600 rounded-2xl mb-4 shadow-sm">
+            <i data-lucide="settings-2" class="w-8 h-8"></i>
         </div>
+        <h1 class="text-3xl font-black text-gray-900 tracking-tight mb-3">Configuración Global de Impuestos</h1>
+        <p class="text-base text-gray-500 max-w-2xl mx-auto">Defina los porcentajes base para el cálculo del Costo de Importación Liquidado en todo el sistema.</p>
+    </div>
 
-        <form asp-action="Save" method="post" class="p-6 sm:p-8">
-            @* Centro de Alertas Unificado *@
-            @if (TempData["ErrorMessage"] != null || !ViewData.ModelState.IsValid)
-            {
-                <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl flex flex-col gap-2 text-red-700 shadow-sm animate__animated animate__shakeX">
-                    <div class="flex items-center gap-3">
-                        <i data-lucide="alert-circle" class="w-5 h-5 shrink-0"></i>
-                        <p class="text-sm font-bold">Han ocurrido los siguientes inconvenientes:</p>
-                    </div>
-                    <div class="ml-8 text-xs space-y-1">
-                        @if (TempData["ErrorMessage"] != null)
-                        {
-                            <p>@TempData["ErrorMessage"]</p>
-                        }
-                        <div asp-validation-summary="All" class="validation-summary-fancy"></div>
-                    </div>
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="mb-8 p-4 bg-green-50 border border-green-200 rounded-2xl flex items-center gap-3 text-green-700 shadow-sm animate__animated animate__fadeInDown">
+            <i data-lucide="check-circle" class="w-5 h-5 shrink-0"></i>
+            <p class="text-sm font-medium">@TempData["SuccessMessage"]</p>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="mb-8 p-4 bg-red-50 border border-red-200 rounded-2xl flex items-center gap-3 text-red-700 shadow-sm animate__animated animate__shakeX">
+            <i data-lucide="alert-circle" class="w-5 h-5 shrink-0"></i>
+            <p class="text-sm font-medium">@TempData["ErrorMessage"]</p>
+        </div>
+    }
+
+    <div class="bg-white border border-gray-200 rounded-[2rem] shadow-xl shadow-gray-200/50 overflow-hidden hover:shadow-2xl transition-shadow duration-500 relative">
+        @* Detalles Visuales del Fondo *@
+        <div class="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-blue-50/50 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute bottom-0 left-0 -ml-16 -mb-16 w-64 h-64 bg-indigo-50/50 rounded-full blur-3xl pointer-events-none"></div>
+
+        <div class="relative z-10 p-8 sm:p-12">
+            <div class="flex items-center gap-4 mb-8 pb-6 border-b border-gray-100">
+                <div class="p-3 bg-gradient-to-tr from-blue-600 to-indigo-600 rounded-xl text-white shadow-md shadow-blue-200">
+                    <i data-lucide="sliders" class="w-6 h-6"></i>
                 </div>
-            }
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                @* Campo: ITBIS *@
-                <div class="group">
-                    <label asp-for="ItbisPercentage" class="block text-sm font-semibold text-gray-700 mb-2 group-focus-within:text-blue-600 transition-colors">Tasa General ITBIS (%)</label>
-                    <div class="relative">
-                        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400 group-focus-within:text-blue-500 transition-colors">
-                            <i data-lucide="percent" class="w-4 h-4"></i>
-                        </div>
-                        <input asp-for="ItbisPercentage" class="block w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-mono font-bold" placeholder="18.00" />
-                    </div>
-                    <span asp-validation-for="ItbisPercentage" class="mt-1.5 text-xs text-red-600 font-medium"></span>
-                    <p class="mt-2 text-[11px] text-gray-400">Porcentaje aplicado sobre la base imponible acumulada.</p>
-                </div>
-
-                @* Campo: Servicio Aduanal *@
-                <div class="group">
-                    <label asp-for="CustomsServiceRatePercentage" class="block text-sm font-semibold text-gray-700 mb-2 group-focus-within:text-blue-600 transition-colors">Tasa Servicio Aduanal (%)</label>
-                    <div class="relative">
-                        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400 group-focus-within:text-blue-500 transition-colors">
-                            <i data-lucide="anchor" class="w-4 h-4"></i>
-                        </div>
-                        <input asp-for="CustomsServiceRatePercentage" class="block w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none font-mono font-bold" placeholder="0.00" />
-                    </div>
-                    <span asp-validation-for="CustomsServiceRatePercentage" class="mt-1.5 text-xs text-red-600 font-medium"></span>
-                    <p class="mt-2 text-[11px] text-gray-400">Porcentaje aplicado sobre el valor CIF del producto.</p>
+                <div>
+                    <h3 class="text-lg font-black text-gray-900 tracking-tight">Parámetros del Motor de Cálculo</h3>
+                    <p class="text-[11px] text-gray-500 font-bold uppercase tracking-widest mt-1">Impacto global en nuevas liquidaciones</p>
                 </div>
             </div>
 
-            <div class="mt-10 pt-6 border-t border-gray-100 flex items-center justify-end">
-                <button type="submit" class="inline-flex items-center justify-center gap-2.5 px-10 py-3 bg-blue-600 text-white text-sm font-bold rounded-xl hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-200 transition-all cursor-pointer hover-scale active:scale-95">
-                    <i data-lucide="save" class="w-5 h-5"></i>
-                    Guardar cambios
-                </button>
-            </div>
-        </form>
+            <form asp-action="Save" method="post">
+                @* Centro de Alertas Unificado *@
+                @if (TempData["ErrorMessage"] != null || !ViewData.ModelState.IsValid)
+                {
+                    <div class="mb-8 p-5 bg-red-50 border border-red-100 rounded-2xl flex flex-col gap-2 text-red-700 shadow-sm animate__animated animate__shakeX">
+                        <div class="flex items-center gap-3">
+                            <i data-lucide="alert-octagon" class="w-5 h-5 shrink-0"></i>
+                            <p class="text-sm font-bold">Por favor, verifique los siguientes inconvenientes:</p>
+                        </div>
+                        <div class="ml-8 text-xs font-medium space-y-1">
+                            @if (TempData["ErrorMessage"] != null)
+                            {
+                                <p>@TempData["ErrorMessage"]</p>
+                            }
+                            <div asp-validation-summary="All" class="validation-summary-fancy"></div>
+                        </div>
+                    </div>
+                }
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    @* ITBIS Card *@
+                    <div class="bg-gray-50/50 border border-gray-100 rounded-3xl p-6 transition-all duration-300 hover:bg-white hover:border-blue-200 hover:shadow-lg hover:shadow-blue-100/50 group">
+                        <div class="flex items-center gap-3 mb-6">
+                            <div class="p-2 bg-blue-100 text-blue-600 rounded-lg group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                                <i data-lucide="percent" class="w-5 h-5"></i>
+                            </div>
+                            <h4 class="text-sm font-black text-gray-900 uppercase tracking-wide">Tasa General ITBIS</h4>
+                        </div>
+                        
+                        <div class="group/input">
+                            <div class="relative">
+                                <input asp-for="ItbisPercentage" class="block w-full pl-6 pr-12 py-4 bg-white border-2 border-gray-200 rounded-2xl text-2xl text-gray-900 focus:bg-white focus:ring-0 focus:border-blue-500 transition-all outline-none font-mono font-black shadow-sm group-hover/input:border-blue-300" placeholder="18.00" />
+                                <div class="absolute inset-y-0 right-0 pr-6 flex items-center pointer-events-none text-gray-400 font-black text-xl">
+                                    %
+                                </div>
+                            </div>
+                            <span asp-validation-for="ItbisPercentage" class="block mt-2 text-xs text-red-600 font-bold"></span>
+                            <p class="mt-4 text-[11px] text-gray-500 font-medium leading-relaxed bg-white/60 p-3 rounded-xl border border-gray-100">
+                                Porcentaje aplicado sobre la base imponible acumulada (CIF + Gravámenes).
+                            </p>
+                        </div>
+                    </div>
+
+                    @* Servicio Aduanal Card *@
+                    <div class="bg-gray-50/50 border border-gray-100 rounded-3xl p-6 transition-all duration-300 hover:bg-white hover:border-indigo-200 hover:shadow-lg hover:shadow-indigo-100/50 group">
+                        <div class="flex items-center gap-3 mb-6">
+                            <div class="p-2 bg-indigo-100 text-indigo-600 rounded-lg group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+                                <i data-lucide="anchor" class="w-5 h-5"></i>
+                            </div>
+                            <h4 class="text-sm font-black text-gray-900 uppercase tracking-wide">Servicio Aduanal</h4>
+                        </div>
+                        
+                        <div class="group/input">
+                            <div class="relative">
+                                <input asp-for="CustomsServiceRatePercentage" class="block w-full pl-6 pr-12 py-4 bg-white border-2 border-gray-200 rounded-2xl text-2xl text-gray-900 focus:bg-white focus:ring-0 focus:border-indigo-500 transition-all outline-none font-mono font-black shadow-sm group-hover/input:border-indigo-300" placeholder="0.00" />
+                                <div class="absolute inset-y-0 right-0 pr-6 flex items-center pointer-events-none text-gray-400 font-black text-xl">
+                                    %
+                                </div>
+                            </div>
+                            <span asp-validation-for="CustomsServiceRatePercentage" class="block mt-2 text-xs text-red-600 font-bold"></span>
+                            <p class="mt-4 text-[11px] text-gray-500 font-medium leading-relaxed bg-white/60 p-3 rounded-xl border border-gray-100">
+                                Porcentaje aplicado directamente sobre el valor total CIF de la mercancía.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-10 pt-8 border-t border-gray-100 flex items-center justify-between">
+                    <div class="hidden sm:flex items-center gap-2 text-amber-600 bg-amber-50 px-4 py-2 rounded-xl border border-amber-100">
+                        <i data-lucide="shield-alert" class="w-4 h-4"></i>
+                        <span class="text-[10px] font-bold uppercase tracking-widest">Afecta configuración global</span>
+                    </div>
+                    <button type="submit" class="inline-flex items-center justify-center gap-3 px-10 py-4 bg-gray-900 text-white text-sm font-black rounded-2xl hover:bg-black hover:shadow-xl hover:shadow-gray-300 transition-all cursor-pointer hover-scale active:scale-95 w-full sm:w-auto">
+                        <i data-lucide="save" class="w-5 h-5"></i>
+                        Actualizar Configuración
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 

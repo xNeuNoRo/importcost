@@ -1,6 +1,12 @@
 @model ImportCostPro.Application.ViewModels.CurrencyViewModels.CreateCurrencyViewModel
 @{
     ViewData["Title"] = "Nueva Moneda";
+    ViewData["Breadcrumbs"] = new List<(string, string?, string?)>
+    {
+        ("Catálogos", "Catalogues", "Home"),
+        ("Monedas", "Index", "Currency"),
+        ("Nueva Moneda", null, null)
+    };
 }
 
 <div class="mb-6 animate__animated animate__fadeIn">

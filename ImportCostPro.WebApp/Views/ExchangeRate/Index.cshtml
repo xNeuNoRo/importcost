@@ -1,6 +1,11 @@
 @model IEnumerable<ImportCostPro.Application.ViewModels.ExchageRateViewModels.ExchangeRateViewModel>
 @{
     ViewData["Title"] = "Tasas de Cambio";
+    ViewData["Breadcrumbs"] = new List<(string, string?, string?)>
+    {
+        ("Catálogos", "Catalogues", "Home"),
+        ("Tasas de Cambio", null, null)
+    };
 }
 
 <div class="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 animate__animated animate__fadeIn">

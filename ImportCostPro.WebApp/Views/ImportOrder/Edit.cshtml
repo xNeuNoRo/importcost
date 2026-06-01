@@ -2,6 +2,12 @@
 @using ImportCostPro.Persistence.Enums
 @{
     ViewData["Title"] = "Editar Orden";
+    ViewData["Breadcrumbs"] = new List<(string, string?, string?)>
+    {
+        ("Operaciones", null, null),
+        ("Órdenes", "Index", "ImportOrder"),
+        ("Editar", null, null)
+    };
     bool isLocked = Model.Status == OrderStatus.Closed || Model.Status == OrderStatus.Canceled;
     bool isCalculated = Model.Status == OrderStatus.Calculated;
 }

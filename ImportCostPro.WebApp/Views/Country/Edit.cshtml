@@ -1,6 +1,12 @@
 @model ImportCostPro.Application.ViewModels.CountryViewModels.CountryUpdateViewModel
 @{
     ViewData["Title"] = "Editar País";
+    ViewData["Breadcrumbs"] = new List<(string, string?, string?)>
+    {
+        ("Catálogos", "Catalogues", "Home"),
+        ("Países", "Index", "Country"),
+        ("Editar País", null, null)
+    };
 }
 
 <div class="mb-6 animate__animated animate__fadeIn">

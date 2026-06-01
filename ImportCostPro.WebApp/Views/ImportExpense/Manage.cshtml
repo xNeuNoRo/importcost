@@ -3,6 +3,13 @@
 @using ImportCostPro.Application.ViewModels.ImportOrderViewModels
 @{
     var order = (ImportOrderViewModel)ViewBag.Order;
+    ViewData["Title"] = $"Gastos - {order.OrderNumber}";
+    ViewData["Breadcrumbs"] = new List<(string, string?, string?)>
+    {
+        ("Operaciones", null, null), ("Órdenes", "Index", "ImportOrder"),
+        ($"Orden #{order.OrderNumber}", "Details", "ImportOrder"),
+        ("Gastos", null, null)
+    };
     bool isLocked = order.Status != OrderStatus.Open;
     string source = ViewBag.Source ?? (isLocked ? "Details" : "Edit");
 }

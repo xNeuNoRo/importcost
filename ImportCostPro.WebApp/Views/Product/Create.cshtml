@@ -1,6 +1,12 @@
 @model ImportCostPro.Application.ViewModels.ProductViewModels.ProductCreateViewModel
 @{
     ViewData["Title"] = "Registrar Producto";
+    ViewData["Breadcrumbs"] = new List<(string Text, string? Action, string? Controller)>
+    {
+        ("Catálogos", "Catalogues", "Home"),
+        ("Productos", "Index", "Product"),
+        ("Nuevo", null, null)
+    };
 }
 
 <div class="mb-6 animate__animated animate__fadeIn">

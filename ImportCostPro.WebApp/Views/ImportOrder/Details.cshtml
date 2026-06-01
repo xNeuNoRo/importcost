@@ -2,6 +2,12 @@
 @using ImportCostPro.Persistence.Enums
 @{
     ViewData["Title"] = "Consulta de Orden de Importación";
+    ViewData["Breadcrumbs"] = new List<(string, string?, string?)>
+    {
+        ("Operaciones", null, null),
+        ("Órdenes", "Index", "ImportOrder"),
+        ("Detalles", null, null)
+    };
     bool isCalculated = Model.Status == OrderStatus.Calculated || Model.Status == OrderStatus.Closed;
 }
 

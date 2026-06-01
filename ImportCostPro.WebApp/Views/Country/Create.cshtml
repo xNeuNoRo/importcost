@@ -1,6 +1,12 @@
 @model ImportCostPro.Application.ViewModels.CountryViewModels.CountryCreateViewModel
 @{
     ViewData["Title"] = "Nuevo País";
+    ViewData["Breadcrumbs"] = new List<(string, string?, string?)>
+    {
+        ("Catálogos", "Catalogues", "Home"),
+        ("Países", "Index", "Country"),
+        ("Nuevo País", null, null)
+    };
 }
 
 <div class="mb-6 animate__animated animate__fadeIn">

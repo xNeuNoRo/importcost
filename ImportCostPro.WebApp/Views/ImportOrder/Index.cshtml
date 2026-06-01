@@ -3,6 +3,11 @@
 @using ImportCostPro.Application.Extensions
 @{
     ViewData["Title"] = "Registro de Órdenes";
+    ViewData["Breadcrumbs"] = new List<(string, string?, string?)>
+    {
+        ("Operaciones", null, null),
+        ("Órdenes", null, null)
+    };
 }
 
 <div class="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 animate__animated animate__fadeIn">

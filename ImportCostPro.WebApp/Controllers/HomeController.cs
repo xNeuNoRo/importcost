@@ -23,5 +23,15 @@ namespace ImportCostPro.WebApp.Controllers
             ViewData["Title"] = "Créditos del Proyecto";
             return View();
         }
+
+        public IActionResult Catalogues()
+        {
+            ViewData["Title"] = "Gestión de Catálogos";
+            ViewData["Breadcrumbs"] = new List<(string Text, string? Action, string? Controller)>
+            {
+                ("Catálogos", null, null)
+            };
+            return View();
+        }
     }
 }

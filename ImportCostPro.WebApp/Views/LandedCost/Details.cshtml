@@ -2,8 +2,15 @@
 @using ImportCostPro.Persistence.Enums
 @{
     ViewData["Title"] = $"Resultado Liquidación - {Model.OrderNumber}";
+    ViewData["Breadcrumbs"] = new List<(string Text, string? Action, string? Controller)>
+    {
+        ("Operaciones", null, null),
+        ("Liquidación de Costos", "Index", "LandedCost"),
+        ($"Resultado #{Model.OrderNumber}", null, null)
+    };
     bool isClosed = Model.OrderStatus == OrderStatus.Closed;
 }
+
 
 @* Encabezado Exclusivo para Impresión (Membrete Corporativo) *@
 <div class="print-only header-print">

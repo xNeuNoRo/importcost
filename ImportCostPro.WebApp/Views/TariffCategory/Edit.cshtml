@@ -1,6 +1,12 @@
 @model ImportCostPro.Application.ViewModels.TariffCategoryViewModels.UpdateTariffCategoryViewModel
 @{
     ViewData["Title"] = "Editar Categoría Arancelaria";
+    ViewData["Breadcrumbs"] = new List<(string Text, string? Action, string? Controller)>
+    {
+        ("Catálogos", "Catalogues", "Home"),
+        ("Categorías Arancelarias", "Index", "TariffCategory"),
+        ("Editar", null, null)
+    };
     bool isReferenced = ViewBag.IsReferenced ?? false;
 }
 

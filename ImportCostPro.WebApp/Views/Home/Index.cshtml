@@ -1,6 +1,10 @@
 @model ImportCostPro.Application.ViewModels.DashboardViewModels.DashboardViewModel
 @{
     ViewData["Title"] = "Panel Principal de Control";
+    ViewData["Breadcrumbs"] = new List<(string, string?, string?)>
+    {
+        ("Dashboard", null, null)
+    };
 }
 
 <div class="animate__animated animate__fadeIn">
@@ -207,49 +211,161 @@
                                                             </div>
                                                         </div>
 
-                                                        @* Accesos Rápidos Inferiores *@
-                                                        <div class="bg-white border border-gray-200 rounded-3xl shadow-sm overflow-hidden">
+                                                        @* Accesos Rápidos Inferiores Configurables *@
+                                                        <div
+                                                            class="bg-white border border-gray-200 rounded-3xl shadow-sm overflow-hidden animate__animated animate__fadeInUp">
                                                             <div class="px-6 py-5 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
-                                                                <h3 class="text-sm font-bold text-gray-900 uppercase tracking-widest">Herramientas de Configuración</h3>
-                                                                <i data-lucide="settings" class="w-4 h-4 text-gray-400"></i>
+                                                                <h3 class="text-sm font-black text-gray-900 uppercase tracking-widest">Accesos Rápidos Personalizados</h3>
+                                                                <button onclick="configureQuickAccess()"
+                                                                        class="p-2 text-gray-400 hover:text-blue-600 hover:bg-white rounded-xl transition-all cursor-pointer hover-scale shadow-sm"
+                                                                        title="Configurar Accesos Rápidos">
+                                                                    <i data-lucide="settings" class="w-5 h-5"></i>
+                                                                </button>
                                                             </div>
-                                                            <div class="p-4 grid grid-cols-1 sm:grid-cols-3 gap-4">
-                                                                <a asp-controller="Currency" asp-action="Index"
-                                                                   class="flex items-center gap-4 p-4 rounded-2xl hover:bg-gray-50 border border-transparent hover:border-gray-100 transition-all">
-                                                                    <div class="p-2 bg-blue-50 text-blue-600 rounded-xl">
-                                                                        <i data-lucide="coins" class="w-5 h-5"></i>
-                                                                    </div>
-                                                                    <div>
-                                                                        <span class="block text-sm font-bold text-gray-900">Divisas</span>
-                                                                        <span class="text-xs text-gray-400">Manejo de monedas base</span>
-                                                                    </div>
-                                                                </a>
-                                                                <a asp-controller="TaxConfiguration" asp-action="Index"
-                                                                   class="flex items-center gap-4 p-4 rounded-2xl hover:bg-gray-50 border border-transparent hover:border-gray-100 transition-all">
-                                                                    <div class="p-2 bg-purple-50 text-purple-600 rounded-xl">
-                                                                        <i data-lucide="percent" class="w-5 h-5"></i>
-                                                                    </div>
-                                                                    <div>
-                                                                        <span class="block text-sm font-bold text-gray-900">Impuestos Globales</span>
-                                                                        <span class="text-xs text-gray-400">Tasas de ITBIS y Aduanas</span>
-                                                                    </div>
-                                                                </a>
-                                                                <a asp-controller="Country" asp-action="Index"
-                                                                   class="flex items-center gap-4 p-4 rounded-2xl hover:bg-gray-50 border border-transparent hover:border-gray-100 transition-all">
-                                                                    <div class="p-2 bg-emerald-50 text-emerald-600 rounded-xl">
-                                                                        <i data-lucide="globe" class="w-5 h-5"></i>
-                                                                    </div>
-                                                                    <div>
-                                                                        <span class="block text-sm font-bold text-gray-900">Países</span>
-                                                                        <span class="text-xs text-gray-400">Jurisdicciones de origen</span>
-                                                                    </div>
-                                                                </a>
+                                                            <div id="quick-access-container" class="p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                                                                @* Los elementos se cargan dinámicamente vía JS *@
+                                                            </div>
+                                                            <div id="no-tools-message" class="hidden p-12 text-center">
+                                                                <div class="p-4 bg-gray-50 rounded-2xl inline-block mb-4 text-gray-400">
+                                                                    <i data-lucide="layout-grid" class="w-8 h-8"></i>
+                                                                </div>
+                                                                <p class="text-sm font-medium text-gray-500">No ha seleccionado ninguna herramienta para acceso rápido.</p>
+                                                                <button onclick="configureQuickAccess()"
+                                                                        class="mt-4 text-blue-600 font-bold text-xs uppercase tracking-widest hover:underline">Configurar
+                                                                    ahora</button>
+                                                                </div>
                                                             </div>
                                                         </div>
-                                                    </div>
 
-                                                    @section Scripts {
-                                                        <script>
-                                                            lucide.createIcons();
-                                                        </script>
-                                                    }
+                                                        @section Scripts {
+                                                            <script>
+                                                                lucide.createIcons();
+
+                                                                const ALL_TOOLS = [
+                                                                    { id: 'currencies', label: 'Divisas', desc: 'Manejo de monedas base', icon: 'coins', color: 'blue', url: '@Url.Action("Index", "Currency")' },
+                                                                    { id: 'taxes', label: 'Impuestos', desc: 'Tasas de ITBIS y Aduanas', icon: 'percent', color: 'purple', url: '@Url.Action("Index", "TaxConfiguration")' },
+                                                                    { id: 'countries', label: 'Países', desc: 'Orígenes de importación', icon: 'globe', color: 'emerald', url: '@Url.Action("Index", "Country")' },
+                                                                    { id: 'products', label: 'Productos', desc: 'Catálogo de artículos', icon: 'box', color: 'amber', url: '@Url.Action("Index", "Product")' },
+                                                                    { id: 'importers', label: 'Importadores', desc: 'Registro de empresas', icon: 'building', color: 'indigo', url: '@Url.Action("Index", "Importer")' },
+                                                                    { id: 'suppliers', label: 'Proveedores', desc: 'Vendedores externos', icon: 'truck', color: 'rose', url: '@Url.Action("Index", "Supplier")' },
+                                                                    { id: 'rates', label: 'Tasas de Cambio', desc: 'Historial de divisas', icon: 'trending-up', color: 'cyan', url: '@Url.Action("Index", "ExchangeRate")' },
+                                                                    { id: 'categories', label: 'Categorías', desc: 'Clasificación fiscal', icon: 'book-open', color: 'orange', url: '@Url.Action("Index", "TariffCategory")' }
+                                                                ];
+
+                                                                function renderQuickAccess() {
+                                                                    const saved = JSON.parse(localStorage.getItem('dashboard-quick-access') || '["currencies", "taxes", "rates", "products"]');
+                                                                    const container = document.getElementById('quick-access-container');
+                                                                    const emptyMsg = document.getElementById('no-tools-message');
+
+                                                                    container.innerHTML = '';
+                                                                    const selectedTools = ALL_TOOLS.filter(t => saved.includes(t.id));
+
+                                                                    if (selectedTools.length === 0) {
+                                                                        container.classList.add('hidden');
+                                                                        emptyMsg.classList.remove('hidden');
+                                                                    } else {
+                                                                        container.classList.remove('hidden');
+                                                                        emptyMsg.classList.add('hidden');
+
+                                                                        selectedTools.forEach(tool => {
+                                                                            const card = `
+                                                                                                                                        <a href="${tool.url}" class="flex items-center gap-4 p-4 rounded-2xl bg-white hover:bg-${tool.color}-50 border border-gray-100 hover:border-${tool.color}-200 transition-all group hover-scale shadow-sm">
+                                                                                                                                            <div class="p-2 bg-${tool.color}-50 text-${tool.color}-600 rounded-xl group-hover:bg-${tool.color}-600 group-hover:text-white transition-all duration-300">
+                                                                                                                                                <i data-lucide="${tool.icon}" class="w-5 h-5"></i>
+                                                                                                                                            </div>
+                                                                                                                                            <div class="min-w-0">
+                                                                                                                                                <span class="block text-sm font-black text-gray-900 truncate">${tool.label}</span>
+                                                                                                                                                <span class="block text-[10px] text-gray-400 truncate uppercase font-bold tracking-tighter">${tool.desc}</span>
+                                                                                                                                            </div>
+                                                                                                                                        </a>
+                                                                                                                                    `;
+                                                                            container.innerHTML += card;
+                                                                        });
+                                                                        lucide.createIcons();
+                                                                    }
+                                                                }
+
+                                                                function configureQuickAccess() {
+                                                                    const saved = JSON.parse(localStorage.getItem('dashboard-quick-access') || '["currencies", "taxes", "rates", "products"]');
+
+                                                                    let html = '<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 p-4">';
+                                                                    ALL_TOOLS.forEach(tool => {
+                                                                        const isChecked = saved.includes(tool.id);
+                                                                        html += `
+                                                                                                                                    <div onclick="toggleToolSelection('${tool.id}')" 
+                                                                                                                                         id="tool-card-${tool.id}"
+                                                                                                                                         class="cursor-pointer p-4 rounded-2xl border-2 transition-all duration-300 flex flex-col items-center text-center gap-2 group ${isChecked ? 'border-blue-600 bg-blue-50 shadow-md' : 'border-gray-100 bg-gray-50 hover:border-blue-200'}">
+                                                                                                                                        <input type="checkbox" id="check-${tool.id}" class="hidden" ${isChecked ? 'checked' : ''}>
+                                                                                                                                        <div class="p-3 rounded-xl ${isChecked ? 'bg-blue-600 text-white' : 'bg-white text-gray-400 group-hover:text-blue-500'} shadow-sm transition-all duration-300">
+                                                                                                                                            <i data-lucide="${tool.icon}" class="w-6 h-6"></i>
+                                                                                                                                        </div>
+                                                                                                                                        <div>
+                                                                                                                                            <p class="text-xs font-black text-gray-900 leading-tight">${tool.label}</p>
+                                                                                                                                            <p class="text-[9px] text-gray-400 font-bold uppercase mt-1">Configurar</p>
+                                                                                                                                        </div>
+                                                                                                                                    </div>
+                                                                                                                                `;
+                                                                    });
+                                                                    html += '</div>';
+
+                                                                    Swal.fire({
+                                                                        title: 'Personalizar Accesos',
+                                                                        html: html,
+                                                                        width: '800px',
+                                                                        showCancelButton: true,
+                                                                        confirmButtonColor: '#2563eb',
+                                                                        cancelButtonColor: '#6b7280',
+                                                                        confirmButtonText: 'Actualizar Panel',
+                                                                        cancelButtonText: 'Cancelar',
+                                                                        didOpen: () => {
+                                                                            lucide.createIcons();
+                                                                        },
+                                                                        customClass: {
+                                                                            popup: 'rounded-[2.5rem]',
+                                                                            confirmButton: 'rounded-xl px-8 py-3 text-sm font-bold',
+                                                                            cancelButton: 'rounded-xl px-8 py-3 text-sm font-bold'
+                                                                        },
+                                                                        preConfirm: () => {
+                                                                            const selected = Array.from(document.querySelectorAll('.swal2-html-container input:checked')).map(el => el.id.replace('check-', ''));
+                                                                            localStorage.setItem('dashboard-quick-access', JSON.stringify(selected));
+                                                                            return selected;
+                                                                        }
+                                                                    }).then((result) => {
+                                                                        if (result.isConfirmed) {
+                                                                            renderQuickAccess();
+                                                                            Swal.fire({
+                                                                                icon: 'success',
+                                                                                title: 'Panel actualizado',
+                                                                                toast: true,
+                                                                                position: 'top-end',
+                                                                                showConfirmButton: false,
+                                                                                timer: 2000
+                                                                            });
+                                                                        }
+                                                                    });
+                                                                }
+
+                                                                function toggleToolSelection(id) {
+                                                                    const card = document.getElementById(`tool-card-${id}`);
+                                                                    const checkbox = document.getElementById(`check-${id}`);
+                                                                    const iconContainer = card.querySelector('div:nth-child(2)');
+
+                                                                    checkbox.checked = !checkbox.checked;
+
+                                                                    if (checkbox.checked) {
+                                                                        card.classList.remove('border-gray-100', 'bg-gray-50');
+                                                                        card.classList.add('border-blue-600', 'bg-blue-50', 'shadow-md');
+                                                                        iconContainer.classList.remove('bg-white', 'text-gray-400');
+                                                                        iconContainer.classList.add('bg-blue-600', 'text-white');
+                                                                    } else {
+                                                                        card.classList.add('border-gray-100', 'bg-gray-50');
+                                                                        card.classList.remove('border-blue-600', 'bg-blue-50', 'shadow-md');
+                                                                        iconContainer.classList.add('bg-white', 'text-gray-400');
+                                                                        iconContainer.classList.remove('bg-blue-600', 'text-white');
+                                                                    }
+                                                                }
+
+                                                                // Inicializar al cargar
+                                                                renderQuickAccess();
+                                                            </script>
+                                                        }

@@ -2,6 +2,12 @@
 @using ImportCostPro.Persistence.Enums
 @{
     ViewData["Title"] = "Nueva Orden de Importación";
+    ViewData["Breadcrumbs"] = new List<(string, string?, string?)>
+    {
+        ("Operaciones", null, null),
+        ("Órdenes", "Index", "ImportOrder"),
+        ("Nueva", null, null)
+    };
 }
 
 <div class="mb-6 animate__animated animate__fadeIn">

@@ -2,6 +2,11 @@
 @using ImportCostPro.Application.Extensions
 @{
     ViewData["Title"] = "Catálogo de Productos";
+    ViewData["Breadcrumbs"] = new List<(string, string?, string?)>
+    {
+        ("Catálogos", "Catalogues", "Home"),
+        ("Productos", null, null)
+    };
 }
 
 <div class="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 animate__animated animate__fadeIn">

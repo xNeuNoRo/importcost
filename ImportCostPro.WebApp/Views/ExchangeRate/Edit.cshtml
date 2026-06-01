@@ -1,6 +1,12 @@
 @model ImportCostPro.Application.ViewModels.ExchageRateViewModels.UpdateExchangeRateViewModel
 @{
     ViewData["Title"] = "Editar Tasa de Cambio";
+    ViewData["Breadcrumbs"] = new List<(string Text, string? Action, string? Controller)>
+    {
+        ("Catálogos", "Catalogues", "Home"),
+        ("Tasas de Cambio", "Index", "ExchangeRate"),
+        ("Editar", null, null)
+    };
 }
 
 <div class="mb-6 animate__animated animate__fadeIn">
