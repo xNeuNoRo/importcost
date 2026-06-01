@@ -1,0 +1,148 @@
+@model ImportCostPro.Application.ViewModels.ExchageRateViewModels.CreateExchangeRateViewModel
+@{
+    ViewData["Title"] = "Nueva Tasa de Cambio";
+    ViewData["Breadcrumbs"] = new List<(string Text, string? Action, string? Controller)>
+    {
+        ("Catálogos", "Catalogues", "Home"),
+        ("Tasas de Cambio", "Index", "ExchangeRate"),
+        ("Nueva", null, null)
+    };
+}
+
+<div class="mb-6 animate__animated animate__fadeIn">
+    <a asp-action="Index" class="inline-flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-blue-600 transition-colors cursor-pointer">
+        <i data-lucide="arrow-left" class="w-4 h-4"></i>
+        Volver al histórico
+    </a>
+    <h1 class="text-2xl font-bold text-gray-900 mt-2">Nueva Tasa</h1>
+    <p class="text-sm text-gray-500">Registre un nuevo valor de conversión para las operaciones del sistema.</p>
+</div>
+
+<div class="max-w-3xl animate__animated animate__fadeInUp animate__faster">
+    <div class="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-300">
+        <form asp-action="Create" method="post" class="p-6 sm:p-8">
+            @* Centro de Alertas Unificado *@
+            @if (TempData["ErrorMessage"] != null || !ViewData.ModelState.IsValid)
+            {
+                <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl flex flex-col gap-2 text-red-700 shadow-sm animate__animated animate__shakeX">
+                    <div class="flex items-center gap-3">
+                        <i data-lucide="alert-circle" class="w-5 h-5 shrink-0"></i>
+                        <p class="text-sm font-bold">Han ocurrido los siguientes inconvenientes:</p>
+                    </div>
+                    <div class="ml-8 text-xs space-y-1">
+                        @if (TempData["ErrorMessage"] != null)
+                        {
+                            <p>@TempData["ErrorMessage"]</p>
+                        }
+                        <div asp-validation-summary="All" class="validation-summary-fancy"></div>
+                    </div>
+                </div>
+            }
+
+            <div class="space-y-8">
+                @* Sección: Definición de Monedas *@
+                <div>
+                    <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2 border-b border-gray-100 pb-2">
+                        <i data-lucide="refresh-cw" class="w-5 h-5 text-blue-600"></i>
+                        Par de Divisas
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="group">
+                            <label asp-for="FromCurrencyId" class="block text-sm font-semibold text-gray-700 mb-2 group-focus-within:text-blue-600 transition-colors">Moneda Origen</label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400 group-focus-within:text-blue-500 transition-colors">
+                                    <i data-lucide="arrow-up-right" class="w-4 h-4"></i>
+                                </div>
+                                <select asp-for="FromCurrencyId" asp-items="ViewBag.Currencies" class="block w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none cursor-pointer">
+                                    <option value="">Seleccione moneda...</option>
+                                </select>
+                            </div>
+                            <span asp-validation-for="FromCurrencyId" class="mt-1.5 text-xs text-red-600 font-medium"></span>
+                        </div>
+
+                        <div class="group">
+                            <label asp-for="ToCurrencyId" class="block text-sm font-semibold text-gray-700 mb-2 group-focus-within:text-blue-600 transition-colors">Moneda Destino</label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400 group-focus-within:text-blue-500 transition-colors">
+                                    <i data-lucide="arrow-down-left" class="w-4 h-4"></i>
+                                </div>
+                                <select asp-for="ToCurrencyId" asp-items="ViewBag.Currencies" class="block w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none cursor-pointer">
+                                    <option value="">Seleccione moneda...</option>
+                                </select>
+                            </div>
+                            <span asp-validation-for="ToCurrencyId" class="mt-1.5 text-xs text-red-600 font-medium"></span>
+                        </div>
+                    </div>
+                </div>
+
+                @* Sección: Valor y Fecha *@
+                <div>
+                    <h3 class="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2 border-b border-gray-100 pb-2">
+                        <i data-lucide="calculator" class="w-5 h-5 text-blue-600"></i>
+                        Detalles de la Tasa
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="group">
+                            <label asp-for="RateValue" class="block text-sm font-semibold text-gray-700 mb-2 group-focus-within:text-blue-600 transition-colors"></label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400 group-focus-within:text-blue-500 transition-colors">
+                                    <i data-lucide="trending-up" class="w-4 h-4"></i>
+                                </div>
+                                <input asp-for="RateValue" class="block w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none" placeholder="0.0000" />
+                            </div>
+                            <span asp-validation-for="RateValue" class="mt-1.5 text-xs text-red-600 font-medium"></span>
+                        </div>
+
+                        <div class="group">
+                            <label asp-for="EffectiveDate" class="block text-sm font-semibold text-gray-700 mb-2 group-focus-within:text-blue-600 transition-colors"></label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400 group-focus-within:text-blue-500 transition-colors">
+                                    <i data-lucide="calendar" class="w-4 h-4"></i>
+                                </div>
+                                <input asp-for="EffectiveDate" class="block w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:bg-white focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all outline-none" />
+                            </div>
+                            <span asp-validation-for="EffectiveDate" class="mt-1.5 text-xs text-red-600 font-medium"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-10 pt-6 border-t border-gray-100 flex items-center justify-end gap-3">
+                <a asp-action="Index" class="px-5 py-2.5 text-sm font-semibold text-gray-600 hover:bg-gray-100 rounded-xl transition-all cursor-pointer">
+                    Cancelar
+                </a>
+                <button type="submit" class="inline-flex items-center justify-center gap-2.5 px-8 py-2.5 bg-blue-600 text-white text-sm font-bold rounded-xl hover:bg-blue-700 hover:shadow-lg hover:shadow-blue-200 transition-all cursor-pointer hover-scale active:scale-95">
+                    <i data-lucide="save" class="w-5 h-5"></i>
+                    Guardar Tasa
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        const fromCurrency = document.querySelector('select[name="FromCurrencyId"]');
+        const toCurrency = document.querySelector('select[name="ToCurrencyId"]');
+
+        function validateCurrencies() {
+            if (fromCurrency.value && toCurrency.value && fromCurrency.value === toCurrency.value) {
+                Swal.fire({
+                    title: 'Monedas idénticas',
+                    text: 'La moneda origen no puede ser igual a la moneda destino.',
+                    icon: 'error',
+                    confirmButtonColor: '#3b82f6',
+                    confirmButtonText: 'Entendido',
+                    customClass: {
+                        confirmButton: 'rounded-xl px-6 py-2.5 text-sm font-bold'
+                    }
+                });
+                toCurrency.value = ""; // Limpiar selección errónea
+            }
+        }
+
+        fromCurrency.addEventListener('change', validateCurrencies);
+        toCurrency.addEventListener('change', validateCurrencies);
+    </script>
+}

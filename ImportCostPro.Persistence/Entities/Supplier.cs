@@ -5,7 +5,7 @@ namespace ImportCostPro.Persistence.Entities
     public class Supplier : ActivatableBaseEntity
     {
         public required string Name { get; set; }
-        public required string Email { get; set; }
+        public string? Email { get; set; }
         public string? PhoneNumber { get; set; }
 
         // Pais de Origen y moneda principal de negociacion

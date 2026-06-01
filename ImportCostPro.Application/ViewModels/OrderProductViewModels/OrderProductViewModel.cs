@@ -30,6 +30,12 @@ namespace ImportCostPro.Application.ViewModels.OrderProductViewModels
         [DisplayFormat(DataFormatString = "{0:C2}")]
         public decimal SubtotalFob { get; set; }
 
+        [Display(Name = "Peso Total")]
+        public decimal TotalWeight { get; set; }
+
+        [Display(Name = "Volumen Total")]
+        public decimal TotalVolume { get; set; }
+
         [Display(Name = "Margen (%)")]
         [DisplayFormat(DataFormatString = "{0:P2}")]
         public decimal TargetProfitMargin { get; set; }

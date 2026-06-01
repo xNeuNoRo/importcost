@@ -59,5 +59,15 @@ namespace ImportCostPro.Persistence.Interfaces.Repositories
         /// incluyendo productos, gastos y datos maestros necesarios para el motor de promediacion.
         /// </summary>
         Task<ImportOrder?> GetAggregateForCalculationAsync(int id);
+
+        /// <summary>
+        /// Cuenta las órdenes que se encuentran en un estado específico.
+        /// </summary>
+        Task<int> CountByStatusAsync(OrderStatus status);
+
+        /// <summary>
+        /// Verifica si la orden tiene productos o gastos asociados.
+        /// </summary>
+        Task<bool> HasRelatedRecordsAsync(int id);
     }
 }

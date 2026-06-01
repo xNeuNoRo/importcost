@@ -25,5 +25,10 @@ namespace ImportCostPro.Persistence.Interfaces.Repositories
         /// incluyendo de forma optimizada todo el desglose de productos (Details) para el cierre logístico.
         /// </summary>
         Task<CalculationResult?> GetLatestCalculatedResultWithDetailsAsync(int importOrderId);
+
+        /// <summary>
+        /// Calcula la sumatoria del costo de importación total para un mes y año específicos.
+        /// </summary>
+        Task<decimal> GetMonthlyTotalImportCostAsync(int month, int year);
     }
 }

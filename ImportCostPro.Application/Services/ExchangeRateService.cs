@@ -1,4 +1,4 @@
-﻿using ImportCostPro.Application.DTOs.ExchangeRate.Requests;
+using ImportCostPro.Application.DTOs.ExchangeRate.Requests;
 using ImportCostPro.Application.DTOs.ExchangeRate.Responses;
 using ImportCostPro.Application.Exceptions;
 using ImportCostPro.Application.Extensions;
@@ -27,7 +27,42 @@ namespace ImportCostPro.Application.Services
         public async Task<IEnumerable<ExchangeRateResponse>> GetAllAsync()
         {
             var rates = await _exchangeRateRepository.GetAllWithCurrenciesAsync();
-            return rates.Select(r => r.ToResponse());
+            var now = _dateTimeProvider.UtcNow.Date;
+
+            var responses = rates.Select(r => r.ToResponse()).ToList();
+
+            // Lógica para determinar el estado visual dinámico por par de monedas
+            var activeGroups = responses
+                .Where(r => r.IsActive)
+                .GroupBy(r => new { r.FromCurrencyId, r.ToCurrencyId });
+
+            foreach (var group in activeGroups)
+            {
+                // Tasas Programadas (Fecha futura)
+                foreach (var rate in group.Where(r => r.EffectiveDate > now))
+                {
+                    rate.DisplayStatus = "Programada";
+                }
+
+                // La tasa actualmente en vigor (La más reciente <= Hoy)
+                var currentInEffect = group
+                    .Where(r => r.EffectiveDate <= now)
+                    .OrderByDescending(r => r.EffectiveDate)
+                    .FirstOrDefault();
+
+                if (currentInEffect != null)
+                {
+                    currentInEffect.DisplayStatus = "Vigente";
+
+                    // Tasas Expiradas (Tasas pasivas que ya fueron superadas por una más nueva)
+                    foreach (var rate in group.Where(r => r.EffectiveDate <= now && r.Id != currentInEffect.Id))
+                    {
+                        rate.DisplayStatus = "Expirada";
+                    }
+                }
+            }
+
+            return responses;
         }
 
         public async Task<ExchangeRateResponse?> GetByIdAsync(int id)
@@ -47,34 +82,58 @@ namespace ImportCostPro.Application.Services
             decimal normalizedRateValue = request.RateValue;
             DateTime normalizedEffectiveDate = request.EffectiveDate.Date;
 
-            var fromCurrency = await _currencyRepository.GetByIdAsync(normalizedFromCurrencyId);
-            if (fromCurrency == null || !fromCurrency.IsActive)
+            if (normalizedFromCurrencyId == normalizedToCurrencyId)
             {
                 throw new ValidationBusinessException(
                     nameof(request.FromCurrencyId),
-                    "La moneda origen debe existir y estar activa en el mantenimiento de monedas."
+                    "La moneda origen no puede ser igual a la moneda destino."
+                );
+            }
+
+            var fromCurrency = await _currencyRepository.GetByIdAsync(normalizedFromCurrencyId);
+            if (fromCurrency == null)
+            {
+                throw new ValidationBusinessException(
+                    nameof(request.FromCurrencyId),
+                    "La moneda origen seleccionada no existe."
+                );
+            }
+
+            if (!fromCurrency.IsActive)
+            {
+                throw new ValidationBusinessException(
+                    nameof(request.FromCurrencyId),
+                    "La moneda origen seleccionada se encuentra inactiva."
                 );
             }
 
             var toCurrency = await _currencyRepository.GetByIdAsync(normalizedToCurrencyId);
-            if (toCurrency == null || !toCurrency.IsActive)
+            if (toCurrency == null)
             {
                 throw new ValidationBusinessException(
                     nameof(request.ToCurrencyId),
-                    "La moneda destino debe existir y estar activa en el mantenimiento de monedas."
+                    "La moneda destino seleccionada no existe."
                 );
             }
 
-            bool duplicate = await _exchangeRateRepository.ExistsActiveDuplicateAsync(
+            if (!toCurrency.IsActive)
+            {
+                throw new ValidationBusinessException(
+                    nameof(request.ToCurrencyId),
+                    "La moneda destino seleccionada se encuentra inactiva."
+                );
+            }
+
+            bool duplicateExists = await _exchangeRateRepository.ExistsActiveDuplicateAsync(
                 normalizedFromCurrencyId,
                 normalizedToCurrencyId,
                 normalizedEffectiveDate
             );
 
-            if (duplicate)
+            if (duplicateExists)
             {
                 throw new ValidationBusinessException(
-                    nameof(request.FromCurrencyId),
+                    nameof(request.EffectiveDate),
                     "Ya existe una tasa de cambio activa para esta moneda origen, moneda destino y fecha de vigencia."
                 );
             }
@@ -99,18 +158,24 @@ namespace ImportCostPro.Application.Services
             decimal normalizedRateValue = request.RateValue;
             DateTime normalizedEffectiveDate = request.EffectiveDate.Date;
 
+            if (normalizedFromCurrencyId == normalizedToCurrencyId)
+            {
+                throw new ValidationBusinessException(
+                    nameof(request.FromCurrencyId),
+                    "La moneda origen no puede ser igual a la moneda destino."
+                );
+            }
+
             var entity = await _exchangeRateRepository.GetByIdAsync(request.Id);
             if (entity == null)
             {
-                throw new BusinessException(
-                    $"La tasa de cambio con ID {request.Id} no fue encontrada en el sistema."
-                );
+                throw new BusinessException($"La tasa de cambio con ID {request.Id} no fue encontrada.");
             }
 
             if (await _exchangeRateRepository.IsExchangeRateReferencedAsync(request.Id))
             {
                 throw new BusinessException(
-                    "No se puede modificar esta tasa de cambio porque ya fue utilizada en un cálculo oficial de landed cost."
+                    "No se puede modificar esta tasa de cambio porque ya fue utilizada en una Liquidación de Costos oficial."
                 );
             }
 
@@ -119,7 +184,7 @@ namespace ImportCostPro.Application.Services
             {
                 throw new ValidationBusinessException(
                     nameof(request.FromCurrencyId),
-                    "La moneda origen debe existir en el mantenimiento de monedas."
+                    "La moneda origen seleccionada no existe."
                 );
             }
 
@@ -128,21 +193,21 @@ namespace ImportCostPro.Application.Services
             {
                 throw new ValidationBusinessException(
                     nameof(request.ToCurrencyId),
-                    "La moneda destino debe existir en el mantenimiento de monedas."
+                    "La moneda destino seleccionada no existe."
                 );
             }
 
-            bool duplicate = await _exchangeRateRepository.ExistsActiveDuplicateAsync(
+            bool duplicateExists = await _exchangeRateRepository.ExistsActiveDuplicateAsync(
                 normalizedFromCurrencyId,
                 normalizedToCurrencyId,
                 normalizedEffectiveDate,
-                request.Id
+                excludeId: request.Id
             );
 
-            if (duplicate)
+            if (duplicateExists)
             {
                 throw new ValidationBusinessException(
-                    nameof(request.FromCurrencyId),
+                    nameof(request.EffectiveDate),
                     "Ya existe una tasa de cambio activa para esta moneda origen, moneda destino y fecha de vigencia."
                 );
             }
@@ -153,6 +218,8 @@ namespace ImportCostPro.Application.Services
                 normalizedRateValue,
                 normalizedEffectiveDate
             );
+
+            entity.IsActive = request.IsActive;
 
             await _exchangeRateRepository.UpdateAsync(entity);
 
@@ -185,7 +252,7 @@ namespace ImportCostPro.Application.Services
             if (await _exchangeRateRepository.IsExchangeRateReferencedAsync(id))
             {
                 throw new BusinessException(
-                    "No se puede eliminar esta tasa de cambio porque ya fue utilizada en un cálculo oficial de landed cost."
+                    "No se puede eliminar esta tasa de cambio porque ya fue utilizada en una Liquidación de Costos oficial."
                 );
             }
 

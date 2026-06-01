@@ -9,5 +9,6 @@ namespace ImportCostPro.Application.DTOs.TariffCategory.Requests
         public decimal ExciseTaxRate { get; set; }
         public bool AppliesItbis { get; set; }
         public bool AppliesExciseTax { get; set; }
+        public bool IsActive { get; set; }
     }
 }

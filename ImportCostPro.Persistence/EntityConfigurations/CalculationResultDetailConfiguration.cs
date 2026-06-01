@@ -18,6 +18,7 @@ namespace ImportCostPro.Persistence.EntityConfigurations
 
             builder.Property(x => x.Quantity).IsRequired().HasPrecision(10, 2);
             builder.Property(x => x.OriginalUnitPriceFob).IsRequired().HasPrecision(18, 2);
+            builder.Property(x => x.OriginalTotalFob).IsRequired().HasPrecision(18, 2);
             builder.Property(x => x.LocalTotalFob).IsRequired().HasPrecision(18, 2);
             builder.Property(x => x.AllocatedFreight).IsRequired().HasPrecision(18, 2);
             builder.Property(x => x.AllocatedInsurance).IsRequired().HasPrecision(18, 2);

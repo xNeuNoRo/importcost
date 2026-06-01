@@ -12,9 +12,9 @@ namespace ImportCostPro.Application.Validators.Supplier
                 .MaximumLength(150).WithMessage("El nombre del proveedor debe tener un máximo de 150 caracteres.");
 
             RuleFor(x => x.Email)
-                .NotEmpty().WithMessage("El correo electrónico del proveedor es requerido.")
                 .MaximumLength(100).WithMessage("El correo electrónico debe tener un máximo de 100 caracteres.")
-                .EmailAddress().WithMessage("El correo electrónico debe tener un formato válido.");
+                .EmailAddress().WithMessage("El correo electrónico debe tener un formato válido.")
+                .When(x => !string.IsNullOrEmpty(x.Email));
 
             RuleFor(x => x.OriginCountryId)
                 .GreaterThan(0).WithMessage("El país de origen seleccionado no es válido.");

@@ -15,13 +15,18 @@ namespace ImportCostPro.Persistence.Interfaces.Repositories
         Task<bool> ExistsByIsoCodeAsync(string isoCode, int? excludeId = null);
 
         /// <summary>
+        /// Verifica si ya existe una moneda registrada con el nombre especificado.
+        /// </summary>
+        Task<bool> ExistsByNameAsync(string name, int? excludeId = null);
+
+        /// <summary>
         /// Verifica si ya existe una moneda marcada como moneda local.
         /// </summary>
         Task<bool> AnyLocalCurrencyAsync(int? excludingId = null);
 
         /// <summary>
         /// Verifica si la moneda está referenciada por otras entidades del sistema
-        /// (tasas, proveedores, órdenes, gastos, resultados de landed cost, etc.).
+        /// (tasas, proveedores, órdenes, gastos, resultados de liquidación, etc.).
         /// </summary>
         Task<bool> IsCurrencyReferencedAsync(int currencyId);
     }

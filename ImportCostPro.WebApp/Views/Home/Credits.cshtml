@@ -1,0 +1,142 @@
+@{
+    ViewData["Title"] = "Créditos del Proyecto";
+    ViewData["Breadcrumbs"] = new List<(string, string?, string?)>
+    {
+        ("Información", null, null),
+        ("Créditos", null, null)
+    };
+}
+
+<div class="animate__animated animate__fadeIn">
+    @* Encabezado de Página Compacto *@
+    <div class="text-center mb-6">
+        <div class="inline-flex p-2 bg-blue-50 text-blue-600 rounded-xl mb-2 shadow-sm">
+            <i data-lucide="award" class="w-6 h-6"></i>
+        </div>
+        <h1 class="text-3xl font-black text-gray-900 tracking-tight mb-2">The <span class="text-blue-600">Dream Team</span></h1>
+        <p class="text-sm text-gray-500 max-w-2xl mx-auto mb-2">
+            Esfuerzo conjunto y excelencia técnica bajo supervisión magistral.
+        </p>
+        <span class="inline-block px-4 py-1.5 bg-blue-100 text-blue-700 rounded-full text-[11px] font-black uppercase tracking-wider">
+            Profe, por el respeto debe ponernos 10/10.
+        </span>
+    </div>
+
+    @* Card del Profesor (The Master) - Más compacta *@
+        @* Card del Profesor (The Master) *@
+        <div class="flex justify-center mb-6">
+            <div
+                class="w-full max-w-md bg-linear-to-br from-amber-50 to-orange-50 border border-amber-200 rounded-4xl p-6 text-center relative overflow-hidden group hover:border-amber-500 transition-all hover:shadow-xl animate__animated animate__pulse animate__infinite animate__slow">
+                <div class="relative z-10">
+                    <div class="flex items-center justify-center gap-4 mb-4">
+                        <div
+                            class="w-14 h-14 bg-linear-to-tr from-amber-500 to-orange-600 rounded-xl flex items-center justify-center text-white text-xl font-black shadow-lg shadow-amber-200 group-hover:rotate-12 transition-transform">
+                            LT
+                        </div>
+                        <div class="text-left">
+                            <div class="flex items-center gap-2">
+                                <h2 class="text-lg font-black text-gray-900 leading-tight">Leonardo Enrique Tavarez B.</h2>
+                                <i data-lucide="crown" class="w-4 h-4 text-amber-500 fill-amber-500"></i>
+                            </div>
+                            <p class="text-amber-700 font-black text-[10px] uppercase tracking-[0.2em]">Project Master /
+                                Esclavizador</p>
+                            </div>
+                        </div>
+                        <div
+                            class="inline-flex items-center gap-2 px-3 py-1 bg-white/60 text-amber-800 text-[10px] font-bold rounded-full border border-amber-100 backdrop-blur-sm">
+                            Autoridad Suprema del Proyecto
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            @* Rejilla de Desarrolladores - Subida de posición *@
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+
+                @* Isaias - Dev *@
+                <div
+                    class="bg-white border-2 border-emerald-100 rounded-[2.5rem] p-8 text-center relative overflow-hidden group hover:border-emerald-500 transition-all hover:shadow-2xl hover:shadow-emerald-100">
+                    <div class="relative z-10">
+                        <div
+                            class="w-24 h-24 bg-linear-to-tr from-emerald-500 to-teal-600 rounded-3xl mx-auto flex items-center justify-center text-white text-3xl font-black shadow-lg shadow-emerald-200 mb-6 group-hover:scale-110 transition-transform">
+                            IF
+                        </div>
+                        <h2 class="text-xl font-black text-gray-900 mb-1">Isaias Jose Morillo F.</h2>
+                        <p class="text-emerald-600 font-bold text-xs uppercase tracking-widest mb-4">Software Developer</p>
+                        <div
+                            class="inline-flex items-center gap-2 px-3 py-1 bg-emerald-50 text-emerald-600 text-[10px] font-mono rounded-full border border-emerald-100 mb-8">
+                            Matrícula: 2025-1242
+                        </div>
+
+                        <a href="https://github.com/IsaiasMorillo" target="_blank"
+                           class="w-full inline-flex items-center justify-center gap-2.5 px-6 py-3.5 bg-emerald-600 text-white rounded-2xl font-bold text-sm hover:bg-emerald-700 transition-all hover-scale shadow-lg shadow-emerald-200">
+                            <i data-lucide="github" class="w-5 h-5"></i>
+                            Ver perfil en GitHub
+                        </a>
+                    </div>
+                </div>
+
+                @* Angel - Lead Dev *@
+                <div
+                    class="bg-white border-2 border-blue-100 rounded-[2.5rem] p-8 text-center relative overflow-hidden group hover:border-blue-500 transition-all hover:shadow-2xl hover:shadow-blue-100">
+                    <div class="relative z-10">
+                        <div
+                            class="w-24 h-24 bg-linear-to-tr from-blue-600 to-indigo-600 rounded-3xl mx-auto flex items-center justify-center text-white text-3xl font-black shadow-lg shadow-blue-200 mb-6 group-hover:scale-110 transition-transform">
+                            AM
+                        </div>
+                        <h2 class="text-xl font-black text-gray-900 mb-1">Angel Gonzalez Muñoz</h2>
+                        <p class="text-blue-600 font-bold text-xs uppercase tracking-widest mb-4">Líder de Desarrollo</p>
+                        <div
+                            class="inline-flex items-center gap-2 px-3 py-1 bg-blue-50 text-blue-600 text-[10px] font-mono rounded-full border border-blue-100 mb-8">
+                            Matrícula: 2025-1122
+                        </div>
+
+                        <a href="https://github.com/xNeuNoRo" target="_blank"
+                           class="w-full inline-flex items-center justify-center gap-2.5 px-6 py-3.5 bg-gray-900 text-white rounded-2xl font-bold text-sm hover:bg-black transition-all hover-scale shadow-lg shadow-gray-200">
+                            <i data-lucide="github" class="w-5 h-5"></i>
+                            Ver perfil en GitHub
+                        </a>
+                    </div>
+                </div>
+
+                @* Engel - Dev *@
+                <div
+                    class="bg-white border-2 border-indigo-100 rounded-[2.5rem] p-8 text-center relative overflow-hidden group hover:border-indigo-500 transition-all hover:shadow-2xl hover:shadow-indigo-100">
+                    <div class="relative z-10">
+                        <div
+                            class="w-24 h-24 bg-linear-to-tr from-indigo-500 to-purple-600 rounded-3xl mx-auto flex items-center justify-center text-white text-3xl font-black shadow-lg shadow-indigo-200 mb-6 group-hover:scale-110 transition-transform">
+                            AS
+                        </div>
+                        <h2 class="text-xl font-black text-gray-900 mb-1">Engel Orlando Acosta D.</h2>
+                        <p class="text-indigo-600 font-bold text-xs uppercase tracking-widest mb-4">Software Developer</p>
+                        <div
+                            class="inline-flex items-center gap-2 px-3 py-1 bg-indigo-50 text-indigo-600 text-[10px] font-mono rounded-full border border-indigo-100 mb-8">
+                            Matrícula: 2025-0037
+                        </div>
+
+                        <a href="https://github.com/notengel" target="_blank"
+                           class="w-full inline-flex items-center justify-center gap-2.5 px-6 py-3.5 bg-indigo-600 text-white rounded-2xl font-bold text-sm hover:bg-indigo-700 transition-all hover-scale shadow-lg shadow-indigo-200">
+                            <i data-lucide="github" class="w-5 h-5"></i>
+                            Ver perfil en GitHub
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            @* Sello Institucional *@
+            <div class="border-t border-gray-200 pt-12 text-center pb-12">
+                <div class="flex items-center justify-center gap-4 text-gray-400 font-bold uppercase tracking-[0.4em] text-xs">
+                    <span>ITLA</span>
+                    <span class="w-2 h-2 bg-blue-600 rounded-full"></span>
+                    <span>Desarrollo de Software</span>
+                    <span class="w-2 h-2 bg-blue-600 rounded-full"></span>
+                    <span>2026</span>
+                </div>
+            </div>
+        </div>
+
+        @section Scripts {
+            <script>
+                lucide.createIcons();
+            </script>
+        }

@@ -44,5 +44,15 @@ namespace ImportCostPro.Persistence.Interfaces.Repositories
         /// para evitar que sea eliminada físicamente.
         /// </summary>
         Task MarkAsUsedAsync(int id);
+
+        /// <summary>
+        /// Obtiene la cantidad de monedas extranjeras activas que no tienen una tasa de cambio registrada para hoy.
+        /// </summary>
+        Task<int> GetActiveCurrenciesMissingRateCountAsync(DateTime date);
+
+        /// <summary>
+        /// Obtiene la lista de monedas extranjeras activas que no tienen una tasa de cambio registrada para la fecha actual o futura.
+        /// </summary>
+        Task<IEnumerable<Currency>> GetActiveCurrenciesMissingRateAsync(DateTime date);
     }
 }

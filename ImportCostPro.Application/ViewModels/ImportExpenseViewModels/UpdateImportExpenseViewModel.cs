@@ -13,6 +13,16 @@ namespace ImportCostPro.Application.ViewModels.ImportExpenseViewModels
         [Display(Name = "Descripción del Gasto")]
         public string Description { get; set; } = null!;
 
+        [Required(ErrorMessage = "El tipo de gasto seleccionado no es válido.")]
+        [EnumDataType(typeof(ExpenseType), ErrorMessage = "El tipo de gasto seleccionado no es válido.")]
+        [Display(Name = "Tipo de Gasto")]
+        public ExpenseType ExpenseType { get; set; }
+
+        [Required(ErrorMessage = "La moneda seleccionada no es válida.")]
+        [Range(1, int.MaxValue, ErrorMessage = "La moneda seleccionada no es válida.")]
+        [Display(Name = "Moneda")]
+        public int CurrencyId { get; set; }
+
         [Required(ErrorMessage = "La base de distribución seleccionada no es válida.")]
         [EnumDataType(typeof(DistributionBase), ErrorMessage = "La base de distribución seleccionada no es válida.")]
         [Display(Name = "Base de Distribución")]

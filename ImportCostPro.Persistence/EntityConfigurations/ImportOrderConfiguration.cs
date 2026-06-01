@@ -19,7 +19,12 @@ namespace ImportCostPro.Persistence.EntityConfigurations
             builder.Property(x => x.OrderNumber).IsRequired().HasMaxLength(30);
             builder.Property(x => x.OrderDate).IsRequired().HasColumnType("date");
             builder.Property(x => x.TransportMode).IsRequired();
-            builder.Property(x => x.Status).IsRequired().HasDefaultValue(OrderStatus.Open);
+            builder
+                .Property(x => x.Status)
+                .IsRequired()
+                .HasDefaultValue(OrderStatus.Open)
+                .HasSentinel((OrderStatus)(-1)); // Le decimos q el valor vacio o no asignado es -1, que no es un valor valido del enum
+            ;
 
             #endregion
 

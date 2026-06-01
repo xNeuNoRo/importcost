@@ -13,6 +13,8 @@ namespace ImportCostPro.Application.DTOs.OrderProduct.Responses
         public decimal Quantity { get; set; }
         public decimal UnitFobPrice { get; set; }
         public decimal SubtotalFob { get; set; }
+        public decimal TotalWeight { get; set; }
+        public decimal TotalVolume { get; set; }
         public decimal TargetProfitMargin { get; set; }
     }
 }

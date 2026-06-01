@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using ImportCostPro.Persistence.Common;
 
 namespace ImportCostPro.Persistence.Interfaces.Repositories
@@ -43,5 +44,10 @@ namespace ImportCostPro.Persistence.Interfaces.Repositories
         /// </summary>
         /// <param name="id">El ID del registro a verificar</param>
         Task<bool> ExistsByIdAsync(int id);
+
+        /// <summary>
+        /// Obtiene la cantidad de registros que cumplen con una condición opcional.
+        /// </summary>
+        Task<int> CountAsync(Expression<Func<T, bool>>? predicate = null);
     }
 }

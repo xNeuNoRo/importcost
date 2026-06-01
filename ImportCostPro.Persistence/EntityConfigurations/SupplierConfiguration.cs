@@ -17,7 +17,7 @@ namespace ImportCostPro.Persistence.EntityConfigurations
 
             builder.Property(x => x.Name).IsRequired().HasMaxLength(150);
             builder.Property(x => x.PhoneNumber).HasMaxLength(20);
-            builder.Property(x => x.Email).IsRequired().HasMaxLength(100);
+            builder.Property(x => x.Email).IsRequired(false).HasMaxLength(100);
             builder.Property(x => x.IsActive).IsRequired().HasDefaultValue(true);
 
             #endregion

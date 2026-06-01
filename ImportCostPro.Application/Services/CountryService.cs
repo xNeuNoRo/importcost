@@ -44,6 +44,14 @@ namespace ImportCostPro.Application.Services
                 );
             }
 
+            if (await _countryRepository.ExistsByNameAsync(normalizedName))
+            {
+                throw new ValidationBusinessException(
+                    nameof(request.Name),
+                    $"Ya existe un país registrado con este nombre."
+                );
+            }
+
             var country = request.Adapt<Country>();
             country.Name = normalizedName;
             country.IsoCode = normalizedIsoCode;
@@ -65,16 +73,19 @@ namespace ImportCostPro.Application.Services
                 throw new BusinessException($"No se encontró un país con el ID '{request.Id}'.");
             }
 
-            if (
-                await _countryRepository.ExistsByIsoCodeAsync(
-                    normalizedIsoCode,
-                    excludeId: request.Id
-                )
-            )
+            if (await _countryRepository.ExistsByIsoCodeAsync(normalizedIsoCode, excludeId: request.Id))
             {
                 throw new ValidationBusinessException(
                     nameof(request.IsoCode),
                     $"Ya existe un país registrado con este código ISO."
+                );
+            }
+
+            if (await _countryRepository.ExistsByNameAsync(normalizedName, excludeId: request.Id))
+            {
+                throw new ValidationBusinessException(
+                    nameof(request.Name),
+                    $"Ya existe un país registrado con este nombre."
                 );
             }
 
@@ -97,7 +108,7 @@ namespace ImportCostPro.Application.Services
             if (await _countryRepository.IsCountryReferencedAsync(id))
             {
                 throw new BusinessException(
-                    $"No se puede eliminar el país '{existingCountry.Name}' porque está siendo referenciado por otras entidades."
+                    "No se puede eliminar este país porque está asociado a otros registros del sistema."
                 );
             }
 

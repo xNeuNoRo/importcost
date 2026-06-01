@@ -15,6 +15,7 @@ namespace ImportCostPro.Application
             // Registramos los servicios de aplicación
             services.AddScoped<CountryService>();
             services.AddScoped<CurrencyService>();
+            services.AddScoped<DashboardService>();
             services.AddScoped<ExchangeRateService>();
             services.AddScoped<ImporterService>();
             services.AddScoped<ImportExpenseService>();
