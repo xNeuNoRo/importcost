@@ -384,14 +384,21 @@
                                 </a>
                             </li>
                             @{
-                                var breadcrumbs = ViewData["Breadcrumbs"] as IEnumerable<(string Text, string? Action, string? Controller)>;
-                                if (breadcrumbs != null) {
-                                    foreach (var item in breadcrumbs) {
+                                // Surgical patch to support optional Route IDs in breadcrumbs
+                                var bc3 = ViewData["Breadcrumbs"] as IEnumerable<(string Text, string? Action, string? Controller)>;
+                                var bc4 = ViewData["Breadcrumbs"] as IEnumerable<(string Text, string? Action, string? Controller, object? RouteId)>;
+
+                                if (bc3 != null || bc4 != null) {
+                                    var items = bc3 != null 
+                                        ? bc3.Select(x => (x.Text, x.Action, x.Controller, (object?)null)) 
+                                        : bc4!;
+
+                                    foreach (var item in items) {
                                         <li>
                                             <div class="flex items-center">
                                                 <i data-lucide="chevron-right" class="w-4 h-4 text-gray-300"></i>
                                                 @if (item.Action != null && item.Controller != null) {
-                                                    <a asp-controller="@item.Controller" asp-action="@item.Action" class="ml-1 text-xs font-bold text-gray-500 hover:text-blue-600 transition-colors">@item.Text</a>
+                                                    <a asp-controller="@item.Controller" asp-action="@item.Action" asp-route-id="@item.Item4" class="ml-1 text-xs font-bold text-gray-500 hover:text-blue-600 transition-colors">@item.Text</a>
                                                 } else {
                                                     <span class="ml-1 text-xs font-black text-gray-900 tracking-tighter">@item.Text</span>
                                                 }

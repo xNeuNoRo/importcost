@@ -4,11 +4,11 @@
 @{
     var order = (ImportOrderViewModel)ViewBag.Order;
     ViewData["Title"] = $"Productos - {order.OrderNumber}";
-    ViewData["Breadcrumbs"] = new List<(string, string?, string?)>
+    ViewData["Breadcrumbs"] = new List<(string, string?, string?, object?)>
     {
-        ("Operaciones", null, null), ("Órdenes", "Index", "ImportOrder"),
-        ($"Orden #{order.OrderNumber}", "Details", "ImportOrder"),
-        ("Productos", null, null)
+        ("Operaciones", null, null, null), ("Órdenes", "Index", "ImportOrder", null),
+        ($"Orden #{order.OrderNumber}", "Details", "ImportOrder", order.Id),
+        ("Productos", null, null, null)
     };
     bool isLocked = order.Status != OrderStatus.Open;
     string source = ViewBag.Source ?? (isLocked ? "Details" : "Edit");
