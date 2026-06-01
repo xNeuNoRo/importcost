@@ -580,19 +580,34 @@
         }
         // Dark Mode Logic with View Transition API
         const darkModeBtn = document.getElementById('dark-mode-toggle');
-        const darkModeIcon = document.getElementById('dark-mode-icon');
         const darkModeText = document.getElementById('dark-mode-text');
 
         function updateDarkModeUI(isDark) {
-            if (darkModeIcon) {
-                darkModeIcon.setAttribute('data-lucide', isDark ? 'sun' : 'moon');
-                if (isDark) {
-                    darkModeIcon.classList.add('icon-spin-dark');
-                } else {
-                    darkModeIcon.classList.remove('icon-spin-dark');
+            if (darkModeBtn) {
+                // Find existing icon (it could be an svg or i tag)
+                const existingIcon = document.getElementById('dark-mode-icon');
+                if (existingIcon) {
+                    existingIcon.remove();
                 }
+
+                // Create a fresh icon element
+                const newIcon = document.createElement('i');
+                newIcon.id = 'dark-mode-icon';
+                newIcon.setAttribute('data-lucide', isDark ? 'sun' : 'moon');
+                
+                // Add base classes and specific dark mode classes
+                newIcon.className = 'w-5 h-5 shrink-0 icon-spin-transition';
+                if (isDark) {
+                    newIcon.classList.add('icon-spin-dark');
+                }
+
+                // Insert the new icon at the beginning of the button
+                darkModeBtn.insertBefore(newIcon, darkModeBtn.firstChild);
+                
+                // Force Lucide to render the new icon
                 lucide.createIcons();
             }
+
             if (darkModeText) {
                 darkModeText.textContent = isDark ? 'Modo Claro' : 'Modo Oscuro';
             }
