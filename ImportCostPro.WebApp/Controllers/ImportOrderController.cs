@@ -62,9 +62,9 @@ namespace ImportCostPro.WebApp.Controllers
             try
             {
                 var request = viewModel.Adapt<CreateImportOrderRequest>();
-                await _importOrderService.CreateAsync(request);
-                TempData["SuccessMessage"] = "Orden de importación creada correctamente.";
-                return RedirectToAction(nameof(Index));
+                var response = await _importOrderService.CreateAsync(request);
+                TempData["SuccessMessage"] = "Orden de importación creada correctamente. Ahora puede agregar productos y gastos.";
+                return RedirectToAction(nameof(Details), new { id = response.Id });
             }
             catch (ValidationBusinessException ex)
             {
