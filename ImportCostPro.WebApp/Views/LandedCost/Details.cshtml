@@ -93,9 +93,10 @@
                                 </div>
                                 <div class="flex flex-col">
                                     <span class="text-xl font-black text-gray-900">@Model.TotalLocalFob.ToString("C2")</span>
-                                    <span class="text-[10px] text-gray-400 mt-1 font-medium">Tasa aplicada:
-                                        @Model.ExchangeRateUsed.ToString("N4")</span>
-                                    </div>
+                                    <span class="text-[10px] text-gray-400 mt-1 font-medium">Tasa aplicada: 
+                                        <span class="font-bold">@Model.OriginCurrencyIsoCode</span> <i data-lucide="arrow-right" class="inline w-3 h-3 mx-0.5 opacity-75"></i> <span class="font-bold">@Model.LocalCurrencyIsoCode</span> (@Model.ExchangeRateUsed.ToString("N4"))
+                                    </span>
+                                </div>
                                 </div>
 
                                 <div class="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm print-card">

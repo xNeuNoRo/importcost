@@ -39,5 +39,7 @@ namespace ImportCostPro.Application.ViewModels.ImportOrderViewModels
         [Display(Name = "Inversión Liquidada")]
         [DisplayFormat(DataFormatString = "{0:C2}")]
         public decimal TotalLandedCost { get; set; }
+
+        public decimal ExchangeRateUsed { get; set; }
     }
 }

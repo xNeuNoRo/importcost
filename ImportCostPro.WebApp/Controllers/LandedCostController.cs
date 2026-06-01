@@ -76,9 +76,10 @@ namespace ImportCostPro.WebApp.Controllers
             }
 
             var viewModel = result.Adapt<LandedCostCalculationViewModel>();
-            
+
             // Aseguramos la población de datos que Mapster podría omitir sin configuración explícita
             viewModel.LocalCurrencyIsoCode = result.LocalCurrencyUsed?.IsoCode ?? "RD$";
+            viewModel.OriginCurrencyIsoCode = result.ImportOrder?.Currency?.IsoCode ?? string.Empty;
             viewModel.OrderStatus = result.ImportOrder?.Status ?? OrderStatus.Calculated;
 
             ViewData["Title"] = $"Resultado de Liquidación - Orden {viewModel.OrderNumber}";

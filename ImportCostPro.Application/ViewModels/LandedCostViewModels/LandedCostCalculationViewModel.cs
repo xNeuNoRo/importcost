@@ -22,6 +22,9 @@ namespace ImportCostPro.Application.ViewModels.LandedCostViewModels
         [Display(Name = "Divisa Local")]
         public string LocalCurrencyIsoCode { get; set; } = null!;
 
+        [Display(Name = "Divisa Origen")]
+        public string OriginCurrencyIsoCode { get; set; } = null!;
+
         [Display(Name = "Valor FOB Total (Local)")]
         [DisplayFormat(DataFormatString = "{0:C2}")]
         public decimal TotalLocalFob { get; set; }

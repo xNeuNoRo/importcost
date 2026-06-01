@@ -119,15 +119,18 @@ namespace ImportCostPro.WebApp.Controllers
                 {
                     ViewBag.TotalImportCost = calculation.TotalImportCost;
                     ViewBag.LocalCurrencySymbol = calculation.LocalCurrencyUsed?.Symbol ?? "RD$";
+                    ViewBag.ExchangeRateUsed = calculation.ExchangeRateUsed;
                 }
                 else
                 {
                     ViewBag.TotalImportCost = 0m;
+                    ViewBag.ExchangeRateUsed = 0m;
                 }
             }
             else
             {
                 ViewBag.TotalImportCost = 0m;
+                ViewBag.ExchangeRateUsed = 0m;
             }
 
             var viewModel = order.Adapt<UpdateImportOrderViewModel>();
