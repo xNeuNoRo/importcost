@@ -2,7 +2,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ImportCostPro.Application\ImportCostPro.Application.csproj" />
-    <ProjectReference Include="..\ImportCostPro.Persistence\ImportCostPro.Persistence.csproj" />
   </ItemGroup>
 
   <ItemGroup>
