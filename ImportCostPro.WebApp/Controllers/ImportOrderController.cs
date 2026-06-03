@@ -4,7 +4,6 @@ using ImportCostPro.Application.Extensions;
 using ImportCostPro.Application.Services;
 using ImportCostPro.Application.ViewModels.ImportOrderViewModels;
 using ImportCostPro.Persistence.Enums;
-using ImportCostPro.Persistence.Interfaces.Repositories;
 using Mapster;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -18,7 +17,7 @@ namespace ImportCostPro.WebApp.Controllers
         private readonly SupplierService _supplierService;
         private readonly CountryService _countryService;
         private readonly CurrencyService _currencyService;
-        private readonly ICalculationResultRepository _calculationResultRepository;
+        private readonly LandedCostService _landedCostService;
 
         public ImportOrderController(
             ImportOrderService importOrderService,
@@ -26,14 +25,14 @@ namespace ImportCostPro.WebApp.Controllers
             SupplierService supplierService,
             CountryService countryService,
             CurrencyService currencyService,
-            ICalculationResultRepository calculationResultRepository)
+            LandedCostService landedCostService)
         {
             _importOrderService = importOrderService;
             _importerService = importerService;
             _supplierService = supplierService;
             _countryService = countryService;
             _currencyService = currencyService;
-            _calculationResultRepository = calculationResultRepository;
+            _landedCostService = landedCostService;
         }
 
         public async Task<IActionResult> Index()
@@ -114,11 +113,11 @@ namespace ImportCostPro.WebApp.Controllers
 
             if (order.Status == OrderStatus.Calculated || order.Status == OrderStatus.Closed)
             {
-                var calculation = await _calculationResultRepository.GetLatestCalculatedResultWithDetailsAsync(id);
+                var calculation = await _landedCostService.GetLatestByOrderIdAsync(id);
                 if (calculation != null)
                 {
                     ViewBag.TotalImportCost = calculation.TotalImportCost;
-                    ViewBag.LocalCurrencySymbol = calculation.LocalCurrencyUsed?.Symbol ?? "RD$";
+                    ViewBag.LocalCurrencySymbol = calculation.LocalCurrencySymbol;
                     ViewBag.ExchangeRateUsed = calculation.ExchangeRateUsed;
                 }
                 else

@@ -9,6 +9,8 @@ namespace ImportCostPro.Application.Extensions
             this CalculationResult entity,
             string orderNumber,
             string localCurrencyIsoCode,
+            string localCurrencySymbol,
+            string originCurrencyIsoCode,
             Dictionary<int, (string Code, string Name)> productsLookup
         )
         {
@@ -19,6 +21,8 @@ namespace ImportCostPro.Application.Extensions
                 OrderNumber = orderNumber,
                 LocalCurrencyUsedId = entity.LocalCurrencyUsedId,
                 LocalCurrencyIsoCode = localCurrencyIsoCode,
+                LocalCurrencySymbol = localCurrencySymbol,
+                OriginCurrencyIsoCode = originCurrencyIsoCode,
                 ExchangeRateUsed = entity.ExchangeRateUsed,
                 TotalOriginalFob = entity.TotalOriginalFob,
                 TotalLocalFob = entity.TotalLocalFob,

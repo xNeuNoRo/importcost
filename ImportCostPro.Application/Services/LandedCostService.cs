@@ -427,6 +427,27 @@ namespace ImportCostPro.Application.Services
             return calculationResult.ToResponse(
                 order.OrderNumber,
                 localCurrency.IsoCode,
+                localCurrency.Symbol,
+                order.Currency?.IsoCode ?? string.Empty,
+                productsLookup
+            );
+        }
+
+        public async Task<LandedCostCalculationResponse?> GetLatestByOrderIdAsync(int orderId)
+        {
+            var result = await _calculationResultRepository.GetLatestCalculatedResultWithDetailsAsync(orderId);
+            if (result == null) return null;
+
+            var productsLookup = result.Details.ToDictionary(
+                x => x.ProductId,
+                x => (Code: x.Product?.ReferenceCode ?? "N/A", Name: x.Product?.Name ?? "N/A")
+            );
+
+            return result.ToResponse(
+                result.ImportOrder?.OrderNumber ?? "N/A",
+                result.LocalCurrencyUsed?.IsoCode ?? "RD$",
+                result.LocalCurrencyUsed?.Symbol ?? "RD$",
+                result.ImportOrder?.Currency?.IsoCode ?? string.Empty,
                 productsLookup
             );
         }

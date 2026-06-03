@@ -3,7 +3,6 @@ using ImportCostPro.Application.Exceptions;
 using ImportCostPro.Application.Services;
 using ImportCostPro.Application.ViewModels.LandedCostViewModels;
 using ImportCostPro.Persistence.Enums;
-using ImportCostPro.Persistence.Interfaces.Repositories;
 using Mapster;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -14,16 +13,13 @@ namespace ImportCostPro.WebApp.Controllers
     {
         private readonly LandedCostService _landedCostService;
         private readonly ImportOrderService _importOrderService;
-        private readonly ICalculationResultRepository _calculationResultRepository;
 
         public LandedCostController(
             LandedCostService landedCostService, 
-            ImportOrderService importOrderService,
-            ICalculationResultRepository calculationResultRepository)
+            ImportOrderService importOrderService)
         {
             _landedCostService = landedCostService;
             _importOrderService = importOrderService;
-            _calculationResultRepository = calculationResultRepository;
         }
 
         public async Task<IActionResult> Index()
@@ -68,7 +64,7 @@ namespace ImportCostPro.WebApp.Controllers
 
         public async Task<IActionResult> Details(int orderId)
         {
-            var result = await _calculationResultRepository.GetLatestCalculatedResultWithDetailsAsync(orderId);
+            var result = await _landedCostService.GetLatestByOrderIdAsync(orderId);
             if (result == null)
             {
                 TempData["ErrorMessage"] = "No se encontró un cálculo oficial para esta orden.";
@@ -76,11 +72,6 @@ namespace ImportCostPro.WebApp.Controllers
             }
 
             var viewModel = result.Adapt<LandedCostCalculationViewModel>();
-
-            // Aseguramos la población de datos que Mapster podría omitir sin configuración explícita
-            viewModel.LocalCurrencyIsoCode = result.LocalCurrencyUsed?.IsoCode ?? "RD$";
-            viewModel.OriginCurrencyIsoCode = result.ImportOrder?.Currency?.IsoCode ?? string.Empty;
-            viewModel.OrderStatus = result.ImportOrder?.Status ?? OrderStatus.Calculated;
 
             ViewData["Title"] = $"Resultado de Liquidación - Orden {viewModel.OrderNumber}";
             return View(viewModel);
